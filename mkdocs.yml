@@ -1,0 +1,159 @@
+site_name: SOUSA Documentation
+site_url: https://zakkeown.github.io/SOUSA
+site_author: Zak Keown
+site_description: >-
+  Synthetic Open Unified Snare Assessment - A synthetic drum rudiment
+  dataset generator for ML training with 100K+ samples of all 40 PAS rudiments.
+
+repo_name: zakkeown/SOUSA
+repo_url: https://github.com/zakkeown/SOUSA
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.indexes
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [.]
+          options:
+            docstring_style: google
+            show_source: true
+            show_root_heading: true
+            show_root_toc_entry: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            members_order: source
+            separate_signature: true
+            show_signature_annotations: true
+            signature_crossrefs: true
+            merge_init_into_class: true
+            filters:
+              - "!^_"
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      repo_url_shorthand: true
+      user: zakkeown
+      repo: SOUSA
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+extra_css:
+  - stylesheets/extra.css
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/zakkeown/SOUSA
+    - icon: simple/huggingface
+      link: https://huggingface.co/datasets/zkeown/sousa
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - getting-started/index.md
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quickstart.md
+    - Loading the Dataset: getting-started/loading.md
+  - User Guide:
+    - user-guide/index.md
+    - Dataset Generation: user-guide/generation.md
+    - Audio Augmentation: user-guide/augmentation.md
+    - Filtering & Preprocessing: user-guide/filtering.md
+    - ML Training: user-guide/ml-training.md
+    - Validation: user-guide/validation.md
+  - Technical Reference:
+    - reference/index.md
+    - Architecture: reference/architecture.md
+    - Rudiment Schema: reference/rudiment-schema.md
+    - Score Computation: reference/score-computation.md
+    - Audio Processing: reference/audio-processing.md
+    - Data Format: reference/data-format.md
+  - API Reference:
+    - api/index.md
+    - Rudiments: api/rudiments.md
+    - Profiles: api/profiles.md
+    - MIDI Generation: api/midi-gen.md
+    - Audio Synthesis: api/audio-synth.md
+    - Audio Augmentation: api/audio-aug.md
+    - Labels: api/labels.md
+    - Pipeline: api/pipeline.md
+    - Validation: api/validation.md
+  - Examples:
+    - examples/index.md
+    - PyTorch DataLoader: examples/pytorch-dataloader.md
+    - Feature Extraction: examples/feature-extraction.md
+    - Filtering Samples: examples/filtering.md
+    - Hierarchical Labels: examples/hierarchical-labels.md
+  - Contributing: contributing/index.md
+  - Limitations: limitations.md

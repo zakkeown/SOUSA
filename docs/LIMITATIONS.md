@@ -1,4 +1,4 @@
-# SOUSA Dataset Limitations
+# Dataset Limitations
 
 This document explicitly describes the known limitations and potential biases of the SOUSA dataset. Understanding these limitations is critical for appropriate use in ML research.
 
@@ -9,15 +9,16 @@ This document explicitly describes the known limitations and potential biases of
 SOUSA labels are **derived from the same parameters used to generate the data**. This creates a circular relationship:
 
 ```
-PlayerProfile parameters → Generate timing/velocity errors → Compute scores from errors
+PlayerProfile parameters -> Generate timing/velocity errors -> Compute scores from errors
 ```
 
-**Implications:**
-- Models may learn the generation function rather than "drumming quality"
-- High accuracy on SOUSA may not transfer to real-world assessment
-- Labels are mathematically consistent but not validated against human perception
+!!! warning "Implications"
+    - Models may learn the generation function rather than "drumming quality"
+    - High accuracy on SOUSA may not transfer to real-world assessment
+    - Labels are mathematically consistent but not validated against human perception
 
-**Recommendation:** Treat SOUSA as a pretraining or development dataset. Validate models on real human performances before deployment.
+!!! success "Recommendation"
+    Treat SOUSA as a pretraining or development dataset. Validate models on real human performances before deployment.
 
 ### Well-Behaved Error Distribution
 
@@ -29,18 +30,21 @@ Timing and velocity errors are sampled from **Gaussian distributions** with skil
 | Velocity std | ~0.12 | ~0.07 |
 
 **What this captures:**
+
 - Gradual skill progression
 - Correlated improvement across dimensions
 - Realistic variance within skill tiers
 
 **What this misses:**
+
 - Catastrophic failures (wrong sticking patterns, skipped notes)
 - Tempo collapse under difficulty
 - Fatigue effects over long exercises
 - Cognitive errors (playing wrong rudiment)
 - Recovery patterns after mistakes
 
-**Implication:** Models trained on SOUSA may not handle out-of-distribution failures that occur in real practice sessions.
+!!! note "Implication"
+    Models trained on SOUSA may not handle out-of-distribution failures that occur in real practice sessions.
 
 ## Instrument Limitations
 
@@ -49,13 +53,15 @@ Timing and velocity errors are sampled from **Gaussian distributions** with skil
 SOUSA generates **snare drum only** (MIDI note 38, General MIDI acoustic snare).
 
 **Not included:**
+
 - Kick drum patterns
 - Hi-hat/cymbal interplay
 - Tom fills
 - Full drum kit coordination
 - Marching tenor (quads) or bass drum parts
 
-**Implication:** Models are specialized for snare-only assessment and will not generalize to full kit drumming.
+!!! warning "Implication"
+    Models are specialized for snare-only assessment and will not generalize to full kit drumming.
 
 ### Soundfont Dependency
 
@@ -70,6 +76,7 @@ Audio is synthesized using **SF2 soundfonts**, not recorded from physical instru
 | `fluidr3` | FluidR3 GM standard |
 
 **Implications:**
+
 - Timbral variety is limited to these 5 soundfonts
 - Synthesized transients may differ from real drum recordings
 - No stick type variation, head tuning, or snare wire adjustments
@@ -87,12 +94,13 @@ timing_accuracy = 100 - (mean_abs_error_ms * 2)  # 0ms = 100, 50ms = 0
 
 # New sigmoid scaling (v0.2+):
 timing_accuracy = 100 * sigmoid((25 - mean_abs_error) / 10)
-# <10ms ≈ 92-100 (imperceptible)
-# 25ms ≈ 50 (noticeable)
-# >50ms ≈ 0-8 (clearly audible)
+# <10ms -> 92-100 (imperceptible)
+# 25ms -> 50 (noticeable)
+# >50ms -> 0-8 (clearly audible)
 ```
 
-**Note:** If using pre-v0.2 datasets, scores will differ slightly. Regenerate for consistency.
+!!! note "Version Compatibility"
+    If using pre-v0.2 datasets, scores will differ slightly. Regenerate for consistency.
 
 ### Skill Tier Overlap (Classification Ceiling)
 
@@ -100,38 +108,44 @@ Due to realistic skill distributions, **adjacent tiers have significant score ov
 
 | Adjacent Tiers | Score Overlap |
 |----------------|---------------|
-| beginner ↔ intermediate | ~67% |
-| intermediate ↔ advanced | ~83% |
-| advanced ↔ professional | ~83% |
+| beginner <-> intermediate | ~67% |
+| intermediate <-> advanced | ~83% |
+| advanced <-> professional | ~83% |
 
 **Implications:**
+
 - 4-class skill tier classification has an inherent accuracy ceiling due to label noise
 - A sample with score=50 could legitimately be beginner, intermediate, or advanced
 - Models will plateau at ~70-80% accuracy regardless of capacity
 
 **Mitigations provided:**
-1. **`tier_confidence`** (0-1): Indicates how central a sample is to its tier's distribution. Filter low-confidence samples for cleaner training.
-2. **`skill_tier_binary`** (novice/skilled): 2-class alternative with less overlap:
-   - novice = beginner + intermediate
-   - skilled = advanced + professional
 
-**Recommendation:** For classification, use `skill_tier_binary` or filter by `tier_confidence > 0.5`. For assessment, use regression on `overall_score`.
+1. **`tier_confidence`** (0-1): Indicates how central a sample is to its tier's distribution. Filter low-confidence samples for cleaner training.
+
+2. **`skill_tier_binary`** (novice/skilled): 2-class alternative with less overlap:
+    - novice = beginner + intermediate
+    - skilled = advanced + professional
+
+!!! tip "Recommendation"
+    For classification, use `skill_tier_binary` or filter by `tier_confidence > 0.5`. For assessment, use regression on `overall_score`.
 
 ### Score Correlations (Redundancy)
 
 Several scores are **highly correlated** (r > 0.85):
 
 ```
-timing_accuracy ↔ timing_consistency: r = 0.89
-overall_score ↔ timing_consistency: r = 0.89
-overall_score ↔ timing_accuracy: r = 0.88
+timing_accuracy <-> timing_consistency: r = 0.89
+overall_score <-> timing_consistency: r = 0.89
+overall_score <-> timing_accuracy: r = 0.88
 ```
 
 **Implications:**
+
 - Using all scores as separate targets provides no additional learning signal
 - Multi-task models should use orthogonal targets
 
 **Recommended minimal score set:**
+
 1. `overall_score` - General quality (captures correlated cluster)
 2. `tempo_stability` - Independent signal about rushing/dragging
 
@@ -149,19 +163,22 @@ The `hand_balance` score has a **ceiling effect** (mean=88, most samples near 10
 
 **v0.2 fix:** `hand_balance` now combines velocity (50%) + timing (50%) for better discrimination.
 
-**Recommendation:** For pre-v0.2 datasets, exclude `hand_balance` from ML targets.
+!!! tip "Recommendation"
+    For pre-v0.2 datasets, exclude `hand_balance` from ML targets.
 
 ### No Human Validation
 
 Scores are computed from **mathematical formulas**, not human ratings.
 
 **Not validated:**
+
 - Perceptual relevance of scoring thresholds
 - Whether a score of 75 "sounds" better than 65 to human listeners
 - Inter-rater reliability with music instructors
 - Cultural or stylistic scoring preferences
 
-**Recommendation:** Do not interpret score outputs as equivalent to instructor feedback without external validation.
+!!! warning "Recommendation"
+    Do not interpret score outputs as equivalent to instructor feedback without external validation.
 
 ### Rudiment-Specific Score Availability
 
@@ -173,13 +190,14 @@ Some scores are only computed for applicable rudiments:
 | `diddle_quality` | Rudiment contains diddles |
 | `roll_sustain` | Rudiment is a roll type |
 
-**Implication:** Null values exist in the dataset. Handle appropriately in training (masking, separate heads, etc.).
+!!! note "Implication"
+    Null values exist in the dataset. Handle appropriately in training (masking, separate heads, etc.).
 
 ## Domain Gap Considerations
 
 ### Synthetic vs. Real Recordings
 
-Real drum recordings include:
+Real drum recordings include factors not present in SOUSA:
 
 | Factor | SOUSA | Real World |
 |--------|-------|------------|
@@ -190,6 +208,7 @@ Real drum recordings include:
 | Player psychology | None | Nerves, fatigue, musicality |
 
 **Implication:** Models trained on SOUSA may struggle with:
+
 - Multi-instrument mixes
 - Unusual room characteristics
 - Low-quality or phone recordings not matching augmentation presets
@@ -200,10 +219,11 @@ Real drum recordings include:
 SOUSA includes 10 augmentation presets ranging from clean studio to lo-fi:
 
 ```
-clean_studio → practice_room → concert_hall → gym → lo_fi
+clean_studio -> practice_room -> concert_hall -> gym -> lo_fi
 ```
 
 **Not covered:**
+
 - Extreme clipping or distortion
 - Heavy compression artifacts (broadcast limiting)
 - Pitch shifting or time stretching
@@ -226,16 +246,19 @@ Default generation uses:
 **Class imbalance ratio:** 4.26:1 (intermediate vs professional)
 
 **Implications:**
+
 - Models trained without class weights will be biased toward intermediate predictions
 - Accuracy alone is misleading; use balanced accuracy
 - Professional tier predictions will have lower recall
 
 **Mitigations provided:**
+
 1. **Class weights** are enabled by default in `skill_classification.py`
 2. **Balanced accuracy** is used for early stopping and model selection
 3. **Per-class metrics** are reported in evaluation
 
-**Recommendation:** Always use class weights for skill tier classification. Report balanced accuracy, not just accuracy.
+!!! tip "Recommendation"
+    Always use class weights for skill tier classification. Report balanced accuracy, not just accuracy.
 
 ### Profile-Based Splits
 
@@ -245,29 +268,33 @@ Train/val/test splits are by **player profile**, not by sample:
 - Prevents data leakage from player-specific patterns
 - May make generalization harder (testing on "new players")
 
-See [Experiments](#) for empirical analysis of split methodology impact.
-
 ## Recommended Use Cases
 
 ### Appropriate Uses
 
-- **Pretraining:** Initialize models before fine-tuning on real data
-- **Architecture development:** Compare model architectures on controlled data
-- **Ablation studies:** Isolate effects of audio augmentation, skill tiers, etc.
-- **Educational tools:** Build practice aids where exact calibration is less critical
-- **Baseline establishment:** Provide reproducible benchmarks for the research community
+| Use Case | Why It Works |
+|----------|--------------|
+| **Pretraining** | Initialize models before fine-tuning on real data |
+| **Architecture development** | Compare model architectures on controlled data |
+| **Ablation studies** | Isolate effects of audio augmentation, skill tiers, etc. |
+| **Educational tools** | Build practice aids where exact calibration is less critical |
+| **Baseline establishment** | Provide reproducible benchmarks for the research community |
 
 ### Use With Caution
 
-- **Production assessment:** Validate on real performances before deployment
-- **Certification/grading:** Scores are not calibrated to educational standards
-- **Cross-instrument transfer:** Models will not generalize to non-snare instruments
+| Use Case | Concern |
+|----------|---------|
+| **Production assessment** | Validate on real performances before deployment |
+| **Certification/grading** | Scores are not calibrated to educational standards |
+| **Cross-instrument transfer** | Models will not generalize to non-snare instruments |
 
 ### Not Recommended
 
-- **Direct deployment** without real-world validation
-- **Claims of human-equivalent assessment** without instructor calibration studies
-- **Full drum kit assessment** (snare only)
+!!! danger "Avoid These Uses"
+
+    - **Direct deployment** without real-world validation
+    - **Claims of human-equivalent assessment** without instructor calibration studies
+    - **Full drum kit assessment** (snare only)
 
 ## Future Work
 
