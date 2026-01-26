@@ -6,13 +6,25 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 SOUSA (Synthetic Open Unified Snare Assessment) generates synthetic drum rudiment datasets for ML training. It produces 100K+ samples of all 40 PAS drum rudiments with MIDI, audio, and hierarchical labels.
 
-## Commands
+## Setup
 
 ```bash
+# Create and activate virtual environment
+python3 -m venv .venv
+source .venv/bin/activate    # On Windows: .venv\Scripts\activate
+
 # Install (editable mode)
 pip install -e .
 pip install -e '.[dev]'      # With dev dependencies (pytest, black, ruff)
 pip install -e '.[hub]'      # With HuggingFace dependencies
+
+# Install pre-commit hooks (required - CI will fail without this)
+make setup-hooks             # Or: pip install pre-commit && pre-commit install
+```
+
+## Commands
+
+```bash
 
 # Run tests
 pytest                       # All tests

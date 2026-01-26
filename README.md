@@ -1,8 +1,13 @@
 # SOUSA: Synthetic Open Unified Snare Assessment
 
-[![HuggingFace Dataset](https://img.shields.io/badge/HuggingFace-Dataset-yellow)](https://huggingface.co/datasets/zkeown/sousa)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![CI](https://github.com/zakkeown/SOUSA/actions/workflows/test.yml/badge.svg)](https://github.com/zakkeown/SOUSA/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/zakkeown/SOUSA/branch/main/graph/badge.svg)](https://codecov.io/gh/zakkeown/SOUSA)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![HuggingFace Dataset](https://img.shields.io/badge/HuggingFace-Dataset-yellow)](https://huggingface.co/datasets/zkeown/sousa)
 
 A synthetic dataset generator for all 40 PAS (Percussive Arts Society) drum rudiments, designed to train machine learning models for drumming performance assessment.
 
@@ -39,6 +44,10 @@ SOUSA generates 100K+ synthetic drum rudiment performances with:
 ## Quick Start
 
 ```bash
+# Create and activate virtual environment
+python3 -m venv .venv
+source .venv/bin/activate    # On Windows: .venv\Scripts\activate
+
 # Install dependencies
 pip install -e .
 

@@ -315,8 +315,7 @@ class DatasetUploader:
             from huggingface_hub import HfApi
         except ImportError:
             raise ImportError(
-                "huggingface_hub is required for upload. "
-                "Install with: pip install 'sousa[hub]'"
+                "huggingface_hub is required for upload. Install with: pip install 'sousa[hub]'"
             )
 
         api = HfApi(token=self.config.token)
