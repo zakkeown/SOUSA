@@ -170,12 +170,18 @@ Prerequisites:
     try:
         # Prepare staging directory
         logger.info("Preparing HuggingFace format...")
-        staging_dir = uploader.prepare()
+        if args.dry_run:
+            # Skip media copy for dry-run to avoid duplicating 96GB of files
+            staging_dir = uploader.prepare(skip_media_copy=True)
+        else:
+            # Use symlinks to avoid duplicating large files
+            staging_dir = uploader.prepare(skip_media_copy=False, use_symlinks=True)
         print(f"\nStaging directory: {staging_dir}")
         print(uploader.stats.summary())
 
         if args.dry_run:
-            print(f"\nDRY RUN complete. Files prepared in: {staging_dir}")
+            print(f"\nDRY RUN complete. Parquet files prepared in: {staging_dir}")
+            print("Audio/MIDI files were counted but not copied.")
             print("To upload for real, remove --dry-run flag")
             return
 

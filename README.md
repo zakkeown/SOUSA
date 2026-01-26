@@ -211,6 +211,16 @@ To regenerate an identical dataset:
 python scripts/generate_dataset.py --seed 42 --with-audio
 ```
 
+## Future Work
+
+Potential enhancements for v2:
+
+- **Beat Group Labels**: Add `beat_group_index` and `beat_group_name` to stroke labels to identify which portion of a compound rudiment each stroke belongs to (e.g., "paradiddle" vs "diddle" in a paradiddle-diddle). This enables localized technique assessment—identifying that a player's diddles drag while their paradiddles are clean. Currently derivable post-hoc from `rudiment_slug` + pattern definitions.
+
+- **Per-Group Aggregate Scores**: Compute timing/velocity metrics per beat group, creating a three-tier pedagogical hierarchy: stroke → beat_group → exercise.
+
+- **Additional Rudiment Variations**: Expand to include inverted, reversed, and accent-shifted variations of the 40 PAS rudiments.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on reporting issues and contributing to SOUSA.

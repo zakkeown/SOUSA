@@ -85,7 +85,7 @@ class DatasetUploader:
         self.config = config
         self.stats = UploadStats()
 
-    def prepare(self) -> Path:
+    def prepare(self, skip_media_copy: bool = False, use_symlinks: bool = True) -> Path:
         """
         Prepare dataset in HuggingFace Hub format.
 
@@ -94,6 +94,10 @@ class DatasetUploader:
         - audio/ with audio files (if include_audio)
         - midi/ with MIDI files (if include_midi)
         - README.md dataset card
+
+        Args:
+            skip_media_copy: If True, skip copying audio/MIDI files (for dry-run)
+            use_symlinks: If True, use symlinks instead of copies (saves disk space)
 
         Returns:
             Path to staging directory ready for upload
@@ -121,11 +125,11 @@ class DatasetUploader:
         # Add audio/midi paths for HuggingFace
         if self.config.include_audio:
             merged_df["audio"] = merged_df["audio_path"].apply(
-                lambda p: f"audio/{Path(p).name}" if p else None
+                lambda p: f"audio/{Path(p).name}" if pd.notna(p) and p else None
             )
         if self.config.include_midi:
             merged_df["midi"] = merged_df["midi_path"].apply(
-                lambda p: f"midi/{Path(p).name}" if p else None
+                lambda p: f"midi/{Path(p).name}" if pd.notna(p) and p else None
             )
 
         # Create split assignment column
@@ -152,13 +156,19 @@ class DatasetUploader:
             self.stats.train_samples + self.stats.val_samples + self.stats.test_samples
         )
 
-        # Copy audio files
+        # Copy/link audio files
         if self.config.include_audio:
-            self._copy_media_files("audio", "flac")
+            if skip_media_copy:
+                self._count_media_files("audio", "flac")
+            else:
+                self._copy_media_files("audio", "flac", use_symlinks=use_symlinks)
 
-        # Copy MIDI files
+        # Copy/link MIDI files
         if self.config.include_midi:
-            self._copy_media_files("midi", "mid")
+            if skip_media_copy:
+                self._count_media_files("midi", "mid")
+            else:
+                self._copy_media_files("midi", "mid", use_symlinks=use_symlinks)
 
         # Copy README.md (dataset card)
         readme_src = self.config.dataset_dir / "README.md"
@@ -168,9 +178,28 @@ class DatasetUploader:
             logger.warning("No README.md found in dataset directory")
 
         # Calculate total size
-        self.stats.total_size_bytes = sum(
-            f.stat().st_size for f in staging.rglob("*") if f.is_file()
-        )
+        if skip_media_copy:
+            # Calculate from source directories when media wasn't copied
+            self.stats.total_size_bytes = sum(
+                f.stat().st_size for f in staging.rglob("*") if f.is_file()
+            )
+            if self.config.include_audio:
+                audio_dir = self.config.dataset_dir / "audio"
+                if audio_dir.exists():
+                    self.stats.total_size_bytes += sum(
+                        f.stat().st_size for f in audio_dir.glob("*.flac")
+                    )
+            if self.config.include_midi:
+                midi_dir = self.config.dataset_dir / "midi"
+                if midi_dir.exists():
+                    self.stats.total_size_bytes += sum(
+                        f.stat().st_size for f in midi_dir.glob("*.mid")
+                    )
+        else:
+            # Calculate from staging directory (symlinks resolve to real sizes)
+            self.stats.total_size_bytes = sum(
+                f.stat().st_size for f in staging.rglob("*") if f.is_file()
+            )
 
         logger.info(f"Staging complete: {self.stats.summary()}")
         return staging
@@ -213,8 +242,27 @@ class DatasetUploader:
             return "test"
         return "train"  # Default to train
 
-    def _copy_media_files(self, subdir: str, extension: str) -> None:
-        """Copy media files to staging directory."""
+    def _count_media_files(self, subdir: str, extension: str) -> None:
+        """Count media files without copying (for dry-run)."""
+        src_dir = self.config.dataset_dir / subdir
+
+        if not src_dir.exists():
+            logger.warning(f"Source directory {src_dir} does not exist")
+            return
+
+        count = sum(1 for _ in src_dir.glob(f"*.{extension}"))
+
+        if subdir == "audio":
+            self.stats.audio_files = count
+        elif subdir == "midi":
+            self.stats.midi_files = count
+
+        # Estimate size without copying
+        total_size = sum(f.stat().st_size for f in src_dir.glob(f"*.{extension}"))
+        logger.info(f"Found {count} {extension} files ({total_size / (1024**3):.2f} GB)")
+
+    def _copy_media_files(self, subdir: str, extension: str, use_symlinks: bool = True) -> None:
+        """Copy or symlink media files to staging directory."""
         src_dir = self.config.dataset_dir / subdir
         dst_dir = self.config.staging_dir / subdir
 
@@ -227,7 +275,13 @@ class DatasetUploader:
 
         for src_file in src_dir.glob(f"*.{extension}"):
             dst_file = dst_dir / src_file.name
-            shutil.copy2(src_file, dst_file)
+            if use_symlinks:
+                # Use symlink to avoid duplicating large files
+                if dst_file.exists() or dst_file.is_symlink():
+                    dst_file.unlink()
+                dst_file.symlink_to(src_file.resolve())
+            else:
+                shutil.copy2(src_file, dst_file)
             count += 1
 
         if subdir == "audio":
@@ -235,7 +289,8 @@ class DatasetUploader:
         elif subdir == "midi":
             self.stats.midi_files = count
 
-        logger.info(f"Copied {count} {extension} files to {dst_dir}")
+        action = "Linked" if use_symlinks else "Copied"
+        logger.info(f"{action} {count} {extension} files to {dst_dir}")
 
     def upload(self, dry_run: bool = False) -> str | None:
         """
@@ -257,11 +312,11 @@ class DatasetUploader:
             return None
 
         try:
-            from huggingface_hub import HfApi, upload_folder
+            from huggingface_hub import HfApi
         except ImportError:
             raise ImportError(
                 "huggingface_hub is required for upload. "
-                "Install with: pip install 'rudimentary[hub]'"
+                "Install with: pip install 'sousa[hub]'"
             )
 
         api = HfApi(token=self.config.token)
@@ -275,14 +330,14 @@ class DatasetUploader:
             private=self.config.private,
         )
 
-        # Upload the entire staging directory
+        # Upload the entire staging directory using upload_large_folder
+        # which is optimized for repos with many files (120k+ in our case)
         logger.info(f"Uploading dataset to {self.config.repo_id}...")
-        upload_folder(
+        logger.info("Using upload_large_folder for better performance with many files")
+        api.upload_large_folder(
             folder_path=str(staging_dir),
             repo_id=self.config.repo_id,
             repo_type="dataset",
-            commit_message="Upload SOUSA dataset",
-            token=self.config.token,
         )
 
         url = f"https://huggingface.co/datasets/{self.config.repo_id}"
