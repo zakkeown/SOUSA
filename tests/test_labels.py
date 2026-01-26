@@ -109,26 +109,26 @@ def make_simple_rudiment(category: RudimentCategory = RudimentCategory.ROLL) -> 
 
 class TestTimingAccuracyFormula:
     """
-    Test: timing_accuracy = max(0, 100 - mean_abs_error * 2)
+    Test: timing_accuracy = 100 * (1 / (1 + exp((mean_abs_error - 25) / 10)))
 
-    This formula converts mean absolute timing error (in ms) to a 0-100 score.
-    - 0ms error -> 100 (perfect)
-    - 25ms error -> 50
-    - 50ms error -> 0
-    - >50ms error -> 0 (clamped)
+    This formula uses sigmoid/perceptual scaling to match human perception:
+    - Errors <10ms are nearly imperceptible (high score ~92+)
+    - Errors ~25ms give ~50 (center of sigmoid)
+    - Errors >50ms are clearly audible (low score ~7.5 or less)
     """
 
-    def test_perfect_timing_gives_100(self):
-        """0ms timing error should give score of 100."""
+    def test_perfect_timing_gives_high_score(self):
+        """0ms timing error should give score >90 (sigmoid asymptote)."""
         strokes = [make_stroke_label(i, timing_error_ms=0) for i in range(8)]
         events = [make_stroke_event(i, timing_error_ms=0) for i in range(8)]
         rudiment = make_simple_rudiment()
 
         scores = compute_exercise_scores(strokes, events, rudiment)
-        assert scores.timing_accuracy == 100
+        # sigmoid(0ms) = 100 / (1 + exp(-2.5)) ≈ 92.4
+        assert scores.timing_accuracy == pytest.approx(92.4, abs=0.5)
 
     def test_25ms_error_gives_50(self):
-        """25ms mean timing error should give score of ~50."""
+        """25ms mean timing error should give score of ~50 (sigmoid center)."""
         strokes = [make_stroke_label(i, timing_error_ms=25) for i in range(8)]
         events = [make_stroke_event(i, timing_error_ms=25) for i in range(8)]
         rudiment = make_simple_rudiment()
@@ -136,23 +136,25 @@ class TestTimingAccuracyFormula:
         scores = compute_exercise_scores(strokes, events, rudiment)
         assert scores.timing_accuracy == pytest.approx(50, abs=0.1)
 
-    def test_50ms_error_gives_0(self):
-        """50ms mean timing error should give score of 0."""
+    def test_50ms_error_gives_low_score(self):
+        """50ms mean timing error should give low score (~7.5)."""
         strokes = [make_stroke_label(i, timing_error_ms=50) for i in range(8)]
         events = [make_stroke_event(i, timing_error_ms=50) for i in range(8)]
         rudiment = make_simple_rudiment()
 
         scores = compute_exercise_scores(strokes, events, rudiment)
-        assert scores.timing_accuracy == 0
+        # sigmoid(50ms) = 100 / (1 + exp(2.5)) ≈ 7.6
+        assert scores.timing_accuracy == pytest.approx(7.6, abs=0.5)
 
-    def test_large_error_clamped_to_0(self):
-        """Errors >50ms should be clamped to score of 0."""
+    def test_large_error_approaches_zero(self):
+        """Errors >50ms should approach 0 (sigmoid tail)."""
         strokes = [make_stroke_label(i, timing_error_ms=100) for i in range(8)]
         events = [make_stroke_event(i, timing_error_ms=100) for i in range(8)]
         rudiment = make_simple_rudiment()
 
         scores = compute_exercise_scores(strokes, events, rudiment)
-        assert scores.timing_accuracy == 0
+        # sigmoid(100ms) ≈ 0.055
+        assert scores.timing_accuracy < 1
 
     def test_negative_errors_use_absolute_value(self):
         """Negative timing errors (early strokes) should use absolute value."""
@@ -171,24 +173,27 @@ class TestTimingAccuracyFormula:
 
 class TestTimingConsistencyFormula:
     """
-    Test: timing_consistency = max(0, 100 - timing_std * 3)
+    Test: timing_consistency = 100 * (1 / (1 + exp((timing_std - 15) / 8)))
 
-    This formula converts timing error standard deviation to a 0-100 score.
-    Lower variance = higher consistency.
+    This formula uses sigmoid scaling for timing consistency.
+    - 0ms std gives ~87 (sigmoid asymptote)
+    - 15ms std gives 50 (center)
+    - High std approaches 0
     """
 
-    def test_zero_variance_gives_100(self):
-        """All strokes with same error should give 100."""
+    def test_zero_variance_gives_high_score(self):
+        """All strokes with same error should give high score (~87)."""
         strokes = [make_stroke_label(i, timing_error_ms=10) for i in range(8)]
         events = [make_stroke_event(i, timing_error_ms=10) for i in range(8)]
         rudiment = make_simple_rudiment()
 
         scores = compute_exercise_scores(strokes, events, rudiment)
-        assert scores.timing_consistency == 100
+        # sigmoid(0ms std) = 100 / (1 + exp(-15/8)) ≈ 86.7
+        assert scores.timing_consistency == pytest.approx(86.7, abs=1.0)
 
     def test_high_variance_gives_low_score(self):
         """High variance in timing errors should give low score."""
-        # Alternating +40 and -40 gives high std
+        # Alternating +40 and -40 gives std ≈ 42.5
         strokes = []
         events = []
         for i in range(8):
@@ -198,9 +203,8 @@ class TestTimingConsistencyFormula:
 
         rudiment = make_simple_rudiment()
         scores = compute_exercise_scores(strokes, events, rudiment)
-        # std of [40,-40,40,-40,...] = 40
-        # 100 - 40*3 = -20 -> clamped to 0
-        assert scores.timing_consistency == 0
+        # sigmoid(~42ms std) = 100 / (1 + exp((42-15)/8)) ≈ 3.4
+        assert scores.timing_consistency < 10
 
 
 # ============================================================================
@@ -210,49 +214,57 @@ class TestTimingConsistencyFormula:
 
 class TestHandBalanceFormula:
     """
-    Test: hand_balance = min(left_vel, right_vel) / max(left_vel, right_vel) * 100
+    Test: hand_balance = 0.5 * velocity_balance + 0.5 * timing_balance
 
-    This formula measures how evenly matched the two hands are in velocity.
-    - Equal velocities -> 100
-    - One hand at 50% of other -> 50
+    Where:
+    - velocity_balance = min(left_vel, right_vel) / max(left_vel, right_vel) * 100
+    - timing_balance = min(left_timing_error, right_timing_error) / max(...) * 100
+
+    This combined formula considers BOTH velocity AND timing balance.
     """
 
-    def test_equal_hands_gives_100(self):
-        """Equal velocity between hands should give 100."""
+    def test_equal_hands_same_timing_gives_high_score(self):
+        """Equal velocity and timing between hands should give high score."""
         strokes = [
-            make_stroke_label(0, hand="R", actual_velocity=80),
-            make_stroke_label(1, hand="L", actual_velocity=80),
-            make_stroke_label(2, hand="R", actual_velocity=80),
-            make_stroke_label(3, hand="L", actual_velocity=80),
+            make_stroke_label(0, hand="R", actual_velocity=80, timing_error_ms=5),
+            make_stroke_label(1, hand="L", actual_velocity=80, timing_error_ms=5),
+            make_stroke_label(2, hand="R", actual_velocity=80, timing_error_ms=5),
+            make_stroke_label(3, hand="L", actual_velocity=80, timing_error_ms=5),
         ]
         events = [
-            make_stroke_event(i, hand=Hand.RIGHT if i % 2 == 0 else Hand.LEFT, velocity=80)
-            for i in range(4)
+            make_stroke_event(0, hand=Hand.RIGHT, velocity=80, timing_error_ms=5),
+            make_stroke_event(1, hand=Hand.LEFT, velocity=80, timing_error_ms=5),
+            make_stroke_event(2, hand=Hand.RIGHT, velocity=80, timing_error_ms=5),
+            make_stroke_event(3, hand=Hand.LEFT, velocity=80, timing_error_ms=5),
         ]
         rudiment = make_simple_rudiment()
 
         scores = compute_exercise_scores(strokes, events, rudiment)
+        # velocity_balance = 100, timing_balance = 100
+        # combined = 0.5*100 + 0.5*100 = 100
         assert scores.hand_balance == 100
 
-    def test_imbalanced_hands(self):
-        """One hand at 60% of other should give ~60."""
+    def test_imbalanced_velocity_same_timing(self):
+        """Imbalanced velocity with same timing gives combined score."""
         strokes = [
-            make_stroke_label(0, hand="R", actual_velocity=100),
-            make_stroke_label(1, hand="L", actual_velocity=60),
-            make_stroke_label(2, hand="R", actual_velocity=100),
-            make_stroke_label(3, hand="L", actual_velocity=60),
+            make_stroke_label(0, hand="R", actual_velocity=100, timing_error_ms=5),
+            make_stroke_label(1, hand="L", actual_velocity=60, timing_error_ms=5),
+            make_stroke_label(2, hand="R", actual_velocity=100, timing_error_ms=5),
+            make_stroke_label(3, hand="L", actual_velocity=60, timing_error_ms=5),
         ]
         events = [
-            make_stroke_event(0, hand=Hand.RIGHT, velocity=100),
-            make_stroke_event(1, hand=Hand.LEFT, velocity=60),
-            make_stroke_event(2, hand=Hand.RIGHT, velocity=100),
-            make_stroke_event(3, hand=Hand.LEFT, velocity=60),
+            make_stroke_event(0, hand=Hand.RIGHT, velocity=100, timing_error_ms=5),
+            make_stroke_event(1, hand=Hand.LEFT, velocity=60, timing_error_ms=5),
+            make_stroke_event(2, hand=Hand.RIGHT, velocity=100, timing_error_ms=5),
+            make_stroke_event(3, hand=Hand.LEFT, velocity=60, timing_error_ms=5),
         ]
         rudiment = make_simple_rudiment()
 
         scores = compute_exercise_scores(strokes, events, rudiment)
-        # min(100,60) / max(100,60) * 100 = 60/100 * 100 = 60
-        assert scores.hand_balance == 60
+        # velocity_balance = 60/100 * 100 = 60
+        # timing_balance = 5/5 * 100 = 100
+        # combined = 0.5*60 + 0.5*100 = 80
+        assert scores.hand_balance == pytest.approx(80, abs=1)
 
     def test_single_hand_gives_100(self):
         """Single-hand exercise should give 100 (no imbalance possible)."""
@@ -298,7 +310,7 @@ class TestOverallScoreWeights:
         assert sum(weights.values()) == 1.0
 
     def test_perfect_performance_gives_high_overall(self):
-        """Perfect strokes should give overall score close to 100."""
+        """Perfect strokes should give high overall score."""
         strokes = [
             make_stroke_label(i, hand="R" if i % 2 == 0 else "L", timing_error_ms=0)
             for i in range(8)
@@ -310,9 +322,10 @@ class TestOverallScoreWeights:
         rudiment = make_simple_rudiment()
 
         scores = compute_exercise_scores(strokes, events, rudiment)
-        # With perfect timing, most scores should be ~100
-        # Some components may vary slightly due to accent handling
-        assert scores.overall_score >= 90
+        # With perfect timing, scores are high but not 100 due to sigmoid asymptotes
+        # timing_accuracy ~92.4, timing_consistency ~86.7, etc.
+        # Overall should still be solidly high
+        assert scores.overall_score >= 85
 
 
 # ============================================================================

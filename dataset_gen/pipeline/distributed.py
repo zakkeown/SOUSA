@@ -15,7 +15,6 @@ from typing import Iterator, Callable, Any
 import logging
 import time
 
-
 # Ray is optional - only import if available
 try:
     import ray

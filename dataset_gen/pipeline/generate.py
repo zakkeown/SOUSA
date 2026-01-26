@@ -457,7 +457,9 @@ class DatasetGenerator:
 
             # Set augmentation tracking fields (always present for ML filtering)
             sample.soundfont = soundfont_name
-            sample.augmentation_preset = aug_config.preset_name if aug_config.preset_name else "none"
+            sample.augmentation_preset = (
+                aug_config.preset_name if aug_config.preset_name else "none"
+            )
             # augmentation_group_id links clean sample to its augmented variants
             # All samples from the same (profile, rudiment, tempo) share the same group
             sample.augmentation_group_id = f"{profile.id[:8]}_{rudiment.slug}_{tempo}"

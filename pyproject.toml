@@ -1,8 +1,36 @@
 [project]
 name = "rudimentary"
 version = "0.1.0"
-description = "Synthetic dataset generator for PAS drum rudiments"
+description = "SOUSA: Synthetic Open Unified Snare Assessment - generates synthetic drum rudiment datasets for ML training"
+readme = "README.md"
 requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Zak Keown"}]
+keywords = [
+    "drum",
+    "rudiments",
+    "synthetic",
+    "dataset",
+    "music",
+    "percussion",
+    "machine-learning",
+    "audio",
+    "midi",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Sound/Audio",
+    "Topic :: Multimedia :: Sound/Audio :: MIDI",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 dependencies = [
     "mido>=1.3.0",
     "numpy>=1.24.0",
@@ -45,6 +73,13 @@ ml = [
     # Optional but recommended
     # "wandb>=0.16",  # Uncomment for weights & biases logging
 ]
+
+[project.urls]
+Homepage = "https://github.com/zkeown/rudimentary"
+Repository = "https://github.com/zkeown/rudimentary"
+Documentation = "https://github.com/zkeown/rudimentary#readme"
+Dataset = "https://huggingface.co/datasets/zkeown/sousa"
+Issues = "https://github.com/zkeown/rudimentary/issues"
 
 [build-system]
 requires = ["hatchling"]
