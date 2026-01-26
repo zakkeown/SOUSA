@@ -307,7 +307,7 @@ class TestOverallScoreWeights:
             "accent_accuracy": 0.1,
             "hand_balance": 0.15,
         }
-        assert sum(weights.values()) == 1.0
+        assert sum(weights.values()) == pytest.approx(1.0)
 
     def test_perfect_performance_gives_high_overall(self):
         """Perfect strokes should give high overall score."""

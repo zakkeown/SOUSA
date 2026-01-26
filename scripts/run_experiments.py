@@ -42,7 +42,6 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-
 EXPERIMENTS = {
     "score_analysis": {
         "module": "experiments.score_analysis",
@@ -80,9 +79,13 @@ def run_experiment(
         return False, f"Unknown experiment: {name}"
 
     cmd = [
-        sys.executable, "-m", exp_config["module"],
-        "--data-dir", str(data_dir),
-        "--output-dir", str(output_dir),
+        sys.executable,
+        "-m",
+        exp_config["module"],
+        "--data-dir",
+        str(data_dir),
+        "--output-dir",
+        str(output_dir),
     ]
 
     # Add preset for training experiments
@@ -133,7 +136,9 @@ def generate_summary_report(results_dir: Path, output_path: Path):
         if data.get("high_correlations"):
             report.append("\n**High correlations (|r| > 0.8):**")
             for pair in data["high_correlations"][:5]:
-                report.append(f"- {pair['score1']} ↔ {pair['score2']}: r = {pair['correlation']:.3f}")
+                report.append(
+                    f"- {pair['score1']} ↔ {pair['score2']}: r = {pair['correlation']:.3f}"
+                )
 
         if data.get("recommended_scores"):
             report.append(f"\n**Recommended minimal score set:** {data['recommended_scores']}")
@@ -152,10 +157,14 @@ def generate_summary_report(results_dir: Path, output_path: Path):
         report.append("|--------------|---------------|-----|")
 
         profile = summary.get("profile_based", {})
-        report.append(f"| Profile-based | {profile.get('mean_accuracy', 0):.4f} | {profile.get('std_accuracy', 0):.4f} |")
+        report.append(
+            f"| Profile-based | {profile.get('mean_accuracy', 0):.4f} | {profile.get('std_accuracy', 0):.4f} |"
+        )
 
         random = summary.get("random_split", {})
-        report.append(f"| Random | {random.get('mean_accuracy', 0):.4f} | {random.get('std_accuracy', 0):.4f} |")
+        report.append(
+            f"| Random | {random.get('mean_accuracy', 0):.4f} | {random.get('std_accuracy', 0):.4f} |"
+        )
 
         if summary.get("p_value"):
             report.append(f"\n**Statistical test:** p = {summary['p_value']:.4f}")
@@ -210,7 +219,9 @@ def generate_summary_report(results_dir: Path, output_path: Path):
 
         analysis = data.get("analysis", {})
         if analysis.get("average_generalization_gap") is not None:
-            report.append(f"\n**Average generalization gap:** {analysis['average_generalization_gap']:.4f}")
+            report.append(
+                f"\n**Average generalization gap:** {analysis['average_generalization_gap']:.4f}"
+            )
 
         report.append("")
 
