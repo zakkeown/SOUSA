@@ -78,3 +78,6 @@ output/
 .env.local
 *.pem
 *.key
+
+# Documentation build output
+site/

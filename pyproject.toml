@@ -73,11 +73,16 @@ ml = [
     # Optional but recommended
     # "wandb>=0.16",  # Uncomment for weights & biases logging
 ]
+docs = [
+    "mkdocs-material>=9.5.0",
+    "mkdocstrings[python]>=0.24.0",
+    "pymdown-extensions>=10.0",
+]
 
 [project.urls]
 Homepage = "https://github.com/zakkeown/SOUSA"
 Repository = "https://github.com/zakkeown/SOUSA"
-Documentation = "https://github.com/zakkeown/SOUSA#readme"
+Documentation = "https://zakkeown.github.io/SOUSA"
 Dataset = "https://huggingface.co/datasets/zkeown/sousa"
 Issues = "https://github.com/zakkeown/SOUSA/issues"
 
