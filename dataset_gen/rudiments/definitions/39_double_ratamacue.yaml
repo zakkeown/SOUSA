@@ -1,0 +1,35 @@
+name: Double Ratamacue
+slug: double_ratamacue
+category: drag
+pas_number: 39
+description: Two drags in ratamacue pattern
+
+pattern:
+  strokes:
+    # Drag L, R, drag L, R, L, accent R
+    - {hand: L, type: grace, grace_offset: -0.08}
+    - {hand: L, type: grace, grace_offset: -0.04}
+    - {hand: R, type: tap}
+    - {hand: R, type: grace, grace_offset: -0.08}
+    - {hand: R, type: grace, grace_offset: -0.04}
+    - {hand: L, type: tap}
+    - {hand: R, type: tap}
+    - {hand: L, type: tap}
+    - {hand: R, type: accent}
+    # Drag R, L, drag R, L, R, accent L
+    - {hand: R, type: grace, grace_offset: -0.08}
+    - {hand: R, type: grace, grace_offset: -0.04}
+    - {hand: L, type: tap}
+    - {hand: L, type: grace, grace_offset: -0.08}
+    - {hand: L, type: grace, grace_offset: -0.04}
+    - {hand: R, type: tap}
+    - {hand: L, type: tap}
+    - {hand: R, type: tap}
+    - {hand: L, type: accent}
+  beats_per_cycle: 3
+
+subdivision: sixteenth
+tempo_range: [60, 140]
+
+params:
+  drag_spacing_range: [10, 30]

@@ -1,0 +1,16 @@
+name: Single Stroke Seven
+slug: single_stroke_seven
+category: roll
+pas_number: 3
+description: Seven alternating single strokes with accent on first and last
+
+pattern:
+  simple: "R L R L R L R"
+  accents: ">....>."
+  beats_per_cycle: 2
+
+subdivision: sixteenth
+tempo_range: [60, 200]
+
+params:
+  roll_type: open

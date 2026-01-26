@@ -1,0 +1,30 @@
+name: Flam Drag
+slug: flam_drag
+category: flam
+pas_number: 30
+description: Flam followed by a drag (two grace notes and primary)
+
+pattern:
+  strokes:
+    # Flam R, L, drag R
+    - {hand: L, type: grace, grace_offset: -0.05}
+    - {hand: R, type: accent}
+    - {hand: L, type: tap}
+    - {hand: L, type: grace, grace_offset: -0.08}
+    - {hand: L, type: grace, grace_offset: -0.04}
+    - {hand: R, type: accent}
+    # Flam L, R, drag L
+    - {hand: R, type: grace, grace_offset: -0.05}
+    - {hand: L, type: accent}
+    - {hand: R, type: tap}
+    - {hand: R, type: grace, grace_offset: -0.08}
+    - {hand: R, type: grace, grace_offset: -0.04}
+    - {hand: L, type: accent}
+  beats_per_cycle: 3
+
+subdivision: sixteenth
+tempo_range: [60, 160]
+
+params:
+  flam_spacing_range: [15, 50]
+  drag_spacing_range: [10, 30]

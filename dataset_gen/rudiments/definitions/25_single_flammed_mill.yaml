@@ -1,0 +1,26 @@
+name: Single Flammed Mill
+slug: single_flammed_mill
+category: flam
+pas_number: 25
+description: Flam followed by a double stroke on the opposite hand
+
+pattern:
+  strokes:
+    # Flam R, LL
+    - {hand: L, type: grace, grace_offset: -0.05}
+    - {hand: R, type: accent}
+    - {hand: L, type: diddle, diddle_position: 1}
+    - {hand: L, type: diddle, diddle_position: 2}
+    # Flam L, RR
+    - {hand: R, type: grace, grace_offset: -0.05}
+    - {hand: L, type: accent}
+    - {hand: R, type: diddle, diddle_position: 1}
+    - {hand: R, type: diddle, diddle_position: 2}
+  beats_per_cycle: 2
+
+subdivision: sixteenth
+tempo_range: [60, 160]
+
+params:
+  flam_spacing_range: [15, 50]
+  diddle_ratio_range: [0.9, 1.1]

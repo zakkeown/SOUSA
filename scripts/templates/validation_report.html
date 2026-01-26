@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOUSA Dataset Validation Report</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --bg-card: #0f3460;
+            --text-primary: #eee;
+            --text-secondary: #aaa;
+            --accent-green: #00d26a;
+            --accent-red: #ff6b6b;
+            --accent-blue: #4dabf7;
+            --accent-yellow: #ffd93d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .summary-card .value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-card .label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .summary-card.passed .value { color: var(--accent-green); }
+        .summary-card.failed .value { color: var(--accent-red); }
+        .summary-card.neutral .value { color: var(--accent-blue); }
+
+        section {
+            margin-bottom: 3rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent-blue);
+        }
+
+        .check-list {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .check-item {
+            background: var(--bg-secondary);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .check-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .check-icon.passed {
+            background: var(--accent-green);
+            color: var(--bg-primary);
+        }
+
+        .check-icon.failed {
+            background: var(--accent-red);
+            color: var(--bg-primary);
+        }
+
+        .check-name {
+            font-weight: 600;
+            min-width: 200px;
+        }
+
+        .check-message {
+            color: var(--text-secondary);
+            flex: 1;
+        }
+
+        .chart-container {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        th {
+            background: var(--bg-card);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+        }
+
+        .citation {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-top: 0.5rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge.passed { background: rgba(0, 210, 106, 0.2); color: var(--accent-green); }
+        .badge.failed { background: rgba(255, 107, 107, 0.2); color: var(--accent-red); }
+
+        .correlation-matrix {
+            display: grid;
+            gap: 2px;
+            font-size: 0.75rem;
+        }
+
+        .correlation-cell {
+            padding: 0.5rem;
+            text-align: center;
+            border-radius: 4px;
+        }
+
+        footer {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+        }
+
+        .status-overall {
+            font-size: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .status-overall.passed {
+            background: rgba(0, 210, 106, 0.15);
+            border: 2px solid var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .status-overall.failed {
+            background: rgba(255, 107, 107, 0.15);
+            border: 2px solid var(--accent-red);
+            color: var(--accent-red);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>SOUSA Dataset Validation Report</h1>
+            <p class="subtitle">Synthetic Open Unified Snare Assessment</p>
+            <p class="subtitle">Generated: <span id="generated-at"></span></p>
+        </header>
+
+        <div class="summary-grid">
+            <div class="summary-card neutral">
+                <div class="value" id="num-samples">-</div>
+                <div class="label">Total Samples</div>
+            </div>
+            <div class="summary-card" id="verification-card">
+                <div class="value" id="verification-rate">-</div>
+                <div class="label">Verification Checks</div>
+            </div>
+            <div class="summary-card" id="realism-card">
+                <div class="value" id="realism-rate">-</div>
+                <div class="label">Literature Match</div>
+            </div>
+            <div class="summary-card" id="correlation-card">
+                <div class="value" id="correlation-rate">-</div>
+                <div class="label">Correlation Structure</div>
+            </div>
+        </div>
+
+        <section id="verification-section">
+            <h2>Verification Checks</h2>
+            <div class="check-list" id="verification-checks"></div>
+        </section>
+
+        <section id="distribution-section">
+            <h2>Skill Tier Distributions</h2>
+            <div class="chart-row">
+                <div class="chart-container">
+                    <div id="timing-distribution-chart"></div>
+                </div>
+                <div class="chart-container">
+                    <div id="skill-tier-chart"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="realism-section">
+            <h2>Realism Validation (Literature Comparison)</h2>
+            <table id="realism-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Skill Tier</th>
+                        <th>Dataset Value</th>
+                        <th>Expected Range</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="realism-tbody"></tbody>
+            </table>
+            <p class="citation" id="timing-citation"></p>
+        </section>
+
+        <section id="correlation-section">
+            <h2>Correlation Structure</h2>
+            <div class="chart-container">
+                <div id="correlation-heatmap"></div>
+            </div>
+            <div class="check-list" id="correlation-checks"></div>
+        </section>
+
+        <section id="tier-separation-section">
+            <h2>Skill Tier Separation (ANOVA)</h2>
+            <table id="anova-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>F-Statistic</th>
+                        <th>P-Value</th>
+                        <th>Significant (p < 0.05)</th>
+                    </tr>
+                </thead>
+                <tbody id="anova-tbody"></tbody>
+            </table>
+        </section>
+
+        <div class="status-overall" id="overall-status">
+            Loading...
+        </div>
+
+        <footer>
+            <p>SOUSA Dataset Validation Report</p>
+            <p>Generated by the SOUSA validation pipeline</p>
+        </footer>
+    </div>
+
+    <script>
+        // This script will be populated with actual data
+        // For now, it provides structure and sample rendering
+
+        function renderReport(data) {
+            // Set metadata
+            document.getElementById('generated-at').textContent = data.generated_at || 'Unknown';
+            document.getElementById('num-samples').textContent = data.stats?.num_samples?.toLocaleString() || '-';
+
+            // Verification summary
+            const verification = data.verification || {};
+            const numPassed = verification.num_passed || 0;
+            const numTotal = (verification.checks || []).length;
+            const passRate = numTotal > 0 ? Math.round(100 * numPassed / numTotal) : 0;
+
+            document.getElementById('verification-rate').textContent = `${numPassed}/${numTotal}`;
+            const verCard = document.getElementById('verification-card');
+            verCard.classList.add(passRate === 100 ? 'passed' : 'failed');
+
+            // Render verification checks
+            const checkList = document.getElementById('verification-checks');
+            (verification.checks || []).forEach(check => {
+                const item = document.createElement('div');
+                item.className = 'check-item';
+                item.innerHTML = `
+                    <div class="check-icon ${check.passed ? 'passed' : 'failed'}">${check.passed ? '✓' : '✗'}</div>
+                    <div class="check-name">${check.name}</div>
+                    <div class="check-message">${check.message}</div>
+                `;
+                checkList.appendChild(item);
+            });
+
+            // Realism validation
+            const realism = data.realism || {};
+            const litPassRate = Math.round(realism.literature_pass_rate || 0);
+            const corrPassRate = Math.round(realism.correlation_pass_rate || 0);
+
+            document.getElementById('realism-rate').textContent = `${litPassRate}%`;
+            document.getElementById('correlation-rate').textContent = `${corrPassRate}%`;
+
+            document.getElementById('realism-card').classList.add(litPassRate >= 75 ? 'passed' : 'failed');
+            document.getElementById('correlation-card').classList.add(corrPassRate >= 75 ? 'passed' : 'failed');
+
+            // Render realism comparisons
+            const realismTbody = document.getElementById('realism-tbody');
+            let lastCitation = '';
+            (realism.literature_comparisons || []).forEach(comp => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${comp.metric}</td>
+                    <td>${comp.skill_tier}</td>
+                    <td>${comp.dataset_value.toFixed(2)}</td>
+                    <td>[${comp.expected_range[0]}, ${comp.expected_range[1]}]</td>
+                    <td><span class="badge ${comp.within_range ? 'passed' : 'failed'}">${comp.within_range ? 'PASS' : 'FAIL'}</span></td>
+                `;
+                realismTbody.appendChild(row);
+                if (comp.citation) lastCitation = comp.citation;
+            });
+            document.getElementById('timing-citation').textContent = lastCitation;
+
+            // Render correlation checks
+            const corrCheckList = document.getElementById('correlation-checks');
+            (realism.correlation_checks || []).forEach(check => {
+                const item = document.createElement('div');
+                item.className = 'check-item';
+                item.innerHTML = `
+                    <div class="check-icon ${check.passed ? 'passed' : 'failed'}">${check.passed ? '✓' : '✗'}</div>
+                    <div class="check-name">${check.dimensions.join(' ↔ ')}</div>
+                    <div class="check-message">r = ${check.observed_correlation.toFixed(3)} (min ${check.expected_min}) - ${check.rationale}</div>
+                `;
+                corrCheckList.appendChild(item);
+            });
+
+            // Render ANOVA results
+            const anovaTbody = document.getElementById('anova-tbody');
+            const tierSep = realism.skill_tier_separation || {};
+            Object.entries(tierSep).forEach(([metric, result]) => {
+                if (result.f_statistic !== undefined) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${metric}</td>
+                        <td>${result.f_statistic.toFixed(2)}</td>
+                        <td>${result.p_value.toExponential(4)}</td>
+                        <td><span class="badge ${result.significant ? 'passed' : 'failed'}">${result.significant ? 'YES' : 'NO'}</span></td>
+                    `;
+                    anovaTbody.appendChild(row);
+                }
+            });
+
+            // Render correlation heatmap
+            if (realism.correlation_matrix) {
+                const matrix = realism.correlation_matrix;
+                const labels = Object.keys(matrix);
+                const values = labels.map(row => labels.map(col => matrix[row]?.[col] || 0));
+
+                Plotly.newPlot('correlation-heatmap', [{
+                    z: values,
+                    x: labels,
+                    y: labels,
+                    type: 'heatmap',
+                    colorscale: 'RdBu',
+                    zmid: 0,
+                    text: values.map(row => row.map(v => v.toFixed(2))),
+                    texttemplate: '%{text}',
+                    textfont: { size: 10 },
+                    hovertemplate: '%{y} vs %{x}: %{z:.3f}<extra></extra>',
+                }], {
+                    title: 'Score Dimension Correlations',
+                    paper_bgcolor: 'transparent',
+                    plot_bgcolor: 'transparent',
+                    font: { color: '#eee' },
+                    margin: { t: 50, b: 100, l: 150, r: 50 },
+                }, { responsive: true });
+            }
+
+            // Render skill tier distribution
+            const tierCounts = data.stats?.skill_tier_counts || {};
+            if (Object.keys(tierCounts).length > 0) {
+                Plotly.newPlot('skill-tier-chart', [{
+                    x: Object.keys(tierCounts),
+                    y: Object.values(tierCounts),
+                    type: 'bar',
+                    marker: { color: ['#4dabf7', '#00d26a', '#ffd93d', '#ff6b6b'] },
+                }], {
+                    title: 'Samples by Skill Tier',
+                    paper_bgcolor: 'transparent',
+                    plot_bgcolor: 'transparent',
+                    font: { color: '#eee' },
+                    xaxis: { title: 'Skill Tier' },
+                    yaxis: { title: 'Count' },
+                }, { responsive: true });
+            }
+
+            // Render timing distribution by tier
+            const timingByTier = data.stats?.timing_error?.by_group || {};
+            if (Object.keys(timingByTier).length > 0) {
+                const traces = Object.entries(timingByTier).map(([tier, stats]) => ({
+                    name: tier,
+                    x: [tier],
+                    y: [stats.mean],
+                    error_y: { type: 'data', array: [stats.std], visible: true },
+                    type: 'bar',
+                }));
+
+                Plotly.newPlot('timing-distribution-chart', traces, {
+                    title: 'Timing Error by Skill Tier (mean ± SD)',
+                    paper_bgcolor: 'transparent',
+                    plot_bgcolor: 'transparent',
+                    font: { color: '#eee' },
+                    xaxis: { title: 'Skill Tier' },
+                    yaxis: { title: 'Timing Error (ms)' },
+                    barmode: 'group',
+                }, { responsive: true });
+            }
+
+            // Overall status
+            const overallStatus = document.getElementById('overall-status');
+            const allPassed = verification.all_passed && litPassRate >= 75;
+            overallStatus.className = `status-overall ${allPassed ? 'passed' : 'failed'}`;
+            overallStatus.textContent = allPassed
+                ? '✓ VALIDATION PASSED - Dataset meets quality standards'
+                : '✗ VALIDATION ISSUES - Review failed checks above';
+        }
+
+        // Load data from embedded JSON or fetch from file
+        // This will be replaced with actual data when generating the report
+        const reportData = /* REPORT_DATA_PLACEHOLDER */ {};
+
+        if (Object.keys(reportData).length > 0) {
+            renderReport(reportData);
+        } else {
+            document.getElementById('overall-status').textContent = 'No data loaded. Run the validation script to generate report data.';
+        }
+    </script>
+</body>
+</html>

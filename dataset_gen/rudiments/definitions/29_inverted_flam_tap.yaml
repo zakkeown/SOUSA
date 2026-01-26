@@ -1,0 +1,23 @@
+name: Inverted Flam Tap
+slug: inverted_flam_tap
+category: flam
+pas_number: 29
+description: Tap followed by flam on opposite hand (reverse of flam tap)
+
+pattern:
+  strokes:
+    # Tap L, flam R
+    - {hand: L, type: tap}
+    - {hand: L, type: grace, grace_offset: -0.05}
+    - {hand: R, type: accent}
+    # Tap R, flam L
+    - {hand: R, type: tap}
+    - {hand: R, type: grace, grace_offset: -0.05}
+    - {hand: L, type: accent}
+  beats_per_cycle: 1.5
+
+subdivision: sixteenth
+tempo_range: [60, 180]
+
+params:
+  flam_spacing_range: [15, 50]

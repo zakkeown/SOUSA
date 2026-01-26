@@ -1,0 +1,25 @@
+name: Swiss Army Triplet
+slug: swiss_army_triplet
+category: flam
+pas_number: 28
+description: Flam followed by two alternating strokes in triplet feel
+
+pattern:
+  strokes:
+    # Flam R, L, R
+    - {hand: L, type: grace, grace_offset: -0.05}
+    - {hand: R, type: accent}
+    - {hand: L, type: tap}
+    - {hand: R, type: tap}
+    # Flam L, R, L
+    - {hand: R, type: grace, grace_offset: -0.05}
+    - {hand: L, type: accent}
+    - {hand: R, type: tap}
+    - {hand: L, type: tap}
+  beats_per_cycle: 2
+
+subdivision: triplet
+tempo_range: [60, 180]
+
+params:
+  flam_spacing_range: [15, 50]

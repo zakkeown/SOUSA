@@ -1,0 +1,27 @@
+name: Paradiddle-diddle
+slug: paradiddle_diddle
+category: diddle
+pas_number: 19
+description: RLRRLL - single-double-double pattern in 6/8 feel
+
+pattern:
+  strokes:
+    - {hand: R, type: accent}
+    - {hand: L, type: tap}
+    - {hand: R, type: diddle, diddle_position: 1}
+    - {hand: R, type: diddle, diddle_position: 2}
+    - {hand: L, type: diddle, diddle_position: 1}
+    - {hand: L, type: diddle, diddle_position: 2}
+    - {hand: L, type: accent}
+    - {hand: R, type: tap}
+    - {hand: L, type: diddle, diddle_position: 1}
+    - {hand: L, type: diddle, diddle_position: 2}
+    - {hand: R, type: diddle, diddle_position: 1}
+    - {hand: R, type: diddle, diddle_position: 2}
+  beats_per_cycle: 2
+
+subdivision: sextuplet
+tempo_range: [60, 180]
+
+params:
+  diddle_ratio_range: [0.9, 1.1]

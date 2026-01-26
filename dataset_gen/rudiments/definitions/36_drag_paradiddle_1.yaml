@@ -1,0 +1,32 @@
+name: Drag Paradiddle No. 1
+slug: drag_paradiddle_1
+category: drag
+pas_number: 36
+description: Drag followed by tap and diddle, then reverse
+
+pattern:
+  strokes:
+    # Drag R, tap L, tap R, LL
+    - {hand: L, type: grace, grace_offset: -0.08}
+    - {hand: L, type: grace, grace_offset: -0.04}
+    - {hand: R, type: accent}
+    - {hand: L, type: tap}
+    - {hand: R, type: tap}
+    - {hand: L, type: diddle, diddle_position: 1}
+    - {hand: L, type: diddle, diddle_position: 2}
+    # Drag L, tap R, tap L, RR
+    - {hand: R, type: grace, grace_offset: -0.08}
+    - {hand: R, type: grace, grace_offset: -0.04}
+    - {hand: L, type: accent}
+    - {hand: R, type: tap}
+    - {hand: L, type: tap}
+    - {hand: R, type: diddle, diddle_position: 1}
+    - {hand: R, type: diddle, diddle_position: 2}
+  beats_per_cycle: 3.5
+
+subdivision: sixteenth
+tempo_range: [60, 160]
+
+params:
+  drag_spacing_range: [10, 30]
+  diddle_ratio_range: [0.9, 1.1]

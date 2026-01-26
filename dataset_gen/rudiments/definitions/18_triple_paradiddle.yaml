@@ -1,0 +1,31 @@
+name: Triple Paradiddle
+slug: triple_paradiddle
+category: diddle
+pas_number: 18
+description: RLRLRLRR LRLRLRLL - paradiddle with four extra singles
+
+pattern:
+  strokes:
+    - {hand: R, type: accent}
+    - {hand: L, type: tap}
+    - {hand: R, type: tap}
+    - {hand: L, type: tap}
+    - {hand: R, type: tap}
+    - {hand: L, type: tap}
+    - {hand: R, type: diddle, diddle_position: 1}
+    - {hand: R, type: diddle, diddle_position: 2}
+    - {hand: L, type: accent}
+    - {hand: R, type: tap}
+    - {hand: L, type: tap}
+    - {hand: R, type: tap}
+    - {hand: L, type: tap}
+    - {hand: R, type: tap}
+    - {hand: L, type: diddle, diddle_position: 1}
+    - {hand: L, type: diddle, diddle_position: 2}
+  beats_per_cycle: 4
+
+subdivision: sixteenth
+tempo_range: [60, 160]
+
+params:
+  diddle_ratio_range: [0.9, 1.1]

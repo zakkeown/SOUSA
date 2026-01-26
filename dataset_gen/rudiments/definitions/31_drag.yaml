@@ -1,0 +1,23 @@
+name: Drag
+slug: drag
+category: drag
+pas_number: 31
+description: Two grace notes (diddle) followed by primary stroke
+
+pattern:
+  strokes:
+    # Drag R (grace LL + accent R)
+    - {hand: L, type: grace, grace_offset: -0.08}
+    - {hand: L, type: grace, grace_offset: -0.04}
+    - {hand: R, type: accent}
+    # Drag L (grace RR + accent L)
+    - {hand: R, type: grace, grace_offset: -0.08}
+    - {hand: R, type: grace, grace_offset: -0.04}
+    - {hand: L, type: accent}
+  beats_per_cycle: 1
+
+subdivision: eighth
+tempo_range: [60, 160]
+
+params:
+  drag_spacing_range: [10, 30]

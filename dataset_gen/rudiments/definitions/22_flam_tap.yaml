@@ -1,0 +1,23 @@
+name: Flam Tap
+slug: flam_tap
+category: flam
+pas_number: 22
+description: Alternating flams with a tap on each hand
+
+pattern:
+  strokes:
+    # Flam R, tap R
+    - {hand: L, type: grace, grace_offset: -0.05}
+    - {hand: R, type: accent}
+    - {hand: R, type: tap}
+    # Flam L, tap L
+    - {hand: R, type: grace, grace_offset: -0.05}
+    - {hand: L, type: accent}
+    - {hand: L, type: tap}
+  beats_per_cycle: 1.5
+
+subdivision: sixteenth
+tempo_range: [60, 180]
+
+params:
+  flam_spacing_range: [15, 50]

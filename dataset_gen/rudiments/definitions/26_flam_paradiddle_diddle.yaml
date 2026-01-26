@@ -1,0 +1,32 @@
+name: Flam Paradiddle-diddle
+slug: flam_paradiddle_diddle
+category: flam
+pas_number: 26
+description: Flam followed by paradiddle-diddle pattern
+
+pattern:
+  strokes:
+    # Flam R, L, RR, LL
+    - {hand: L, type: grace, grace_offset: -0.05}
+    - {hand: R, type: accent}
+    - {hand: L, type: tap}
+    - {hand: R, type: diddle, diddle_position: 1}
+    - {hand: R, type: diddle, diddle_position: 2}
+    - {hand: L, type: diddle, diddle_position: 1}
+    - {hand: L, type: diddle, diddle_position: 2}
+    # Flam L, R, LL, RR
+    - {hand: R, type: grace, grace_offset: -0.05}
+    - {hand: L, type: accent}
+    - {hand: R, type: tap}
+    - {hand: L, type: diddle, diddle_position: 1}
+    - {hand: L, type: diddle, diddle_position: 2}
+    - {hand: R, type: diddle, diddle_position: 1}
+    - {hand: R, type: diddle, diddle_position: 2}
+  beats_per_cycle: 2
+
+subdivision: sextuplet
+tempo_range: [60, 160]
+
+params:
+  flam_spacing_range: [15, 50]
+  diddle_ratio_range: [0.9, 1.1]

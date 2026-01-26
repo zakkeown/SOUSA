@@ -1,0 +1,29 @@
+name: Flamacue
+slug: flamacue
+category: flam
+pas_number: 23
+description: Flam accent pattern ending with an accent
+
+pattern:
+  strokes:
+    # Flam, tap, tap, tap, accent
+    - {hand: L, type: grace, grace_offset: -0.05}
+    - {hand: R, type: accent}
+    - {hand: L, type: tap}
+    - {hand: R, type: tap}
+    - {hand: L, type: tap}
+    - {hand: R, type: accent}
+    # Mirror: flam, tap, tap, tap, accent
+    - {hand: R, type: grace, grace_offset: -0.05}
+    - {hand: L, type: accent}
+    - {hand: R, type: tap}
+    - {hand: L, type: tap}
+    - {hand: R, type: tap}
+    - {hand: L, type: accent}
+  beats_per_cycle: 3
+
+subdivision: sixteenth
+tempo_range: [60, 160]
+
+params:
+  flam_spacing_range: [15, 50]

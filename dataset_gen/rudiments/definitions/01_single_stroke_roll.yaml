@@ -1,0 +1,16 @@
+name: Single Stroke Roll
+slug: single_stroke_roll
+category: roll
+pas_number: 1
+description: Alternating single strokes, the foundation of all drumming
+
+pattern:
+  simple: "R L R L R L R L"
+  beats_per_cycle: 2
+
+subdivision: sixteenth
+tempo_range: [60, 220]
+
+params:
+  roll_type: open
+  roll_strokes_per_beat: 4

@@ -1,0 +1,29 @@
+name: Single Ratamacue
+slug: single_ratamacue
+category: drag
+pas_number: 38
+description: Drag followed by triplet ending with accent
+
+pattern:
+  strokes:
+    # Drag L, R, L, accent R
+    - {hand: L, type: grace, grace_offset: -0.08}
+    - {hand: L, type: grace, grace_offset: -0.04}
+    - {hand: R, type: tap}
+    - {hand: L, type: tap}
+    - {hand: R, type: tap}
+    - {hand: L, type: accent}
+    # Drag R, L, R, accent L
+    - {hand: R, type: grace, grace_offset: -0.08}
+    - {hand: R, type: grace, grace_offset: -0.04}
+    - {hand: L, type: tap}
+    - {hand: R, type: tap}
+    - {hand: L, type: tap}
+    - {hand: R, type: accent}
+  beats_per_cycle: 2
+
+subdivision: sixteenth
+tempo_range: [60, 160]
+
+params:
+  drag_spacing_range: [10, 30]

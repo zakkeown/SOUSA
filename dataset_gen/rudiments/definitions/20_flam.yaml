@@ -1,0 +1,19 @@
+name: Flam
+slug: flam
+category: flam
+pas_number: 20
+description: Grace note followed by primary stroke - the foundation of all flam rudiments
+
+pattern:
+  strokes:
+    - {hand: L, type: grace, grace_offset: -0.05}
+    - {hand: R, type: accent}
+    - {hand: R, type: grace, grace_offset: -0.05}
+    - {hand: L, type: accent}
+  beats_per_cycle: 1
+
+subdivision: eighth
+tempo_range: [60, 180]
+
+params:
+  flam_spacing_range: [15, 50]

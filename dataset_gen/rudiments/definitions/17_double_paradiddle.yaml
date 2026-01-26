@@ -1,0 +1,27 @@
+name: Double Paradiddle
+slug: double_paradiddle
+category: diddle
+pas_number: 17
+description: RLRLRR LRLRLL - paradiddle with two extra singles
+
+pattern:
+  strokes:
+    - {hand: R, type: accent}
+    - {hand: L, type: tap}
+    - {hand: R, type: tap}
+    - {hand: L, type: tap}
+    - {hand: R, type: diddle, diddle_position: 1}
+    - {hand: R, type: diddle, diddle_position: 2}
+    - {hand: L, type: accent}
+    - {hand: R, type: tap}
+    - {hand: L, type: tap}
+    - {hand: R, type: tap}
+    - {hand: L, type: diddle, diddle_position: 1}
+    - {hand: L, type: diddle, diddle_position: 2}
+  beats_per_cycle: 3
+
+subdivision: sixteenth
+tempo_range: [60, 180]
+
+params:
+  diddle_ratio_range: [0.9, 1.1]

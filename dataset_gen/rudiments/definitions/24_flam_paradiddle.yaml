@@ -1,0 +1,28 @@
+name: Flam Paradiddle
+slug: flam_paradiddle
+category: flam
+pas_number: 24
+description: Paradiddle starting with a flam instead of single accent
+
+pattern:
+  strokes:
+    # Flam R, L, RR
+    - {hand: L, type: grace, grace_offset: -0.05}
+    - {hand: R, type: accent}
+    - {hand: L, type: tap}
+    - {hand: R, type: diddle, diddle_position: 1}
+    - {hand: R, type: diddle, diddle_position: 2}
+    # Flam L, R, LL
+    - {hand: R, type: grace, grace_offset: -0.05}
+    - {hand: L, type: accent}
+    - {hand: R, type: tap}
+    - {hand: L, type: diddle, diddle_position: 1}
+    - {hand: L, type: diddle, diddle_position: 2}
+  beats_per_cycle: 2.5
+
+subdivision: sixteenth
+tempo_range: [60, 180]
+
+params:
+  flam_spacing_range: [15, 50]
+  diddle_ratio_range: [0.9, 1.1]

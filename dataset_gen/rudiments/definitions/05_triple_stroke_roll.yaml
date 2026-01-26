@@ -1,0 +1,21 @@
+name: Triple Stroke Roll
+slug: triple_stroke_roll
+category: roll
+pas_number: 5
+description: Three strokes per hand alternating
+
+pattern:
+  strokes:
+    - {hand: R, type: accent}
+    - {hand: R, type: tap}
+    - {hand: R, type: tap}
+    - {hand: L, type: accent}
+    - {hand: L, type: tap}
+    - {hand: L, type: tap}
+  beats_per_cycle: 2
+
+subdivision: triplet
+tempo_range: [60, 160]
+
+params:
+  roll_type: open

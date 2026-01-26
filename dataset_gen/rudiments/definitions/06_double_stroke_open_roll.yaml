@@ -1,0 +1,20 @@
+name: Double Stroke Open Roll
+slug: double_stroke_open_roll
+category: roll
+pas_number: 6
+description: Alternating double strokes, foundation for all diddle rudiments
+
+pattern:
+  strokes:
+    - {hand: R, type: diddle, diddle_position: 1}
+    - {hand: R, type: diddle, diddle_position: 2}
+    - {hand: L, type: diddle, diddle_position: 1}
+    - {hand: L, type: diddle, diddle_position: 2}
+  beats_per_cycle: 1
+
+subdivision: sixteenth
+tempo_range: [60, 200]
+
+params:
+  roll_type: open
+  diddle_ratio_range: [0.9, 1.1]

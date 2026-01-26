@@ -1,0 +1,16 @@
+name: Multiple Bounce Roll
+slug: multiple_bounce_roll
+category: roll
+pas_number: 4
+description: Buzz roll with multiple bounces per stroke
+
+pattern:
+  simple: "R L R L R L R L"
+  beats_per_cycle: 2
+
+subdivision: sixteenth
+tempo_range: [60, 140]
+
+params:
+  roll_type: buzz
+  buzz_strokes_range: [3, 8]

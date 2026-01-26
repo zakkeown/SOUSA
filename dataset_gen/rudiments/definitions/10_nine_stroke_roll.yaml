@@ -1,0 +1,25 @@
+name: Nine Stroke Roll
+slug: nine_stroke_roll
+category: roll
+pas_number: 10
+description: Four doubles plus an accent
+
+pattern:
+  strokes:
+    - {hand: R, type: diddle, diddle_position: 1}
+    - {hand: R, type: diddle, diddle_position: 2}
+    - {hand: L, type: diddle, diddle_position: 1}
+    - {hand: L, type: diddle, diddle_position: 2}
+    - {hand: R, type: diddle, diddle_position: 1}
+    - {hand: R, type: diddle, diddle_position: 2}
+    - {hand: L, type: diddle, diddle_position: 1}
+    - {hand: L, type: diddle, diddle_position: 2}
+    - {hand: R, type: accent}
+  beats_per_cycle: 2.5
+
+subdivision: sixteenth
+tempo_range: [60, 180]
+
+params:
+  roll_type: open
+  diddle_ratio_range: [0.9, 1.1]

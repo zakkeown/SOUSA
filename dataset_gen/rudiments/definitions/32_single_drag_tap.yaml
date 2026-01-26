@@ -1,0 +1,25 @@
+name: Single Drag Tap
+slug: single_drag_tap
+category: drag
+pas_number: 32
+description: Drag followed by a tap
+
+pattern:
+  strokes:
+    # Drag R, tap L
+    - {hand: L, type: grace, grace_offset: -0.08}
+    - {hand: L, type: grace, grace_offset: -0.04}
+    - {hand: R, type: accent}
+    - {hand: L, type: tap}
+    # Drag L, tap R
+    - {hand: R, type: grace, grace_offset: -0.08}
+    - {hand: R, type: grace, grace_offset: -0.04}
+    - {hand: L, type: accent}
+    - {hand: R, type: tap}
+  beats_per_cycle: 2
+
+subdivision: sixteenth
+tempo_range: [60, 160]
+
+params:
+  drag_spacing_range: [10, 30]

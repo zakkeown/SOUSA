@@ -1,0 +1,220 @@
+{
+  "num_samples": 99770,
+  "score_columns": [
+    "overall_score",
+    "timing_accuracy",
+    "timing_consistency",
+    "tempo_stability",
+    "hand_balance"
+  ],
+  "correlation_matrix": {
+    "overall_score": {
+      "overall_score": 1.0,
+      "timing_accuracy": 0.8754486616560344,
+      "timing_consistency": 0.8850576965286417,
+      "tempo_stability": 0.6491059371752611,
+      "hand_balance": 0.4149199421802303
+    },
+    "timing_accuracy": {
+      "overall_score": 0.8754486616560344,
+      "timing_accuracy": 1.0,
+      "timing_consistency": 0.8879799620384564,
+      "tempo_stability": 0.5751030567845857,
+      "hand_balance": 0.4644017802214138
+    },
+    "timing_consistency": {
+      "overall_score": 0.8850576965286417,
+      "timing_accuracy": 0.8879799620384564,
+      "timing_consistency": 1.0,
+      "tempo_stability": 0.5319727074839514,
+      "hand_balance": 0.4184040259645138
+    },
+    "tempo_stability": {
+      "overall_score": 0.6491059371752611,
+      "timing_accuracy": 0.5751030567845857,
+      "timing_consistency": 0.5319727074839514,
+      "tempo_stability": 1.0,
+      "hand_balance": 0.22913199293666425
+    },
+    "hand_balance": {
+      "overall_score": 0.4149199421802303,
+      "timing_accuracy": 0.4644017802214138,
+      "timing_consistency": 0.4184040259645138,
+      "tempo_stability": 0.22913199293666425,
+      "hand_balance": 1.0
+    }
+  },
+  "high_correlations": [
+    {
+      "score1": "timing_accuracy",
+      "score2": "timing_consistency",
+      "correlation": 0.8879799620384564
+    },
+    {
+      "score1": "overall_score",
+      "score2": "timing_consistency",
+      "correlation": 0.8850576965286417
+    },
+    {
+      "score1": "overall_score",
+      "score2": "timing_accuracy",
+      "correlation": 0.8754486616560344
+    }
+  ],
+  "clusters": [
+    [
+      "overall_score",
+      "timing_accuracy",
+      "timing_consistency"
+    ],
+    [
+      "tempo_stability"
+    ],
+    [
+      "hand_balance"
+    ]
+  ],
+  "recommended_scores": [
+    "overall_score",
+    "tempo_stability",
+    "hand_balance"
+  ],
+  "pca": {
+    "explained_variance": [
+      0.6943932103391078,
+      0.15950848757114033,
+      0.10254877291749107,
+      0.023735659092972948,
+      0.019813870079287824
+    ],
+    "cumulative_variance": [
+      0.6943932103391078,
+      0.8539016979102482,
+      0.9564504708277393,
+      0.9801861299207122,
+      1.0
+    ],
+    "components_for_90_percent": 3,
+    "components_for_95_percent": 3,
+    "top_loadings": {
+      "PC1": [
+        {
+          "score": "overall_score",
+          "loading": 0.5086036233387833
+        },
+        {
+          "score": "timing_accuracy",
+          "loading": 0.504944235061223
+        },
+        {
+          "score": "timing_consistency",
+          "loading": 0.4973359292746784
+        },
+        {
+          "score": "tempo_stability",
+          "loading": 0.38588001345319556
+        },
+        {
+          "score": "hand_balance",
+          "loading": 0.3001787175583091
+        }
+      ],
+      "PC2": [
+        {
+          "score": "hand_balance",
+          "loading": 0.8827770076074045
+        },
+        {
+          "score": "tempo_stability",
+          "loading": -0.4504947164233192
+        },
+        {
+          "score": "overall_score",
+          "loading": -0.1253776165566919
+        },
+        {
+          "score": "timing_consistency",
+          "loading": -0.043771761807682795
+        },
+        {
+          "score": "timing_accuracy",
+          "loading": -0.01112436286735587
+        }
+      ],
+      "PC3": [
+        {
+          "score": "tempo_stability",
+          "loading": 0.7879759875025752
+        },
+        {
+          "score": "timing_consistency",
+          "loading": -0.395288159955172
+        },
+        {
+          "score": "hand_balance",
+          "loading": 0.3567244140856925
+        },
+        {
+          "score": "timing_accuracy",
+          "loading": -0.26574101605604294
+        },
+        {
+          "score": "overall_score",
+          "loading": -0.15802062681598816
+        }
+      ]
+    }
+  },
+  "statistics": {
+    "overall_score": {
+      "count": 99770.0,
+      "mean": 49.82820288970948,
+      "std": 15.691264762533695,
+      "min": 18.061138655843592,
+      "25%": 36.811945151823785,
+      "50%": 47.64765528360334,
+      "75%": 62.117158728514575,
+      "max": 91.31633869704318
+    },
+    "timing_accuracy": {
+      "count": 99770.0,
+      "mean": 37.41404061581133,
+      "std": 30.511754697077702,
+      "min": 0.0,
+      "25%": 0.0,
+      "50%": 39.09187345592037,
+      "75%": 65.64540954709588,
+      "max": 94.74219982441068
+    },
+    "timing_consistency": {
+      "count": 99770.0,
+      "mean": 22.674581500906932,
+      "std": 27.207071775582367,
+      "min": 0.0,
+      "25%": 0.0,
+      "50%": 3.6138759354974184,
+      "75%": 46.73958453515013,
+      "max": 93.19690822626231
+    },
+    "tempo_stability": {
+      "count": 99770.0,
+      "mean": 26.264556082209648,
+      "std": 32.00377684550163,
+      "min": 0.0,
+      "25%": 0.0,
+      "50%": 6.903890457916511,
+      "75%": 51.12561505008661,
+      "max": 99.98921261150622
+    },
+    "hand_balance": {
+      "count": 99770.0,
+      "mean": 87.7264905430042,
+      "std": 11.231955871859064,
+      "min": 35.260663507109,
+      "25%": 81.8018018018018,
+      "50%": 91.19047619047619,
+      "75%": 96.52830188679246,
+      "max": 100.0
+    }
+  }
+}

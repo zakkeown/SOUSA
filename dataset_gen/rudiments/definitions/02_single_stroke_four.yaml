@@ -1,0 +1,17 @@
+name: Single Stroke Four
+slug: single_stroke_four
+category: roll
+pas_number: 2
+description: Four alternating single strokes with accent on the first
+
+pattern:
+  simple: "R L R L"
+  accents: ">..."
+  beats_per_cycle: 1
+
+subdivision: sixteenth
+tempo_range: [60, 200]
+
+params:
+  roll_type: open
+  roll_strokes_per_beat: 4

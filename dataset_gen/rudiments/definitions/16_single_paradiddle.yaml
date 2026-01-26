@@ -1,0 +1,23 @@
+name: Single Paradiddle
+slug: single_paradiddle
+category: diddle
+pas_number: 16
+description: RLRR LRLL - the most fundamental paradiddle pattern
+
+pattern:
+  strokes:
+    - {hand: R, type: accent}
+    - {hand: L, type: tap}
+    - {hand: R, type: diddle, diddle_position: 1}
+    - {hand: R, type: diddle, diddle_position: 2}
+    - {hand: L, type: accent}
+    - {hand: R, type: tap}
+    - {hand: L, type: diddle, diddle_position: 1}
+    - {hand: L, type: diddle, diddle_position: 2}
+  beats_per_cycle: 2
+
+subdivision: sixteenth
+tempo_range: [60, 200]
+
+params:
+  diddle_ratio_range: [0.9, 1.1]
