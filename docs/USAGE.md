@@ -143,6 +143,100 @@ slow = dataset["train"].filter(lambda x: x["tempo_bpm"] < 90)
 fast = dataset["train"].filter(lambda x: x["tempo_bpm"] > 140)
 ```
 
+## ML Task Recommendations
+
+Before training, review these task-specific recommendations based on dataset characteristics. See [LIMITATIONS.md](LIMITATIONS.md) for detailed rationale.
+
+### Skill Classification
+
+**Problem:** Adjacent skill tiers have 67-83% score overlap, creating an inherent accuracy ceiling (~70-80%).
+
+**Recommended approaches:**
+
+```python
+# Option 1: Use 2-class binary labels (less overlap)
+dataset = dataset.filter(lambda x: True)  # No filter needed
+label = sample["skill_tier_binary"]  # "novice" or "skilled"
+
+# Option 2: Filter by tier confidence (cleaner 4-class labels)
+dataset = dataset.filter(lambda x: x["tier_confidence"] > 0.5)
+label = sample["skill_tier"]  # "beginner", "intermediate", "advanced", "professional"
+```
+
+**Always use class weights** to handle 4.26:1 class imbalance:
+```python
+from collections import Counter
+import torch
+
+# Compute inverse frequency weights
+labels = [sample["skill_tier"] for sample in dataset]
+counts = Counter(labels)
+total = sum(counts.values())
+weights = {k: total / (len(counts) * v) for k, v in counts.items()}
+class_weights = torch.tensor([weights[tier] for tier in sorted(weights.keys())])
+
+# Use in loss function
+criterion = torch.nn.CrossEntropyLoss(weight=class_weights)
+```
+
+**Report balanced accuracy**, not just accuracy:
+```python
+from sklearn.metrics import balanced_accuracy_score
+balanced_acc = balanced_accuracy_score(y_true, y_pred)
+```
+
+### Score Regression (Assessment)
+
+**Recommended target:** `overall_score`
+
+```python
+# Simple regression setup
+target = sample["overall_score"] / 100.0  # Normalize to 0-1 range
+criterion = torch.nn.MSELoss()
+```
+
+This captures the correlated cluster of timing/consistency scores in a single target.
+
+### Multi-Task Learning
+
+**Recommended minimal score set** (orthogonal targets):
+```python
+RECOMMENDED_SCORES = ["overall_score", "tempo_stability"]
+
+# Multi-task output heads
+targets = {
+    "overall_score": sample["overall_score"] / 100.0,
+    "tempo_stability": sample["tempo_stability"] / 100.0,
+}
+```
+
+**Avoid using all scores** as separate targets—`timing_accuracy`, `timing_consistency`, and `overall_score` are highly correlated (r > 0.85) and provide redundant learning signal.
+
+### Filtering by Augmentation
+
+Control acoustic domain during training:
+
+```python
+# Clean samples only (no augmentation)
+clean = dataset.filter(lambda x: x["augmentation_preset"] == "none")
+
+# Specific soundfont
+marching = dataset.filter(lambda x: x["soundfont"] == "marching")
+
+# Link clean and augmented variants
+groups = dataset.group_by("augmentation_group_id")
+```
+
+### Summary Table
+
+| Task | Recommended Approach |
+|------|---------------------|
+| Skill classification (4-class) | Filter by `tier_confidence > 0.5`, use class weights, report balanced accuracy |
+| Skill classification (2-class) | Use `skill_tier_binary` field |
+| Assessment/regression | Use `overall_score` as target |
+| Multi-task | Use `["overall_score", "tempo_stability"]` |
+| Cross-soundfont generalization | Train on mixed soundfonts, evaluate per-soundfont |
+
 ## Working with Labels
 
 ### Exercise-Level Scores
