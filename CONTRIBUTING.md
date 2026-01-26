@@ -30,7 +30,18 @@ If you find a bug or have a feature request, please [open an issue](https://gith
    pip install -e ".[dev]"
    ```
 
-4. Install FluidSynth (required for audio synthesis):
+4. Install pre-commit hooks (**required** - CI will fail without this):
+   ```bash
+   pip install pre-commit
+   pre-commit install
+   ```
+
+   Or use the Makefile:
+   ```bash
+   make setup-hooks
+   ```
+
+5. Install FluidSynth (required for audio synthesis):
    ```bash
    # macOS
    brew install fluid-synth
@@ -58,6 +69,25 @@ pytest --cov=dataset_gen
 pytest -v
 ```
 
+## Pre-commit Hooks
+
+This project uses [pre-commit](https://pre-commit.com/) to run automated checks before each commit. **Pre-commit hooks are required** - CI will fail if they weren't run.
+
+The hooks check:
+- **trailing-whitespace**: Removes trailing whitespace
+- **end-of-file-fixer**: Ensures files end with a newline
+- **check-yaml/check-toml**: Validates YAML and TOML syntax
+- **black**: Formats Python code (line length: 100)
+- **ruff**: Fast Python linter with auto-fix
+
+```bash
+# Run on all files (do this before committing)
+pre-commit run --all-files
+
+# Or use the Makefile
+make pre-commit
+```
+
 ## Code Style
 
 We use [black](https://black.readthedocs.io/) for formatting and [ruff](https://docs.astral.sh/ruff/) for linting:
@@ -71,6 +101,10 @@ ruff check dataset_gen/ tests/ scripts/
 
 # Auto-fix linting issues
 ruff check --fix dataset_gen/ tests/ scripts/
+
+# Or use the Makefile
+make format
+make lint
 ```
 
 Configuration is in `pyproject.toml`:
