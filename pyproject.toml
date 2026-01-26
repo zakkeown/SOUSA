@@ -1,5 +1,5 @@
 [project]
-name = "rudimentary"
+name = "sousa"
 version = "0.1.0"
 description = "SOUSA: Synthetic Open Unified Snare Assessment - generates synthetic drum rudiment datasets for ML training"
 readme = "README.md"
@@ -75,11 +75,11 @@ ml = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/zkeown/rudimentary"
-Repository = "https://github.com/zkeown/rudimentary"
-Documentation = "https://github.com/zkeown/rudimentary#readme"
+Homepage = "https://github.com/zakkeown/SOUSA"
+Repository = "https://github.com/zakkeown/SOUSA"
+Documentation = "https://github.com/zakkeown/SOUSA#readme"
 Dataset = "https://huggingface.co/datasets/zkeown/sousa"
-Issues = "https://github.com/zkeown/rudimentary/issues"
+Issues = "https://github.com/zakkeown/SOUSA/issues"
 
 [build-system]
 requires = ["hatchling"]

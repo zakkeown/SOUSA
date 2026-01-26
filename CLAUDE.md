@@ -72,4 +72,4 @@ The pipeline flows: **Rudiment YAML → PlayerProfile → MIDI → Audio → Lab
 ## External Dependencies
 
 - **FluidSynth**: Required for audio synthesis. Install via `brew install fluid-synth` (macOS)
-- **Ray**: Optional distributed processing. Install with `pip install 'rudimentary[cloud]'`
+- **Ray**: Optional distributed processing. Install with `pip install 'sousa[cloud]'`

@@ -4,7 +4,7 @@ Thank you for your interest in contributing to SOUSA (Synthetic Open Unified Sna
 
 ## Reporting Issues
 
-If you find a bug or have a feature request, please [open an issue](https://github.com/zkeown/rudimentary/issues) with:
+If you find a bug or have a feature request, please [open an issue](https://github.com/zakkeown/SOUSA/issues) with:
 
 - A clear description of the problem or suggestion
 - Steps to reproduce (for bugs)
@@ -15,8 +15,8 @@ If you find a bug or have a feature request, please [open an issue](https://gith
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/zkeown/rudimentary.git
-   cd rudimentary
+   git clone https://github.com/zakkeown/SOUSA.git
+   cd SOUSA
    ```
 
 2. Create a virtual environment:
@@ -90,7 +90,7 @@ Configuration is in `pyproject.toml`:
 ## Project Structure
 
 ```
-rudimentary/
+SOUSA/
 ├── dataset_gen/           # Core generation modules
 │   ├── rudiments/         # Rudiment definitions (YAML)
 │   ├── profiles/          # Player skill modeling

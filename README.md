@@ -56,7 +56,7 @@ python scripts/generate_dataset.py --with-audio
 
 ```bash
 # Install hub dependencies
-pip install 'rudimentary[hub]'
+pip install 'sousa[hub]'
 
 # Login to HuggingFace
 huggingface-cli login
