@@ -3,7 +3,6 @@
 import json
 import pytest
 import pandas as pd
-from pathlib import Path
 
 from dataset_gen.hub.uploader import HubConfig, DatasetUploader
 
@@ -48,19 +47,23 @@ class TestDatasetUploaderHelpers:
         labels_dir.mkdir()
 
         # Create samples parquet
-        samples_df = pd.DataFrame({
-            "sample_id": ["s1", "s2", "s3", "s4"],
-            "profile_id": ["p1", "p1", "p2", "p3"],
-            "audio_path": ["audio/a1.flac", "audio/a2.flac", "audio/a3.flac", "audio/a4.flac"],
-            "midi_path": ["midi/m1.mid", "midi/m2.mid", "midi/m3.mid", "midi/m4.mid"],
-        })
+        samples_df = pd.DataFrame(
+            {
+                "sample_id": ["s1", "s2", "s3", "s4"],
+                "profile_id": ["p1", "p1", "p2", "p3"],
+                "audio_path": ["audio/a1.flac", "audio/a2.flac", "audio/a3.flac", "audio/a4.flac"],
+                "midi_path": ["midi/m1.mid", "midi/m2.mid", "midi/m3.mid", "midi/m4.mid"],
+            }
+        )
         samples_df.to_parquet(labels_dir / "samples.parquet")
 
         # Create exercises parquet (minimal)
-        exercises_df = pd.DataFrame({
-            "sample_id": ["s1", "s2", "s3", "s4"],
-            "overall_score": [80.0, 85.0, 75.0, 90.0],
-        })
+        exercises_df = pd.DataFrame(
+            {
+                "sample_id": ["s1", "s2", "s3", "s4"],
+                "overall_score": [80.0, 85.0, 75.0, 90.0],
+            }
+        )
         exercises_df.to_parquet(labels_dir / "exercises.parquet")
 
         # Create splits
