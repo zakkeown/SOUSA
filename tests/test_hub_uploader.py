@@ -120,3 +120,33 @@ class TestDatasetUploaderHelpers:
         assert len(shard_map) == 4
         assert "a1.flac" in shard_map
         assert shard_map["a1.flac"].shard_name == "train-00000.tar"
+
+    def test_prepare_with_tar_shards_adds_shard_columns(self, sample_dataset):
+        """prepare() adds audio_shard and audio_filename columns when using TAR shards."""
+        # Create actual audio and midi files
+        audio_dir = sample_dataset / "audio"
+        audio_dir.mkdir()
+        for name in ["a1.flac", "a2.flac", "a3.flac", "a4.flac"]:
+            (audio_dir / name).write_bytes(b"fake audio content")
+
+        midi_dir = sample_dataset / "midi"
+        midi_dir.mkdir()
+        for name in ["m1.mid", "m2.mid", "m3.mid", "m4.mid"]:
+            (midi_dir / name).write_bytes(b"fake midi content")
+
+        config = HubConfig(dataset_dir=sample_dataset, repo_id="test/repo", use_tar_shards=True)
+        uploader = DatasetUploader(config)
+
+        staging_dir = uploader.prepare()
+
+        # Check parquet has shard columns
+        train_df = pd.read_parquet(staging_dir / "data" / "train-00000-of-00001.parquet")
+
+        assert "audio_shard" in train_df.columns
+        assert "audio_filename" in train_df.columns
+        assert "midi_shard" in train_df.columns
+        assert "midi_filename" in train_df.columns
+
+        # Values should be set
+        assert train_df["audio_shard"].iloc[0] == "train-00000.tar"
+        assert train_df["audio_filename"].iloc[0] in ["a1.flac", "a2.flac"]
