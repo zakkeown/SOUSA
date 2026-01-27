@@ -81,3 +81,6 @@ output/
 
 # Documentation build output
 site/
+
+# Git worktrees
+.worktrees/
