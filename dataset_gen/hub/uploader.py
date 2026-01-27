@@ -142,18 +142,22 @@ class DatasetUploader:
             # Add shard columns to dataframe
             if self.config.include_audio:
                 merged_df["audio_shard"] = merged_df["audio_path"].apply(
-                    lambda p: audio_shard_map.get(Path(p).name, ShardInfo("", "")).shard_name
-                    if pd.notna(p) and p
-                    else None
+                    lambda p: (
+                        audio_shard_map.get(Path(p).name, ShardInfo("", "")).shard_name
+                        if pd.notna(p) and p
+                        else None
+                    )
                 )
                 merged_df["audio_filename"] = merged_df["audio_path"].apply(
                     lambda p: Path(p).name if pd.notna(p) and p else None
                 )
             if self.config.include_midi:
                 merged_df["midi_shard"] = merged_df["midi_path"].apply(
-                    lambda p: midi_shard_map.get(Path(p).name, ShardInfo("", "")).shard_name
-                    if pd.notna(p) and p
-                    else None
+                    lambda p: (
+                        midi_shard_map.get(Path(p).name, ShardInfo("", "")).shard_name
+                        if pd.notna(p) and p
+                        else None
+                    )
                 )
                 merged_df["midi_filename"] = merged_df["midi_path"].apply(
                     lambda p: Path(p).name if pd.notna(p) and p else None
