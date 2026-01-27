@@ -3,6 +3,14 @@
 from dataset_gen.hub.archiver import ShardInfo, create_sharded_archives
 
 
+def test_archiver_exported_from_hub_module():
+    """Archiver functions are exported from hub module."""
+    from dataset_gen.hub import ShardInfo, create_sharded_archives
+
+    assert ShardInfo is not None
+    assert create_sharded_archives is not None
+
+
 class TestShardInfo:
     """Tests for ShardInfo dataclass."""
 
