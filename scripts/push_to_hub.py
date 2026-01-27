@@ -90,6 +90,11 @@ Prerequisites:
         help="Prepare files but don't upload (for testing)",
     )
     parser.add_argument(
+        "--no-sharding",
+        action="store_true",
+        help="Disable TAR sharding (not recommended for large datasets)",
+    )
+    parser.add_argument(
         "--staging-dir",
         type=Path,
         default=None,
@@ -147,6 +152,7 @@ Prerequisites:
         include_audio=not args.no_audio,
         include_midi=not args.no_midi,
         staging_dir=args.staging_dir,
+        use_tar_shards=not args.no_sharding,
     )
 
     # Print plan
