@@ -91,3 +91,32 @@ class TestDatasetUploaderHelpers:
         assert set(result["validation"]) == {"a3.flac"}
         # p3 has 1 sample -> test
         assert set(result["test"]) == {"a4.flac"}
+
+    def test_create_media_archives_creates_tar_files(self, sample_dataset):
+        """_create_media_archives creates TAR files in staging directory."""
+        # Create actual audio files
+        audio_dir = sample_dataset / "audio"
+        audio_dir.mkdir()
+        for name in ["a1.flac", "a2.flac", "a3.flac", "a4.flac"]:
+            (audio_dir / name).write_bytes(b"fake audio content")
+
+        config = HubConfig(dataset_dir=sample_dataset, repo_id="test/repo")
+        uploader = DatasetUploader(config)
+
+        # Create staging dir
+        staging = config.staging_dir
+        staging.mkdir(parents=True)
+
+        shard_map = uploader._create_media_archives("audio", "flac")
+
+        # Should have created TAR files
+        audio_staging = staging / "audio"
+        assert audio_staging.exists()
+        assert (audio_staging / "train-00000.tar").exists()
+        assert (audio_staging / "validation-00000.tar").exists()
+        assert (audio_staging / "test-00000.tar").exists()
+
+        # Shard map should have all files
+        assert len(shard_map) == 4
+        assert "a1.flac" in shard_map
+        assert shard_map["a1.flac"].shard_name == "train-00000.tar"

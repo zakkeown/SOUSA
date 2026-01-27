@@ -17,6 +17,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from dataset_gen.hub.archiver import ShardInfo, create_sharded_archives
+
 logger = logging.getLogger(__name__)
 
 
@@ -338,6 +340,43 @@ class DatasetUploader:
                 result["train"].append(filename)  # Default to train
 
         return result
+
+    def _create_media_archives(self, media_type: str, extension: str) -> dict[str, ShardInfo]:
+        """
+        Create sharded TAR archives for media files.
+
+        Args:
+            media_type: Either "audio" or "midi"
+            extension: File extension (e.g., "flac", "mid")
+
+        Returns:
+            Dict mapping filename to ShardInfo
+        """
+        src_dir = self.config.dataset_dir / media_type
+        dst_dir = self.config.staging_dir / media_type
+
+        if not src_dir.exists():
+            logger.warning(f"Source directory {src_dir} does not exist")
+            return {}
+
+        filenames_by_split = self._get_filenames_by_split(media_type)
+
+        shard_map = create_sharded_archives(
+            source_dir=src_dir,
+            output_dir=dst_dir,
+            filenames_by_split=filenames_by_split,
+            target_shard_size_bytes=self.config.tar_shard_size_bytes,
+            extension=extension,
+        )
+
+        # Update stats
+        total_files = sum(len(files) for files in filenames_by_split.values())
+        if media_type == "audio":
+            self.stats.audio_files = total_files
+        elif media_type == "midi":
+            self.stats.midi_files = total_files
+
+        return shard_map
 
     def upload(self, dry_run: bool = False) -> str | None:
         """
