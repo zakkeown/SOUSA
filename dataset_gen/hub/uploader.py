@@ -42,6 +42,10 @@ class HubConfig:
     # Shard settings for large datasets
     max_shard_size: str = "500MB"
 
+    # TAR sharding options (for staying under HuggingFace 100k file limit)
+    use_tar_shards: bool = True
+    tar_shard_size_bytes: int = 1_000_000_000  # 1GB per shard
+
     def __post_init__(self):
         self.dataset_dir = Path(self.dataset_dir)
         if self.staging_dir is None:
