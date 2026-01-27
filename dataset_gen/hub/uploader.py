@@ -296,6 +296,49 @@ class DatasetUploader:
         action = "Linked" if use_symlinks else "Copied"
         logger.info(f"{action} {count} {extension} files to {dst_dir}")
 
+    def _get_filenames_by_split(self, media_type: str) -> dict[str, list[str]]:
+        """
+        Get filenames grouped by split for a media type.
+
+        Args:
+            media_type: Either "audio" or "midi"
+
+        Returns:
+            Dict mapping split name to list of filenames
+        """
+        # Load source data
+        samples_df = pd.read_parquet(self.config.dataset_dir / "labels" / "samples.parquet")
+
+        # Load splits
+        with open(self.config.dataset_dir / "splits.json") as f:
+            splits = json.load(f)
+
+        # Determine path column
+        path_col = f"{media_type}_path"
+        if path_col not in samples_df.columns:
+            return {"train": [], "validation": [], "test": []}
+
+        result: dict[str, list[str]] = {"train": [], "validation": [], "test": []}
+
+        for _, row in samples_df.iterrows():
+            path = row[path_col]
+            if pd.isna(path) or not path:
+                continue
+
+            filename = Path(path).name
+            profile_id = row["profile_id"]
+
+            if profile_id in splits.get("train_profile_ids", []):
+                result["train"].append(filename)
+            elif profile_id in splits.get("val_profile_ids", []):
+                result["validation"].append(filename)
+            elif profile_id in splits.get("test_profile_ids", []):
+                result["test"].append(filename)
+            else:
+                result["train"].append(filename)  # Default to train
+
+        return result
+
     def upload(self, dry_run: bool = False) -> str | None:
         """
         Upload prepared dataset to HuggingFace Hub.
