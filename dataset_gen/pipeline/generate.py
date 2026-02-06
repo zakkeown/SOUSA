@@ -65,7 +65,12 @@ class GenerationConfig:
     # Scale settings
     num_profiles: int = 100
     samples_per_profile: int = 40  # One per rudiment
+
+    # Duration settings (choose one mode)
+    # Mode 1: Fixed cycles (original behavior)
     num_cycles_per_sample: int = 4
+    # Mode 2: Fixed duration (recommended for ML - removes duration as confounding variable)
+    target_duration_sec: float | None = None  # If set, overrides num_cycles_per_sample
 
     # Profile distribution
     skill_distribution: dict[SkillTier, float] = field(
@@ -374,11 +379,17 @@ class DatasetGenerator:
     ) -> None:
         """Generate a single sample (MIDI + audio variations)."""
         # Generate MIDI performance
+        # Use target_duration_sec if set, otherwise fall back to num_cycles
         performance = self._midi_gen.generate(
             rudiment=rudiment,
             profile=profile,
             tempo_bpm=tempo,
-            num_cycles=self.config.num_cycles_per_sample,
+            num_cycles=(
+                self.config.num_cycles_per_sample
+                if self.config.target_duration_sec is None
+                else None
+            ),
+            target_duration_sec=self.config.target_duration_sec,
             include_midi=True,
         )
 
@@ -529,7 +540,12 @@ class DatasetGenerator:
             rudiment=rudiment,
             profile=profile,
             tempo_bpm=tempo,
-            num_cycles=self.config.num_cycles_per_sample,
+            num_cycles=(
+                self.config.num_cycles_per_sample
+                if self.config.target_duration_sec is None
+                else None
+            ),
+            target_duration_sec=self.config.target_duration_sec,
             include_midi=True,
         )
 

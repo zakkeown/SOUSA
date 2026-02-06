@@ -113,7 +113,8 @@ class MIDIGenerator:
         rudiment: Rudiment,
         profile: PlayerProfile,
         tempo_bpm: int = 120,
-        num_cycles: int = 4,
+        num_cycles: int | None = None,
+        target_duration_sec: float | None = None,
         include_midi: bool = True,
     ) -> GeneratedPerformance:
         """
@@ -123,12 +124,22 @@ class MIDIGenerator:
             rudiment: The rudiment to perform
             profile: The player profile defining execution characteristics
             tempo_bpm: Tempo in BPM
-            num_cycles: How many times to repeat the rudiment pattern
+            num_cycles: How many times to repeat the rudiment pattern (if target_duration_sec not set)
+            target_duration_sec: Target duration in seconds (overrides num_cycles if set)
             include_midi: Whether to generate MIDI bytes
 
         Returns:
             GeneratedPerformance with stroke events and optional MIDI data
         """
+        # Calculate num_cycles from target duration if specified
+        if target_duration_sec is not None:
+            # Calculate how long one cycle takes at this tempo
+            cycle_duration = rudiment.duration_at_tempo(tempo_bpm, num_cycles=1)
+            # Calculate cycles needed (at least 1, round to nearest int)
+            num_cycles = max(1, round(target_duration_sec / cycle_duration))
+        elif num_cycles is None:
+            num_cycles = 4  # Default fallback
+
         # Generate ideal timing grid
         ideal_events = self._generate_ideal_events(rudiment, tempo_bpm, num_cycles)
 
@@ -435,7 +446,8 @@ def generate_performance(
     rudiment: Rudiment,
     profile: PlayerProfile,
     tempo_bpm: int = 120,
-    num_cycles: int = 4,
+    num_cycles: int | None = None,
+    target_duration_sec: float | None = None,
     seed: int | None = None,
 ) -> GeneratedPerformance:
     """
@@ -445,14 +457,21 @@ def generate_performance(
         rudiment: The rudiment to perform
         profile: Player profile
         tempo_bpm: Tempo
-        num_cycles: Number of pattern repetitions
+        num_cycles: Number of pattern repetitions (if target_duration_sec not set)
+        target_duration_sec: Target duration in seconds (overrides num_cycles)
         seed: Random seed
 
     Returns:
         GeneratedPerformance
     """
     generator = MIDIGenerator(seed=seed)
-    return generator.generate(rudiment, profile, tempo_bpm, num_cycles)
+    return generator.generate(
+        rudiment,
+        profile,
+        tempo_bpm,
+        num_cycles=num_cycles,
+        target_duration_sec=target_duration_sec,
+    )
 
 
 def regenerate_midi(

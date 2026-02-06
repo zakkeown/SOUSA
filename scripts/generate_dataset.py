@@ -99,6 +99,7 @@ def worker_generate(
         ),
         seed=config_dict["seed"] + worker_id,  # Different seed per worker
         verbose=config_dict["verbose"],
+        target_duration_sec=config_dict.get("target_duration_sec"),
     )
 
     # Get this worker's profiles with their global indices
@@ -281,6 +282,14 @@ Examples:
         action="store_true",
         help="Reduce output verbosity",
     )
+    parser.add_argument(
+        "--fixed-duration",
+        type=float,
+        default=None,
+        metavar="SECONDS",
+        help="Generate samples with fixed duration (e.g., 4.0 for 4 seconds). "
+        "Recommended for ML training to prevent models learning note count instead of patterns.",
+    )
 
     args = parser.parse_args()
 
@@ -337,6 +346,10 @@ Examples:
     print(f"  {len(rudiments)} rudiments")
     print(f"  {args.tempos} tempos per rudiment")
     print(f"  {args.augmentations} augmentations per sample")
+    if args.fixed_duration:
+        print(f"  Fixed duration: {args.fixed_duration}s per sample (ML-optimized)")
+    else:
+        print("  Variable duration: 4 cycles per sample (original behavior)")
     print(f"\nTotal samples: {total_samples:,}")
     print("\nEstimated storage:")
     print(f"  MIDI files:  ~{midi_total_mb:.1f} MB")
@@ -413,6 +426,7 @@ Examples:
             "soundfont_path": str(args.soundfont) if args.soundfont else None,
             "seed": args.seed,
             "verbose": not args.quiet,
+            "target_duration_sec": args.fixed_duration,
         }
 
         # Create worker tasks
@@ -449,6 +463,7 @@ Examples:
             soundfont_path=args.soundfont,
             seed=args.seed,
             verbose=not args.quiet,
+            target_duration_sec=args.fixed_duration,
         )
 
         logger.info(f"Generating dataset to {args.output}")
