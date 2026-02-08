@@ -245,33 +245,64 @@ class DatasetWriter:
         return paths
 
     def _write_parquet(self, records: list[dict], path: Path) -> None:
-        """Write records to Parquet file, appending to existing if present."""
+        """Write records to Parquet file, appending to existing if present.
+
+        Uses atomic writes (write to temp, then rename) to prevent corruption
+        if the process is interrupted mid-write.
+        """
+        import tempfile
+        import os
+
         new_df = pd.DataFrame(records)
 
         # Append to existing file if it exists
         if path.exists():
-            existing_df = pd.read_parquet(path)
-            combined_df = pd.concat([existing_df, new_df], ignore_index=True)
-            # Deduplicate based on sample_id (and index for strokes)
-            if "sample_id" in combined_df.columns:
-                if "index" in combined_df.columns:
-                    # Strokes/measures: dedupe on (sample_id, index)
-                    combined_df = combined_df.drop_duplicates(
-                        subset=["sample_id", "index"], keep="last"
-                    )
-                else:
-                    # Samples/exercises: dedupe on sample_id
-                    combined_df = combined_df.drop_duplicates(subset=["sample_id"], keep="last")
-            table = pa.Table.from_pandas(combined_df)
+            try:
+                existing_df = pd.read_parquet(path)
+                combined_df = pd.concat([existing_df, new_df], ignore_index=True)
+                # Deduplicate based on sample_id (and index for strokes)
+                if "sample_id" in combined_df.columns:
+                    if "index" in combined_df.columns:
+                        # Strokes/measures: dedupe on (sample_id, index)
+                        combined_df = combined_df.drop_duplicates(
+                            subset=["sample_id", "index"], keep="last"
+                        )
+                    else:
+                        # Samples/exercises: dedupe on sample_id
+                        combined_df = combined_df.drop_duplicates(subset=["sample_id"], keep="last")
+                table = pa.Table.from_pandas(combined_df)
+            except Exception as e:
+                # If existing file is corrupted, log warning and use only new data
+                import logging
+
+                logging.getLogger(__name__).warning(
+                    f"Could not read existing parquet file {path}, starting fresh: {e}"
+                )
+                table = pa.Table.from_pandas(new_df)
         else:
             table = pa.Table.from_pandas(new_df)
 
-        pq.write_table(
-            table,
-            str(path),
-            compression=self.config.compression,
-            row_group_size=self.config.row_group_size,
+        # Write to temp file first, then atomically rename
+        # This prevents corruption if the process is interrupted mid-write
+        temp_fd, temp_path = tempfile.mkstemp(
+            suffix=".parquet", dir=path.parent, prefix=f".{path.stem}_"
         )
+        os.close(temp_fd)
+
+        try:
+            pq.write_table(
+                table,
+                temp_path,
+                compression=self.config.compression,
+                row_group_size=self.config.row_group_size,
+            )
+            # Atomic rename (on POSIX systems)
+            os.replace(temp_path, path)
+        except Exception:
+            # Clean up temp file on failure
+            if os.path.exists(temp_path):
+                os.unlink(temp_path)
+            raise
 
     def _write_index(self) -> Path:
         """Write dataset index file."""

@@ -79,8 +79,10 @@ def worker_generate(
         output_dir: Base output directory (worker appends worker_id)
 
     Returns:
-        Statistics dict with samples generated
+        Statistics dict with samples generated (includes error info if failed)
     """
+    import traceback
+
     # Re-import in worker process (required for multiprocessing)
     from dataset_gen.pipeline.generate import DatasetGenerator, GenerationConfig
 
@@ -105,22 +107,23 @@ def worker_generate(
     # Get this worker's profiles with their global indices
     worker_profiles = [(i, all_profiles[i]) for i in profile_indices]
 
-    # Create a dummy splits assignment (profiles already assigned globally)
-    # Worker doesn't need to track splits - we merge later
-    generator = DatasetGenerator(config)
-
-    # Pre-populate profile numbers with GLOBAL indices to avoid ID collisions
-    for global_idx, profile in worker_profiles:
-        generator._profile_numbers[profile.id] = global_idx
-
-    # Create a minimal split assignment for the worker
-    dummy_splits = SplitAssignment(
-        train_profile_ids=[p.id for _, p in worker_profiles],
-        val_profile_ids=[],
-        test_profile_ids=[],
-    )
-
+    generator = None
     try:
+        # Create a dummy splits assignment (profiles already assigned globally)
+        # Worker doesn't need to track splits - we merge later
+        generator = DatasetGenerator(config)
+
+        # Pre-populate profile numbers with GLOBAL indices to avoid ID collisions
+        for global_idx, profile in worker_profiles:
+            generator._profile_numbers[profile.id] = global_idx
+
+        # Create a minimal split assignment for the worker
+        dummy_splits = SplitAssignment(
+            train_profile_ids=[p.id for _, p in worker_profiles],
+            val_profile_ids=[],
+            test_profile_ids=[],
+        )
+
         # Generate samples for this worker's profiles
         for _, profile in worker_profiles:
             generator._generate_profile_samples(profile, rudiments, dummy_splits)
@@ -131,14 +134,27 @@ def worker_generate(
             "samples": generator.progress.completed_samples,
             "failed": generator.progress.failed_samples,
             "output_dir": str(worker_dir),
+            "error": None,
+        }
+    except Exception as e:
+        # Return error info instead of raising - allows other workers to continue
+        return {
+            "worker_id": worker_id,
+            "samples": generator.progress.completed_samples if generator else 0,
+            "failed": generator.progress.failed_samples if generator else len(profile_indices),
+            "output_dir": str(worker_dir),
+            "error": f"{type(e).__name__}: {e}\n{traceback.format_exc()}",
         }
     finally:
-        generator.close()
+        if generator:
+            generator.close()
 
 
 def merge_worker_outputs(output_dir: Path, num_workers: int, logger) -> None:
     """
     Merge parquet files from worker directories into main output.
+
+    Robust to missing/corrupted worker outputs - will skip and log warnings.
 
     Args:
         output_dir: Base output directory
@@ -165,7 +181,11 @@ def merge_worker_outputs(output_dir: Path, num_workers: int, logger) -> None:
         for w in range(num_workers):
             worker_path = output_dir / f"worker_{w}" / "labels" / pq_file
             if worker_path.exists():
-                dfs.append(pd.read_parquet(worker_path))
+                try:
+                    dfs.append(pd.read_parquet(worker_path))
+                except Exception as e:
+                    logger.warning(f"Could not read {worker_path}: {e}")
+                    continue
 
         if dfs:
             combined = pd.concat(dfs, ignore_index=True)
@@ -173,6 +193,8 @@ def merge_worker_outputs(output_dir: Path, num_workers: int, logger) -> None:
             table = pa.Table.from_pandas(combined)
             pq.write_table(table, str(output_path), compression="snappy")
             logger.info(f"Merged {pq_file}: {len(combined)} records")
+        else:
+            logger.warning(f"No valid data found for {pq_file}")
 
     # Move MIDI and audio files
     for w in range(num_workers):
@@ -440,9 +462,20 @@ Examples:
         with mp.Pool(processes=args.workers) as pool:
             results = pool.starmap(worker_generate, worker_args)
 
-        # Report worker results
+        # Report worker results and handle errors
         total_samples = sum(r["samples"] for r in results)
         total_failed = sum(r["failed"] for r in results)
+        failed_workers = [r for r in results if r.get("error")]
+
+        if failed_workers:
+            logger.warning(f"{len(failed_workers)} workers encountered errors:")
+            for r in failed_workers:
+                logger.warning(f"  Worker {r['worker_id']}: {r['error'].split(chr(10))[0]}")
+                # Write full error to file for debugging
+                error_file = args.output / f"worker_{r['worker_id']}_error.log"
+                error_file.parent.mkdir(parents=True, exist_ok=True)
+                error_file.write_text(r["error"])
+
         logger.info(f"Workers completed: {total_samples} samples, {total_failed} failed")
 
         # Merge worker outputs
