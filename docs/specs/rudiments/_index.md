@@ -40,15 +40,15 @@ These specs serve as the authoritative source of truth for the SOUSA project and
 
 | PAS # | Name | Category | Family | Subdivision | Cycle Length | Status |
 |-------|------|----------|--------|-------------|--------------|--------|
-| 7 | Five Stroke Roll | roll | counted roll | sixteenth | 1.5 beats | Pending |
-| 8 | Six Stroke Roll | roll | counted roll | sixteenth | 1.5 beats | Pending |
-| 9 | Seven Stroke Roll | roll | counted roll | sixteenth | 2 beats | Pending |
-| 10 | Nine Stroke Roll | roll | counted roll | sixteenth | 2.5 beats | Pending |
-| 11 | Ten Stroke Roll | roll | counted roll | sixteenth | 3 beats | Pending |
-| 12 | Eleven Stroke Roll | roll | counted roll | sixteenth | 3 beats | Pending |
-| 13 | Thirteen Stroke Roll | roll | counted roll | sixteenth | 4 beats | Pending |
-| 14 | Fifteen Stroke Roll | roll | counted roll | sixteenth | 4 beats | Pending |
-| 15 | Seventeen Stroke Roll | roll | counted roll | sixteenth | 4.5 beats | Pending |
+| 7 | [Five Stroke Roll](./07_five_stroke_roll.md) | roll | counted roll | sixteenth | 1.5 beats | Done |
+| 8 | [Six Stroke Roll](./08_six_stroke_roll.md) | roll | counted roll | sixteenth | 1.5 beats | Done |
+| 9 | [Seven Stroke Roll](./09_seven_stroke_roll.md) | roll | counted roll | sixteenth | 2 beats | Done |
+| 10 | [Nine Stroke Roll](./10_nine_stroke_roll.md) | roll | counted roll | sixteenth | 2.5 beats | Done |
+| 11 | [Ten Stroke Roll](./11_ten_stroke_roll.md) | roll | counted roll | sixteenth | 2.5 beats | Done |
+| 12 | [Eleven Stroke Roll](./12_eleven_stroke_roll.md) | roll | counted roll | sixteenth | 3 beats | Done |
+| 13 | [Thirteen Stroke Roll](./13_thirteen_stroke_roll.md) | roll | counted roll | sixteenth | 3.5 beats | Done |
+| 14 | [Fifteen Stroke Roll](./14_fifteen_stroke_roll.md) | roll | counted roll | sixteenth | 4 beats | Done |
+| 15 | [Seventeen Stroke Roll](./15_seventeen_stroke_roll.md) | roll | counted roll | sixteenth | 4.5 beats | Done |
 
 ---
 
