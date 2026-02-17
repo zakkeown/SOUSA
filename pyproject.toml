@@ -46,6 +46,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+analysis = [
+    "madmom @ git+https://github.com/CPJKU/madmom.git",
+    "matplotlib>=3.7.0",
+]
 dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
