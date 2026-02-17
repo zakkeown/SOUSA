@@ -253,7 +253,7 @@ def train_baseline_classifiers(
 
     # Model 1: Logistic Regression
     logger.info(f"Training Logistic Regression for {task_name}...")
-    lr = LogisticRegression(max_iter=1000, multi_class="multinomial")
+    lr = LogisticRegression(max_iter=1000)
     lr.fit(X_train, y_train)
     y_pred = lr.predict(X_test)
 

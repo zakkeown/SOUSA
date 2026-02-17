@@ -81,6 +81,77 @@ The pipeline flows: **Rudiment YAML → PlayerProfile → MIDI → Audio → Lab
 - `data/noise_profiles/` - Background noise samples
 - `output/dataset/` - Generated dataset (midi/, audio/, labels/)
 
+## Evaluation & Validation
+
+After generating a dataset, use the following tools to validate quality. Run them in order from quick checks to deep analysis.
+
+### Post-Generation Validation (run after every regeneration)
+
+```bash
+# 1. Quick health check (seconds) — exit code 1 = critical issues
+python scripts/check_generation.py output/dataset
+
+# 2. Dataset statistics overview
+python scripts/dataset_stats.py output/dataset              # Console output
+python scripts/dataset_stats.py output/dataset --markdown    # For dataset card
+python scripts/dataset_stats.py output/dataset --json stats.json
+
+# 3. Full test suite (includes label verification, tier ordering, realism checks)
+pytest tests/ -v
+
+# 4. Audio quality validation (requires --with-audio generation)
+python -m dataset_gen.validation.audio_check output/dataset --sample-size 100
+```
+
+### Deep Analysis (run before publishing or after pipeline changes)
+
+```bash
+# 5. ML utility proof — trains baseline classifiers/regressors, reports learnability
+#    Outputs: output/dataset/proofs/utility_report.json
+#    Pass criteria: classification acc > 0.7 AND regression R² > 0.5
+python scripts/prove_utility.py output/dataset
+
+# 6. Publication plots — 6 PNGs for dataset card
+#    Outputs: score_distribution, timing_accuracy, rudiment_distribution,
+#             skill_tier_distribution, tempo_distribution, timing_vs_velocity
+python scripts/generate_plots.py output/dataset --output-dir output/dataset/plots
+
+# 7. Score correlation analysis — identifies redundant scores, PCA, clustering
+python -m experiments.score_analysis --data-dir output/dataset
+```
+
+### Audio Inspection (for debugging individual samples)
+
+```bash
+# Analyze a single audio file — renders waveform, onsets, dashboard, cycle zoom
+python scripts/analyze_audio.py output/dataset/audio/SAMPLE.flac \
+    --midi output/dataset/midi/SAMPLE.mid --view all
+
+# Views: waveform | onsets | dashboard | cycles | all
+# Dashboard panel 4 shows velocity-amplitude correlation per stroke
+# Cycle zoom shows per-stroke match quality (green=matched, red=missed)
+```
+
+### Validation Modules (programmatic access)
+
+| Module | Purpose | Key checks |
+|--------|---------|------------|
+| `dataset_gen.validation.verify` | Label integrity | 14 checks: parquet integrity, ID uniqueness, ref validity, score ranges, tier ordering, MIDI alignment |
+| `dataset_gen.validation.analysis` | Statistical analysis | Distribution stats by stroke/measure/exercise level, per-tier breakdowns |
+| `dataset_gen.validation.realism` | Literature comparison | Timing SD and velocity CV vs. published benchmarks (Fujii 2011, Repp 2005, etc.) |
+| `dataset_gen.validation.audio_check` | Audio quality | File integrity, silence, clipping, duration match, RMS consistency |
+| `dataset_gen.validation.report` | Integrated report | Combines all validators into single JSON report |
+
+### Expected Pass Criteria
+
+- **Label verification**: 14/14 checks pass
+- **Realism - literature**: 8/8 comparisons within published ranges
+- **Realism - correlations**: timing_accuracy↔consistency r≥0.5, timing↔overall r≥0.6
+- **Skill tier ordering**: timing_accuracy and hand_balance properly ordered across all 4 tiers
+- **Audio quality**: <1% clipping, <20% silence, RMS in [-40, -6] dB range
+- **ML utility**: classification accuracy > 0.7, regression R² > 0.5
+- **Velocity-amplitude correlation**: mean within-sample r > 0.3 (post velocity gain curve)
+
 ## External Dependencies
 
 - **FluidSynth**: Required for audio synthesis. Install via `brew install fluid-synth` (macOS)
