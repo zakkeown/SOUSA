@@ -25,7 +25,6 @@ from dataset_gen.profiles.archetypes import (
     PlayerProfile,
     SkillTier,
     generate_profile,
-    generate_profiles_batch,
 )
 from dataset_gen.midi_gen.generator import MIDIGenerator, regenerate_midi
 from dataset_gen.midi_gen.articulations import ArticulationEngine
@@ -293,11 +292,13 @@ class DatasetGenerator:
         return splits
 
     def _generate_profiles(self) -> list[PlayerProfile]:
-        """Generate player profiles according to distribution."""
-        return generate_profiles_batch(
+        """Generate player profiles with correlated skill dimensions."""
+        from dataset_gen.profiles.sampler import ProfileSampler
+
+        sampler = ProfileSampler(seed=self.config.seed)
+        return sampler.sample_batch(
             self.config.num_profiles,
             skill_distribution=self.config.skill_distribution,
-            seed=self.config.seed,
         )
 
     def _get_profile_number(self, profile: PlayerProfile) -> int:

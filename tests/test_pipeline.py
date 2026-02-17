@@ -339,6 +339,33 @@ class TestGenerationConfig:
 class TestDatasetGenerator:
     """Tests for the main generator."""
 
+    def test_profiles_have_correlated_dimensions(self):
+        """Generated profiles should have correlated timing/hand_balance dimensions."""
+        from scipy import stats
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            config = GenerationConfig(
+                output_dir=Path(tmpdir),
+                num_profiles=50,
+                generate_audio=False,
+                seed=42,
+            )
+            generator = DatasetGenerator(config)
+            profiles = generator._generate_profiles()
+
+            # Extract timing_accuracy (error, high=bad) and lr_velocity_ratio (high=good)
+            timing_errors = [p.dimensions.timing.timing_accuracy for p in profiles]
+            vel_ratios = [p.dimensions.hand_balance.lr_velocity_ratio for p in profiles]
+
+            # Higher timing error should correlate with lower velocity ratio
+            r, _ = stats.pearsonr(timing_errors, vel_ratios)
+            assert r < -0.15, (
+                f"Expected negative correlation between timing_accuracy and "
+                f"lr_velocity_ratio, got r={r:.3f}"
+            )
+
+            generator.close()
+
     def test_generator_initialization(self, sample_rudiment):
         """Test generator initializes without errors."""
         with tempfile.TemporaryDirectory() as tmpdir:
