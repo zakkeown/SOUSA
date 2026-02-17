@@ -221,6 +221,28 @@ class TestMIDIGenerator:
             assert ratio < 0.98
 
 
+class TestVelocitySpread:
+    """Tests for ideal velocity distribution."""
+
+    def test_ideal_velocity_spread(self):
+        """Ideal velocities should span at least 70 MIDI units for ML-useful dynamic range."""
+        gen = MIDIGenerator(seed=42)
+        profile = generate_profile(SkillTier.PROFESSIONAL, rng=np.random.default_rng(42))
+        # Use flam paradiddle: has all 4 stroke types (grace, accent, tap, diddle)
+        rudiment = load_rudiment(
+            Path(__file__).parent.parent
+            / "dataset_gen"
+            / "rudiments"
+            / "definitions"
+            / "24_flam_paradiddle.yaml"
+        )
+        performance = gen.generate(rudiment, profile, tempo_bpm=120, num_cycles=4)
+
+        velocities = [e.intended_velocity for e in performance.strokes]
+        vel_range = max(velocities) - min(velocities)
+        assert vel_range >= 70, f"Velocity range {vel_range} too narrow (need >= 70)"
+
+
 class TestConvenienceFunction:
     """Tests for the convenience generate_performance function."""
 

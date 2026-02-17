@@ -197,13 +197,13 @@ class MIDIGenerator:
 
                 # Calculate ideal velocity
                 if stroke.stroke_type == StrokeType.ACCENT:
-                    ideal_velocity = 110
+                    ideal_velocity = 120
                 elif stroke.stroke_type == StrokeType.GRACE:
-                    ideal_velocity = 70
+                    ideal_velocity = 40
                 elif stroke.stroke_type == StrokeType.DIDDLE:
-                    ideal_velocity = 85
+                    ideal_velocity = 75
                 else:  # TAP
-                    ideal_velocity = 85
+                    ideal_velocity = 65
 
                 # Find parent stroke for grace notes
                 parent_index = None
