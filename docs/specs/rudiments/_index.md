@@ -74,10 +74,10 @@ These specs serve as the authoritative source of truth for the SOUSA project and
 | 24 | [Flam Paradiddle](./24_flam_paradiddle.md) | flam | compound flam | sixteenth | 2.5 beats | Done |
 | 25 | [Single Flammed Mill](./25_single_flammed_mill.md) | flam | compound flam | sixteenth | 2 beats | Done |
 | 26 | [Flam Paradiddle-Diddle](./26_flam_paradiddle_diddle.md) | flam | compound flam | sextuplet | 2 beats | Done |
-| 27 | Pataflafla | flam | advanced flam | sixteenth | 2 beats | Pending |
-| 28 | Swiss Army Triplet | flam | advanced flam | triplet | 2 beats | Pending |
-| 29 | Inverted Flam Tap | flam | advanced flam | eighth | 1 beat | Pending |
-| 30 | Flam Drag | flam | advanced flam | sixteenth | 3 beats | Pending |
+| 27 | [Pataflafla](./27_pataflafla.md) | flam | advanced flam | sixteenth | 2 beats | Done |
+| 28 | [Swiss Army Triplet](./28_swiss_army_triplet.md) | flam | advanced flam | triplet | 2 beats | Done |
+| 29 | [Inverted Flam Tap](./29_inverted_flam_tap.md) | flam | advanced flam | sixteenth | 1.5 beats | Done |
+| 30 | [Flam Drag](./30_flam_drag.md) | flam | advanced flam | sixteenth | 3 beats | Done |
 
 ---
 
