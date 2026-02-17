@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import numpy as np
 import pytest
 import mido
+import soundfile as sf
 
-from dataset_gen.audio_analysis.onsets import DetectedOnset
+from dataset_gen.audio_analysis.onsets import detect_onsets, DetectedOnset
 from dataset_gen.audio_analysis.midi_alignment import MidiOnset, extract_midi_onsets
 
 
@@ -77,3 +79,49 @@ class TestMidiAlignment:
     def test_extract_from_path_string(self, simple_midi_file):
         onsets = extract_midi_onsets(str(simple_midi_file))
         assert len(onsets) == 4
+
+
+class TestOnsetDetection:
+    @pytest.fixture
+    def click_audio(self, tmp_path):
+        sr = 44100
+        duration_sec = 2.5
+        n_samples = int(sr * duration_sec)
+        audio = np.zeros(n_samples)
+        click_times = [0.25, 0.75, 1.25, 1.75]
+        click_len = int(0.005 * sr)
+        for t in click_times:
+            start = int(t * sr)
+            click = np.exp(-np.linspace(0, 10, click_len)) * 0.9
+            audio[start : start + click_len] += click
+        audio_path = tmp_path / "clicks.wav"
+        sf.write(str(audio_path), audio, sr)
+        return audio_path, click_times
+
+    def test_detect_onsets_returns_list(self, click_audio):
+        audio_path, _ = click_audio
+        onsets = detect_onsets(audio_path)
+        assert isinstance(onsets, list)
+        assert all(isinstance(o, DetectedOnset) for o in onsets)
+
+    def test_detect_onsets_finds_clicks(self, click_audio):
+        audio_path, expected_times = click_audio
+        onsets = detect_onsets(audio_path)
+        assert 3 <= len(onsets) <= 6, f"Expected ~4 onsets, got {len(onsets)}"
+
+    def test_detect_onsets_timing_accuracy(self, click_audio):
+        audio_path, expected_times = click_audio
+        onsets = detect_onsets(audio_path)
+        detected_times = [o.time_sec for o in onsets]
+        for expected in expected_times:
+            closest = min(detected_times, key=lambda t: abs(t - expected))
+            error_ms = abs(closest - expected) * 1000
+            assert (
+                error_ms < 50
+            ), f"Onset at {expected}s: closest detection {closest}s ({error_ms}ms off)"
+
+    def test_detect_onsets_from_array(self, click_audio):
+        audio_path, _ = click_audio
+        audio, sr = sf.read(str(audio_path))
+        onsets = detect_onsets(audio, sample_rate=sr)
+        assert len(onsets) >= 3
