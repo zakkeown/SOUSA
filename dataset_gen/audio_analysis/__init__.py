@@ -7,6 +7,7 @@ from dataset_gen.audio_analysis.onsets import (
     get_onset_activation,
 )
 from dataset_gen.audio_analysis.views import (
+    render_cycle_zoom,
     render_dashboard,
     render_onset_timeline,
     render_waveform,
@@ -18,6 +19,7 @@ __all__ = [
     "detect_onsets",
     "extract_midi_onsets",
     "get_onset_activation",
+    "render_cycle_zoom",
     "render_dashboard",
     "render_onset_timeline",
     "render_waveform",
