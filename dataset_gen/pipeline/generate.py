@@ -430,6 +430,14 @@ class DatasetGenerator:
                 except Exception as e:
                     logger.warning(f"Audio synthesis failed: {e}")
 
+            # Apply velocity-dependent gain to compensate for flat soundfont mapping
+            if base_audio is not None:
+                from dataset_gen.audio_synth.synthesizer import apply_velocity_curve
+
+                base_audio = apply_velocity_curve(
+                    base_audio, performance.strokes, self.config.sample_rate
+                )
+
             # Apply augmentation to audio
             augmented_audio = None
             audio_aug_params = None
