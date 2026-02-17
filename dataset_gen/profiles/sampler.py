@@ -138,7 +138,8 @@ class CorrelationStructure:
 
         # Hand balance → Timing
         # Poor hand balance → worse timing (from weak hand)
-        set_corr("lr_velocity_ratio", "timing_accuracy", cls.WEAK_NEGATIVE)
+        set_corr("lr_velocity_ratio", "timing_accuracy", cls.MODERATE_NEGATIVE)
+        set_corr("lr_timing_bias", "timing_accuracy", cls.MODERATE_POSITIVE)
         set_corr("lr_consistency_delta", "timing_consistency", cls.MODERATE_POSITIVE)
 
         # Hand balance → Rudiment-specific
@@ -159,9 +160,10 @@ class CorrelationStructure:
     @staticmethod
     def _nearest_positive_definite(A: np.ndarray) -> np.ndarray:
         """
-        Find the nearest positive-definite matrix to A.
+        Find the nearest positive-definite correlation matrix to A.
 
-        Uses the Higham (2002) algorithm.
+        Uses the Higham (2002) algorithm, then re-normalizes the diagonal
+        to 1.0 so the result remains a valid correlation matrix.
         """
         B = (A + A.T) / 2
         _, s, V = np.linalg.svd(B)
@@ -170,6 +172,9 @@ class CorrelationStructure:
         A3 = (A2 + A2.T) / 2
 
         if cls_is_positive_definite(A3):
+            # Re-normalize diagonal to 1.0 for a valid correlation matrix
+            d = np.sqrt(np.diag(A3))
+            A3 = A3 / np.outer(d, d)
             return A3
 
         spacing = np.spacing(np.linalg.norm(A))
@@ -180,6 +185,9 @@ class CorrelationStructure:
             A3 += I * (-min_eig * k**2 + spacing)
             k += 1
 
+        # Re-normalize diagonal to 1.0 for a valid correlation matrix
+        d = np.sqrt(np.diag(A3))
+        A3 = A3 / np.outer(d, d)
         return A3
 
 

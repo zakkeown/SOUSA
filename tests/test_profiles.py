@@ -145,6 +145,22 @@ class TestCorrelatedSampling:
         correlation = np.corrcoef(timing_accuracy, timing_consistency)[0, 1]
         assert correlation > 0.3  # Should show positive correlation
 
+    def test_sampler_hand_balance_timing_correlation(self):
+        """Test moderate negative correlation between lr_velocity_ratio and timing_accuracy."""
+        sampler = ProfileSampler(seed=42)
+
+        # Sample within a single tier to test within-tier correlation
+        profiles = sampler.sample_batch(200, skill_distribution={SkillTier.INTERMEDIATE: 1.0})
+
+        timing = [p.dimensions.timing.timing_accuracy for p in profiles]
+        vel_ratio = [p.dimensions.hand_balance.lr_velocity_ratio for p in profiles]
+
+        correlation = np.corrcoef(timing, vel_ratio)[0, 1]
+        assert correlation < -0.25, (
+            f"Expected moderate negative within-tier correlation between "
+            f"timing_accuracy and lr_velocity_ratio, got r={correlation:.3f}"
+        )
+
     def test_dimension_order_matches_archetype_params(self):
         """Test that dimension order is consistent with archetype params."""
         # Verify we have the right number of dimensions
