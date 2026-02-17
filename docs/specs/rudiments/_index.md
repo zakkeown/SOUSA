@@ -67,9 +67,9 @@ These specs serve as the authoritative source of truth for the SOUSA project and
 
 | PAS # | Name | Category | Family | Subdivision | Cycle Length | Status |
 |-------|------|----------|--------|-------------|--------------|--------|
-| 20 | Flam | flam | basic flam | eighth | 1 beat | Pending |
-| 21 | Flam Accent | flam | basic flam | triplet | 2 beats | Pending |
-| 22 | Flam Tap | flam | basic flam | eighth | 1 beat | Pending |
+| 20 | [Flam](./20_flam.md) | flam | basic flam | eighth | 1 beat | Done |
+| 21 | [Flam Accent](./21_flam_accent.md) | flam | basic flam | triplet | 2 beats | Done |
+| 22 | [Flam Tap](./22_flam_tap.md) | flam | basic flam | eighth | 1 beat | Done |
 | 23 | Flamacue | flam | compound flam | sixteenth | 2.5 beats | Pending |
 | 24 | Flam Paradiddle | flam | compound flam | sixteenth | 2 beats | Pending |
 | 25 | Single Flammed Mill | flam | compound flam | sixteenth | 2 beats | Pending |
