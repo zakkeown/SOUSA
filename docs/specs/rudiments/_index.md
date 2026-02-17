@@ -34,7 +34,7 @@ These specs serve as the authoritative source of truth for the SOUSA project and
 
 | PAS # | Name | Category | Family | Subdivision | Cycle Length | Status |
 |-------|------|----------|--------|-------------|--------------|--------|
-| 6 | Double Stroke Open Roll | roll | double stroke | sixteenth | 2 beats | Pending |
+| 6 | [Double Stroke Open Roll](./06_double_stroke_open_roll.md) | roll | double stroke | sixteenth | 2 beats | Done |
 
 ### E. Counted Stroke Rolls
 
