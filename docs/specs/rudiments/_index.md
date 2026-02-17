@@ -85,9 +85,9 @@ These specs serve as the authoritative source of truth for the SOUSA project and
 
 | PAS # | Name | Category | Family | Subdivision | Cycle Length | Status |
 |-------|------|----------|--------|-------------|--------------|--------|
-| 31 | Drag | drag | basic drag | eighth | 1 beat | Pending |
-| 32 | Single Drag Tap | drag | basic drag | sixteenth | 2 beats | Pending |
-| 33 | Double Drag Tap | drag | basic drag | sixteenth | 3 beats | Pending |
+| 31 | [Drag](./31_drag.md) | drag | basic drag | eighth | 1 beat | Done |
+| 32 | [Single Drag Tap](./32_single_drag_tap.md) | drag | basic drag | sixteenth | 2 beats | Done |
+| 33 | [Double Drag Tap](./33_double_drag_tap.md) | drag | basic drag | sixteenth | 3 beats | Done |
 | 34 | Lesson 25 | drag | compound drag | sixteenth | 4 beats | Pending |
 | 35 | Single Dragadiddle | drag | compound drag | sixteenth | 2 beats | Pending |
 | 36 | Drag Paradiddle #1 | drag | compound drag | sixteenth | 2 beats | Pending |
