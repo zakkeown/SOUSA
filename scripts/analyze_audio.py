@@ -136,6 +136,7 @@ def main():
                 detected_onsets=detected,
                 activation=activation,
                 activation_fps=act_fps,
+                threshold=args.threshold,
                 output_path=output_file,
             )
 

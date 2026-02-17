@@ -33,6 +33,48 @@ def _to_mono(audio: np.ndarray) -> np.ndarray:
     return audio
 
 
+def _match_onsets(
+    midi_onsets: list[MidiOnset],
+    detected_onsets: list[DetectedOnset] | None,
+    match_window_ms: float = 50.0,
+) -> dict[int, float | None]:
+    """Match each MIDI onset to its closest detected onset.
+
+    Returns:
+        Dict mapping MIDI onset index to timing offset in ms (detected - MIDI),
+        or None if no detected onset matched within the window.
+    """
+    result: dict[int, float | None] = {}
+    if not detected_onsets:
+        for i in range(len(midi_onsets)):
+            result[i] = None
+        return result
+
+    det_times = [o.time_sec * 1000.0 for o in detected_onsets]
+    used: set[int] = set()
+
+    for i, midi in enumerate(midi_onsets):
+        t_midi = midi.time_sec * 1000.0
+        best_offset: float | None = None
+        best_det_idx: int | None = None
+        best_abs = match_window_ms
+
+        for j, t_det in enumerate(det_times):
+            if j in used:
+                continue
+            offset = t_det - t_midi
+            if abs(offset) < best_abs:
+                best_abs = abs(offset)
+                best_offset = offset
+                best_det_idx = j
+
+        if best_det_idx is not None:
+            used.add(best_det_idx)
+        result[i] = best_offset
+
+    return result
+
+
 def _rms_envelope(
     audio: np.ndarray, sample_rate: int, frame_ms: float = 5.0
 ) -> tuple[np.ndarray, np.ndarray]:
@@ -484,6 +526,7 @@ def render_cycle_zoom(
     activation: np.ndarray | None = None,
     activation_fps: int = 100,
     max_cycles: int = 4,
+    threshold: float = 0.1,
     output_path: str | Path = "cycles.png",
     dpi: int = 150,
 ) -> Path:
@@ -493,7 +536,7 @@ def render_cycle_zoom(
     - Top: RMS envelope (shows amplitude peaks clearly despite drum resonance)
       with MIDI onset lines, velocity labels, and IOI annotations
     - Bottom: Onset activation function (neural net confidence) with detected
-      onset markers
+      onset markers and threshold line
 
     This is the highest-resolution view for inspecting flams, drags, and diddles.
     """
@@ -502,6 +545,9 @@ def render_cycle_zoom(
 
     # Precompute RMS envelope (3ms frames — smooth enough to read, fine enough for flams)
     env_time, env_rms = _rms_envelope(mono, sample_rate, frame_ms=3.0)
+
+    # Match MIDI onsets to detected onsets for timing accuracy display
+    onset_matches = _match_onsets(midi_onsets, detected_onsets)
 
     cycles = _find_cycle_boundaries(midi_onsets)
     n_cycles = min(len(cycles), max_cycles)
@@ -532,8 +578,12 @@ def render_cycle_zoom(
         ax_env.fill_between(t_env, 0, r_env, color="steelblue", alpha=0.4)
         ax_env.plot(t_env, r_env, linewidth=0.8, color="steelblue")
 
-        # MIDI onsets: red lines + velocity labels (staggered to avoid overlap)
+        # MIDI onsets: color-coded by detection match quality
         cycle_midi = [o for o in midi_onsets if cyc_start <= o.time_sec * 1000 <= cyc_end]
+        # Map cycle_midi back to global indices for onset_matches lookup
+        cycle_global_idx = [
+            j for j, o in enumerate(midi_onsets) if cyc_start <= o.time_sec * 1000 <= cyc_end
+        ]
         rms_max = r_env.max() if len(r_env) > 0 and r_env.max() > 0 else 0.1
 
         # Pre-classify: grace notes (part of a flam, <50ms from neighbor) vs main strokes
@@ -552,9 +602,18 @@ def render_cycle_zoom(
             t = onset.time_sec * 1000
             vel_frac = onset.velocity / 127.0
             grace = is_grace[i]
+
+            # Color by match quality: green=matched, red=missed
+            global_idx = cycle_global_idx[i]
+            offset = onset_matches.get(global_idx)
+            if offset is not None:
+                line_color = "green" if abs(offset) < 10 else "orange"
+            else:
+                line_color = "red"
+
             ax_env.axvline(
                 x=t,
-                color="red",
+                color=line_color,
                 linewidth=0.8 if grace else 1.5,
                 alpha=0.5 if grace else 0.7,
                 linestyle=":" if grace else "-",
@@ -564,17 +623,22 @@ def render_cycle_zoom(
                 t,
                 rms_max * 1.05,
                 marker="v",
-                color="red",
+                color=line_color,
                 markersize=4 + vel_frac * 6,
                 alpha=0.9,
             )
-            # Stagger velocity labels: grace notes go lower to avoid overlap
+            # Velocity label + offset annotation (only show offset if >=5ms)
             label_y = rms_max * (1.0 if grace else 1.15)
+            vel_text = f"v{onset.velocity}"
+            if offset is not None and abs(offset) >= 5:
+                vel_text += f" ({offset:+.0f}ms)"
+            elif offset is None:
+                vel_text += " MISS"
             ax_env.annotate(
-                f"v{onset.velocity}",
+                vel_text,
                 xy=(t, label_y),
                 fontsize=7 if grace else 9,
-                color="darkred" if grace else "red",
+                color=line_color,
                 fontweight="normal" if grace else "bold",
                 ha="center",
                 va="bottom",
@@ -598,9 +662,13 @@ def render_cycle_zoom(
             )
 
         n_midi = len(cycle_midi)
+        n_matched = sum(1 for j in cycle_global_idx if onset_matches.get(j) is not None)
+        n_missed = n_midi - n_matched
+        match_str = f"{n_matched}/{n_midi} detected"
+        if n_missed > 0:
+            match_str += f"  ({n_missed} missed)"
         ax_env.set_title(
-            f"Cycle {cyc_idx + 1}  |  {cyc_start:.0f}\u2013{cyc_end:.0f} ms  |  "
-            f"{n_midi} MIDI hits",
+            f"Cycle {cyc_idx + 1}  |  {cyc_start:.0f}\u2013{cyc_end:.0f} ms  |  {match_str}",
             fontsize=10,
             fontweight="bold",
         )
@@ -643,12 +711,22 @@ def render_cycle_zoom(
         else:
             n_det = 0
 
+        # Threshold line — shows detection cutoff
+        ax_act.axhline(
+            y=threshold,
+            color="orange",
+            linewidth=1.0,
+            linestyle="--",
+            alpha=0.7,
+            label=f"Threshold ({threshold})" if cyc_idx == 0 else None,
+        )
+
         ax_act.set_ylabel("Activation")
         ax_act.set_xlim(cyc_start, cyc_end)
         ax_act.set_ylim(0, act_y_max * 1.1)  # consistent across cycles
         ax_act.grid(True, alpha=0.2)
         ax_act.set_title(
-            f"  Onset activation  |  {n_det} detected",
+            f"  Onset activation  |  {n_det} detected  |  threshold={threshold}",
             fontsize=9,
             loc="left",
         )
