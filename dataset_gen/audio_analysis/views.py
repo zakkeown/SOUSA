@@ -55,35 +55,51 @@ def _rms_envelope(
 
 def _find_cycle_boundaries(
     midi_onsets: list[MidiOnset],
-    min_gap_ratio: float = 2.5,
+    target_cycles: int | None = None,
 ) -> list[tuple[float, float]]:
-    """Auto-detect pattern cycle boundaries from MIDI onsets.
+    """Split MIDI onsets into equal cycles for visual inspection.
 
-    Finds large IOI gaps that likely mark cycle boundaries.
-    Returns list of (start_ms, end_ms) for each cycle.
+    Uses strict equal-count splitting: each cycle gets the same number of
+    notes (±1). The only adjustment is avoiding splits inside flams/drags
+    (IOI < 40ms) by shifting the split point by +1.
+
+    Args:
+        midi_onsets: List of MIDI onsets sorted by time.
+        target_cycles: Number of cycles to create. If None, auto-selects
+            based on total note count (aims for 6-10 notes per cycle).
+
+    Returns:
+        List of (start_ms, end_ms) for each cycle with padding.
     """
-    if len(midi_onsets) < 4:
-        return [(midi_onsets[0].time_sec * 1000, midi_onsets[-1].time_sec * 1000)]
+    n = len(midi_onsets)
+    if n < 4:
+        pad = 50.0
+        return [
+            (max(0, midi_onsets[0].time_sec * 1000 - pad), midi_onsets[-1].time_sec * 1000 + pad)
+        ]
 
-    iois = []
-    for i in range(1, len(midi_onsets)):
-        iois.append((midi_onsets[i].time_sec - midi_onsets[i - 1].time_sec) * 1000)
+    iois = [(midi_onsets[i].time_sec - midi_onsets[i - 1].time_sec) * 1000 for i in range(1, n)]
 
-    median_ioi = np.median(iois)
-    threshold = median_ioi * min_gap_ratio
+    # Auto-select number of cycles: aim for 6-10 notes per cycle
+    if target_cycles is None:
+        target_cycles = max(2, min(6, n // 7))
 
-    # Find indices where IOI exceeds threshold (cycle boundaries)
-    boundaries = [0]  # First onset starts cycle 1
-    for i, ioi in enumerate(iois):
-        if ioi > threshold:
-            boundaries.append(i + 1)
+    # Strict equal-count split indices
+    split_indices: list[int] = []
+    for k in range(1, target_cycles):
+        idx = round(k * n / target_cycles)
+        # Avoid splitting inside a flam/drag (IOI < 40ms): shift +1
+        if 0 < idx < n and idx - 1 < len(iois) and iois[idx - 1] < 40:
+            idx = min(idx + 1, n - 1)
+        split_indices.append(idx)
 
+    # Build cycle ranges
+    all_starts = [0] + split_indices
+    all_ends = [s - 1 for s in split_indices] + [n - 1]
+
+    pad_ms = 50.0
     cycles = []
-    for j in range(len(boundaries)):
-        start_idx = boundaries[j]
-        end_idx = boundaries[j + 1] - 1 if j + 1 < len(boundaries) else len(midi_onsets) - 1
-        # Add padding around the cycle
-        pad_ms = 50.0
+    for start_idx, end_idx in zip(all_starts, all_ends):
         start_ms = midi_onsets[start_idx].time_sec * 1000 - pad_ms
         end_ms = midi_onsets[end_idx].time_sec * 1000 + pad_ms
         cycles.append((max(0, start_ms), end_ms))
@@ -324,15 +340,17 @@ def render_dashboard(
     """
     output_path = Path(output_path)
     mono = _to_mono(audio)
-    time_ms = np.arange(len(mono)) / sample_rate * 1000.0
 
     fig, axes = plt.subplots(4, 1, figsize=figsize, sharex=True)
 
-    # --- Panel 1: Waveform with onset markers ---
+    # --- Panel 1: RMS envelope with onset markers ---
     ax1 = axes[0]
-    ax1.plot(time_ms, mono, linewidth=0.4, color="steelblue", alpha=0.8)
-    ax1.set_ylabel("Amplitude")
-    ax1.set_title("Waveform")
+    env_time, env_rms = _rms_envelope(mono, sample_rate, frame_ms=3.0)
+    ax1.fill_between(env_time, -env_rms, env_rms, color="steelblue", alpha=0.6)
+    ax1.plot(env_time, env_rms, linewidth=0.4, color="steelblue", alpha=0.9)
+    ax1.plot(env_time, -env_rms, linewidth=0.4, color="steelblue", alpha=0.9)
+    ax1.set_ylabel("RMS Amplitude")
+    ax1.set_title("Waveform (RMS Envelope)")
     ax1.grid(True, alpha=0.2)
 
     if midi_onsets:
@@ -482,18 +500,23 @@ def render_cycle_zoom(
     output_path = Path(output_path)
     mono = _to_mono(audio)
 
-    # Precompute RMS envelope (1ms frames for high resolution in cycle view)
-    env_time, env_rms = _rms_envelope(mono, sample_rate, frame_ms=1.0)
+    # Precompute RMS envelope (3ms frames — smooth enough to read, fine enough for flams)
+    env_time, env_rms = _rms_envelope(mono, sample_rate, frame_ms=3.0)
 
     cycles = _find_cycle_boundaries(midi_onsets)
     n_cycles = min(len(cycles), max_cycles)
+
+    # Precompute global activation y-max for consistent scaling across cycles
+    act_y_max = 1.0
+    if activation is not None and len(activation) > 0:
+        act_y_max = float(np.max(activation)) if np.max(activation) > 0 else 1.0
 
     # 2 rows per cycle: RMS envelope + activation
     n_rows = n_cycles * 2
     fig, axes = plt.subplots(
         n_rows,
         1,
-        figsize=(16, 2.5 * n_rows),
+        figsize=(16, 3.0 * n_rows),
         squeeze=False,
     )
 
@@ -509,14 +532,34 @@ def render_cycle_zoom(
         ax_env.fill_between(t_env, 0, r_env, color="steelblue", alpha=0.4)
         ax_env.plot(t_env, r_env, linewidth=0.8, color="steelblue")
 
-        # MIDI onsets: red lines + prominent velocity labels
+        # MIDI onsets: red lines + velocity labels (staggered to avoid overlap)
         cycle_midi = [o for o in midi_onsets if cyc_start <= o.time_sec * 1000 <= cyc_end]
         rms_max = r_env.max() if len(r_env) > 0 and r_env.max() > 0 else 0.1
-        for onset in cycle_midi:
+
+        # Pre-classify: grace notes (part of a flam, <50ms from neighbor) vs main strokes
+        is_grace = [False] * len(cycle_midi)
+        for i in range(len(cycle_midi)):
+            if i > 0:
+                gap_prev = (cycle_midi[i].time_sec - cycle_midi[i - 1].time_sec) * 1000
+                if gap_prev < 50 and cycle_midi[i].velocity > cycle_midi[i - 1].velocity:
+                    is_grace[i - 1] = True  # quieter note before loud = grace
+            if i < len(cycle_midi) - 1:
+                gap_next = (cycle_midi[i + 1].time_sec - cycle_midi[i].time_sec) * 1000
+                if gap_next < 50 and cycle_midi[i].velocity < cycle_midi[i + 1].velocity:
+                    is_grace[i] = True
+
+        for i, onset in enumerate(cycle_midi):
             t = onset.time_sec * 1000
             vel_frac = onset.velocity / 127.0
-            ax_env.axvline(x=t, color="red", linewidth=1.5, alpha=0.7)
-            # Velocity as a horizontal bar at the top
+            grace = is_grace[i]
+            ax_env.axvline(
+                x=t,
+                color="red",
+                linewidth=0.8 if grace else 1.5,
+                alpha=0.5 if grace else 0.7,
+                linestyle=":" if grace else "-",
+                label="MIDI onset" if cyc_idx == 0 and i == 0 else None,
+            )
             ax_env.plot(
                 t,
                 rms_max * 1.05,
@@ -525,45 +568,45 @@ def render_cycle_zoom(
                 markersize=4 + vel_frac * 6,
                 alpha=0.9,
             )
+            # Stagger velocity labels: grace notes go lower to avoid overlap
+            label_y = rms_max * (1.0 if grace else 1.15)
             ax_env.annotate(
-                f"{onset.velocity}",
-                xy=(t, rms_max * 1.15),
-                fontsize=8,
-                color="red",
-                fontweight="bold",
+                f"v{onset.velocity}",
+                xy=(t, label_y),
+                fontsize=7 if grace else 9,
+                color="darkred" if grace else "red",
+                fontweight="normal" if grace else "bold",
                 ha="center",
                 va="bottom",
             )
 
-        # IOI annotations between consecutive MIDI onsets
+        # IOI annotations — only sub-50ms gaps (flams/drags/grace notes)
         for i in range(1, len(cycle_midi)):
             ioi = (cycle_midi[i].time_sec - cycle_midi[i - 1].time_sec) * 1000
+            if ioi >= 50:
+                continue
             mid_t = (cycle_midi[i - 1].time_sec + cycle_midi[i].time_sec) / 2 * 1000
-            is_short = ioi < 50
             ax_env.annotate(
                 f"{ioi:.0f}ms",
-                xy=(mid_t, -rms_max * 0.15),
-                fontsize=8 if is_short else 7,
-                color="red" if is_short else "gray",
-                fontweight="bold" if is_short else "normal",
+                xy=(mid_t, -rms_max * 0.12),
+                fontsize=9,
+                color="red",
+                fontweight="bold",
                 ha="center",
                 va="top",
-                bbox=(
-                    dict(boxstyle="round,pad=0.15", fc="white", ec="none", alpha=0.7)
-                    if is_short
-                    else None
-                ),
+                bbox=dict(boxstyle="round,pad=0.15", fc="white", ec="none", alpha=0.8),
             )
 
         n_midi = len(cycle_midi)
         ax_env.set_title(
-            f"Cycle {cyc_idx + 1}  |  {cyc_start:.0f}-{cyc_end:.0f} ms  |  " f"{n_midi} MIDI hits",
+            f"Cycle {cyc_idx + 1}  |  {cyc_start:.0f}\u2013{cyc_end:.0f} ms  |  "
+            f"{n_midi} MIDI hits",
             fontsize=10,
             fontweight="bold",
         )
         ax_env.set_ylabel("RMS")
         ax_env.set_xlim(cyc_start, cyc_end)
-        ax_env.set_ylim(-rms_max * 0.2, rms_max * 1.35)
+        ax_env.set_ylim(-rms_max * 0.2, rms_max * 1.5)
         ax_env.grid(True, alpha=0.2)
 
         # --- Bottom row: activation + detected onsets ---
@@ -573,21 +616,28 @@ def render_cycle_zoom(
             t_act = act_time[act_mask]
             a_act = activation[act_mask]
             ax_act.fill_between(t_act, 0, a_act, color="purple", alpha=0.3)
-            ax_act.plot(t_act, a_act, linewidth=1.0, color="purple")
+            ax_act.plot(
+                t_act,
+                a_act,
+                linewidth=1.0,
+                color="purple",
+                label="Activation" if cyc_idx == 0 else None,
+            )
 
-        # MIDI onset reference lines (thin gray)
+        # MIDI onset reference lines (thin red)
         for onset in cycle_midi:
             ax_act.axvline(x=onset.time_sec * 1000, color="red", linewidth=0.5, alpha=0.3)
 
         # Detected onsets: blue markers
         if detected_onsets:
             cycle_det = [o for o in detected_onsets if cyc_start <= o.time_sec * 1000 <= cyc_end]
-            for onset in cycle_det:
+            for i, onset in enumerate(cycle_det):
                 ax_act.axvline(
                     x=onset.time_sec * 1000,
                     color="blue",
                     linewidth=1.2,
                     alpha=0.7,
+                    label="Detected onset" if cyc_idx == 0 and i == 0 else None,
                 )
             n_det = len(cycle_det)
         else:
@@ -595,12 +645,18 @@ def render_cycle_zoom(
 
         ax_act.set_ylabel("Activation")
         ax_act.set_xlim(cyc_start, cyc_end)
+        ax_act.set_ylim(0, act_y_max * 1.1)  # consistent across cycles
         ax_act.grid(True, alpha=0.2)
         ax_act.set_title(
             f"  Onset activation  |  {n_det} detected",
             fontsize=9,
             loc="left",
         )
+
+    # Add legend to first row pair only
+    axes[0, 0].legend(loc="upper right", fontsize=8)
+    if n_rows >= 2:
+        axes[1, 0].legend(loc="upper right", fontsize=8)
 
     axes[-1, 0].set_xlabel("Time (ms)")
     fig.tight_layout()
