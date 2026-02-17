@@ -528,7 +528,7 @@ def render_cycle_zoom(
     max_cycles: int = 4,
     threshold: float = 0.1,
     output_path: str | Path = "cycles.png",
-    dpi: int = 150,
+    dpi: int = 200,
 ) -> Path:
     """Render zoomed-in views of individual pattern cycles.
 
@@ -752,15 +752,52 @@ def render_cycle_zoom(
     total_matched = sum(1 for v in onset_matches.values() if v is not None)
     total_missed = total_midi - total_matched
     offsets = [v for v in onset_matches.values() if v is not None]
-    mean_offset = np.mean(np.abs(offsets)) if offsets else 0.0
+    abs_offsets = [abs(v) for v in offsets]
+    mean_offset = np.mean(abs_offsets) if abs_offsets else 0.0
+    max_offset = max(abs_offsets) if abs_offsets else 0.0
     pct = total_matched / total_midi * 100 if total_midi > 0 else 0
+
+    # Count flams (sub-50ms IOI pairs)
+    n_flams = sum(
+        1
+        for i in range(1, len(midi_onsets))
+        if (midi_onsets[i].time_sec - midi_onsets[i - 1].time_sec) * 1000 < 50
+    )
+
     fig.suptitle(
-        f"Detection: {total_matched}/{total_midi} matched ({pct:.0f}%)  |  "
+        f"Detection: {total_matched}/{total_midi} ({pct:.0f}%)  |  "
         f"{total_missed} missed  |  mean |offset|: {mean_offset:.1f}ms  |  "
+        f"max |offset|: {max_offset:.0f}ms  |  {n_flams} flam pairs  |  "
         f"threshold: {threshold}",
-        fontsize=11,
+        fontsize=10,
         fontweight="bold",
         y=1.01,
+    )
+
+    # Text summary below the figure for structured readout
+    missed_details = []
+    for i, v in onset_matches.items():
+        if v is None:
+            t_ms = midi_onsets[i].time_sec * 1000
+            missed_details.append(f"t={t_ms:.0f}ms v={midi_onsets[i].velocity}")
+    summary_lines = [
+        f"MIDI: {total_midi} onsets  |  Detected: {len(detected_onsets or [])} onsets  |  "
+        f"Matched: {total_matched} ({pct:.0f}%)",
+        f"Timing: mean |offset| = {mean_offset:.1f}ms, max = {max_offset:.0f}ms  |  "
+        f"Flams: {n_flams} pairs (IOI < 50ms)",
+    ]
+    if missed_details:
+        summary_lines.append(f"Missed: {', '.join(missed_details)}")
+
+    fig.text(
+        0.5,
+        -0.01,
+        "\n".join(summary_lines),
+        ha="center",
+        va="top",
+        fontsize=8,
+        fontfamily="monospace",
+        bbox=dict(boxstyle="round,pad=0.5", fc="#f0f0f0", ec="#cccccc", alpha=0.9),
     )
 
     axes[-1, 0].set_xlabel("Time (ms)")
