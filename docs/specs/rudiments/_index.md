@@ -22,13 +22,13 @@ These specs serve as the authoritative source of truth for the SOUSA project and
 
 | PAS # | Name | Category | Family | Subdivision | Cycle Length | Status |
 |-------|------|----------|--------|-------------|--------------|--------|
-| 4 | Multiple Bounce Roll | roll | buzz | sixteenth | 2 beats | Pending |
+| 4 | [Multiple Bounce Roll](./04_multiple_bounce_roll.md) | roll | buzz | eighth | 2 beats | Done |
 
 ### C. Triple Stroke
 
 | PAS # | Name | Category | Family | Subdivision | Cycle Length | Status |
 |-------|------|----------|--------|-------------|--------------|--------|
-| 5 | Triple Stroke Roll | roll | triple stroke | sextuplet | 2 beats | Pending |
+| 5 | [Triple Stroke Roll](./05_triple_stroke_roll.md) | roll | triple stroke | sextuplet | 2 beats | Done |
 
 ### D. Double Stroke Open Roll
 
