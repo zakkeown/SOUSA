@@ -342,6 +342,76 @@ class AudioSynthesizer:
         self.close()
 
 
+def apply_velocity_curve(
+    audio: np.ndarray,
+    strokes: list,
+    sample_rate: int,
+    veltrack: float = 1.0,
+    crossfade_ms: float = 3.0,
+) -> np.ndarray:
+    """Apply velocity-dependent gain to compensate for flat soundfont mapping.
+
+    FluidSynth's snare soundfonts produce nearly identical amplitude regardless
+    of MIDI velocity. This function applies a post-synthesis gain envelope
+    based on each stroke's actual_velocity, using the same formula as SFZ
+    amp_veltrack.
+
+    Args:
+        audio: Synthesized audio (samples,) or (samples, channels)
+        strokes: List of StrokeEvent objects with actual_time_ms and actual_velocity
+        sample_rate: Audio sample rate in Hz
+        veltrack: Velocity sensitivity 0.0-1.0 (1.0 = full linear mapping)
+        crossfade_ms: Crossfade duration at stroke boundaries to prevent clicks
+
+    Returns:
+        Audio with velocity-dependent gain applied
+    """
+    if not strokes:
+        return audio
+
+    n_samples = audio.shape[0]
+    gain_envelope = np.ones(n_samples, dtype=np.float32)
+
+    # Sort strokes by time
+    sorted_strokes = sorted(strokes, key=lambda s: s.actual_time_ms)
+    crossfade_samples = int(crossfade_ms / 1000 * sample_rate)
+
+    for i, stroke in enumerate(sorted_strokes):
+        # Gain formula (SFZ standard): gain = (1 - veltrack) + veltrack * (vel / 127)
+        vel_gain = (1.0 - veltrack) + veltrack * (stroke.actual_velocity / 127.0)
+
+        start = int(stroke.actual_time_ms / 1000 * sample_rate)
+        start = max(0, min(start, n_samples))
+
+        if i + 1 < len(sorted_strokes):
+            end = int(sorted_strokes[i + 1].actual_time_ms / 1000 * sample_rate)
+            end = max(0, min(end, n_samples))
+        else:
+            end = n_samples
+
+        if start < end:
+            gain_envelope[start:end] = vel_gain
+
+    # Smooth transitions with crossfade to prevent clicks
+    if crossfade_samples > 1:
+        from scipy.ndimage import uniform_filter1d
+
+        gain_envelope = uniform_filter1d(gain_envelope, size=crossfade_samples)
+
+    # Apply gain
+    if audio.ndim == 2:
+        result = audio * gain_envelope[:, np.newaxis]
+    else:
+        result = audio * gain_envelope
+
+    # Prevent clipping
+    max_val = np.max(np.abs(result))
+    if max_val > 1.0:
+        result = result / max_val
+
+    return result
+
+
 def render_midi_to_audio(
     midi_data: bytes | None = None,
     midi_path: Path | str | None = None,
