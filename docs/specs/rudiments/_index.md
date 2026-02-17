@@ -92,6 +92,6 @@ These specs serve as the authoritative source of truth for the SOUSA project and
 | 35 | [Single Dragadiddle](./35_single_dragadiddle.md) | drag | compound drag | sixteenth | 3 beats | Done |
 | 36 | [Drag Paradiddle #1](./36_drag_paradiddle_1.md) | drag | compound drag | sixteenth | 3.5 beats | Done |
 | 37 | [Drag Paradiddle #2](./37_drag_paradiddle_2.md) | drag | compound drag | sixteenth | 5 beats | Done |
-| 38 | Single Ratamacue | drag | ratamacue | sixteenth | 2 beats | Pending |
-| 39 | Double Ratamacue | drag | ratamacue | sixteenth | 3 beats | Pending |
-| 40 | Triple Ratamacue | drag | ratamacue | sixteenth | 4 beats | Pending |
+| 38 | [Single Ratamacue](./38_single_ratamacue.md) | drag | ratamacue | sixteenth | 2 beats | Done |
+| 39 | [Double Ratamacue](./39_double_ratamacue.md) | drag | ratamacue | sixteenth | 3 beats | Done |
+| 40 | [Triple Ratamacue](./40_triple_ratamacue.md) | drag | ratamacue | sixteenth | 4 beats | Done |
