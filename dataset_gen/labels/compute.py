@@ -257,16 +257,21 @@ def compute_exercise_scores(
         vel_ratio = min(left_vel, right_vel) / max(left_vel, right_vel)
         velocity_balance = vel_ratio * 100
 
-        # Timing balance (0-100): based on timing consistency difference between hands
+        # Timing balance (0-100): combines symmetry AND absolute quality
         left_timing_abs = np.mean([np.abs(s.timing_error_ms) for s in left_strokes])
         right_timing_abs = np.mean([np.abs(s.timing_error_ms) for s in right_strokes])
 
-        # Timing ratio: how similar are the hands in timing accuracy?
-        # Perfect balance = both hands have same mean absolute error
-        max_timing = max(left_timing_abs, right_timing_abs, 1)  # Avoid div by zero
+        # Symmetry factor: how similar are the hands?
+        max_timing = max(left_timing_abs, right_timing_abs, 1)
         min_timing = min(left_timing_abs, right_timing_abs)
-        timing_ratio = min_timing / max_timing
-        timing_balance = timing_ratio * 100
+        symmetry_factor = min_timing / max_timing
+
+        # Quality factor: sigmoid penalty for high absolute errors
+        avg_abs_error = (left_timing_abs + right_timing_abs) / 2
+        quality_factor = 100 / (1 + np.exp((avg_abs_error - 25) / 10))
+
+        # Combined: both symmetry and quality matter
+        timing_balance = 0.4 * (symmetry_factor * 100) + 0.6 * quality_factor
 
         # Combined hand balance: 50% velocity, 50% timing
         hand_balance = 0.5 * velocity_balance + 0.5 * timing_balance

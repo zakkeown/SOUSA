@@ -240,9 +240,11 @@ class TestHandBalanceFormula:
         rudiment = make_simple_rudiment()
 
         scores = compute_exercise_scores(strokes, events, rudiment)
-        # velocity_balance = 100, timing_balance = 100
-        # combined = 0.5*100 + 0.5*100 = 100
-        assert scores.hand_balance == 100
+        # velocity_balance = 100, timing_balance uses quality-aware formula
+        # symmetry = 1.0, quality = 100/(1+exp((5-25)/10)) ≈ 88.08
+        # timing_balance = 0.4*100 + 0.6*88.08 ≈ 92.85
+        # combined = 0.5*100 + 0.5*92.85 ≈ 96.4
+        assert scores.hand_balance >= 95
 
     def test_imbalanced_velocity_same_timing(self):
         """Imbalanced velocity with same timing gives combined score."""
@@ -262,9 +264,9 @@ class TestHandBalanceFormula:
 
         scores = compute_exercise_scores(strokes, events, rudiment)
         # velocity_balance = 60/100 * 100 = 60
-        # timing_balance = 5/5 * 100 = 100
-        # combined = 0.5*60 + 0.5*100 = 80
-        assert scores.hand_balance == pytest.approx(80, abs=1)
+        # timing_balance: symmetry=1.0, quality≈88, tb≈0.4*100+0.6*88≈92.8
+        # combined = 0.5*60 + 0.5*92.8 ≈ 76.4
+        assert scores.hand_balance == pytest.approx(76.4, abs=2)
 
     def test_single_hand_gives_100(self):
         """Single-hand exercise should give 100 (no imbalance possible)."""
