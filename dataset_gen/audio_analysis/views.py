@@ -617,7 +617,6 @@ def render_cycle_zoom(
                 linewidth=0.8 if grace else 1.5,
                 alpha=0.5 if grace else 0.7,
                 linestyle=":" if grace else "-",
-                label="MIDI onset" if cyc_idx == 0 and i == 0 else None,
             )
             ax_env.plot(
                 t,
@@ -731,13 +730,41 @@ def render_cycle_zoom(
             loc="left",
         )
 
-    # Add legend to first row pair only
-    axes[0, 0].legend(loc="upper right", fontsize=8)
+    # Add color-coded legend to first row pair
+    from matplotlib.lines import Line2D
+
+    env_handles = [
+        Line2D([0], [0], color="green", linewidth=1.5, label="Matched (<10ms)"),
+        Line2D([0], [0], color="orange", linewidth=1.5, label="Offset (\u226510ms)"),
+        Line2D([0], [0], color="red", linewidth=1.5, label="Missed"),
+    ]
+    axes[0, 0].legend(handles=env_handles, loc="upper right", fontsize=7)
     if n_rows >= 2:
-        axes[1, 0].legend(loc="upper right", fontsize=8)
+        act_handles = [
+            Line2D([0], [0], color="purple", linewidth=1.0, label="Activation"),
+            Line2D([0], [0], color="blue", linewidth=1.2, label="Detected onset"),
+            Line2D([0], [0], color="orange", linewidth=1.0, linestyle="--", label="Threshold"),
+        ]
+        axes[1, 0].legend(handles=act_handles, loc="upper right", fontsize=7)
+
+    # Overall detection summary as figure suptitle
+    total_midi = len(midi_onsets)
+    total_matched = sum(1 for v in onset_matches.values() if v is not None)
+    total_missed = total_midi - total_matched
+    offsets = [v for v in onset_matches.values() if v is not None]
+    mean_offset = np.mean(np.abs(offsets)) if offsets else 0.0
+    pct = total_matched / total_midi * 100 if total_midi > 0 else 0
+    fig.suptitle(
+        f"Detection: {total_matched}/{total_midi} matched ({pct:.0f}%)  |  "
+        f"{total_missed} missed  |  mean |offset|: {mean_offset:.1f}ms  |  "
+        f"threshold: {threshold}",
+        fontsize=11,
+        fontweight="bold",
+        y=1.01,
+    )
 
     axes[-1, 0].set_xlabel("Time (ms)")
     fig.tight_layout()
-    fig.savefig(str(output_path), dpi=dpi)
+    fig.savefig(str(output_path), dpi=dpi, bbox_inches="tight")
     plt.close(fig)
     return output_path
