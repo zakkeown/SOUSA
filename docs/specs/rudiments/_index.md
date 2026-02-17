@@ -88,10 +88,10 @@ These specs serve as the authoritative source of truth for the SOUSA project and
 | 31 | [Drag](./31_drag.md) | drag | basic drag | eighth | 1 beat | Done |
 | 32 | [Single Drag Tap](./32_single_drag_tap.md) | drag | basic drag | sixteenth | 2 beats | Done |
 | 33 | [Double Drag Tap](./33_double_drag_tap.md) | drag | basic drag | sixteenth | 3 beats | Done |
-| 34 | Lesson 25 | drag | compound drag | sixteenth | 4 beats | Pending |
-| 35 | Single Dragadiddle | drag | compound drag | sixteenth | 2 beats | Pending |
-| 36 | Drag Paradiddle #1 | drag | compound drag | sixteenth | 2 beats | Pending |
-| 37 | Drag Paradiddle #2 | drag | compound drag | sixteenth | 3 beats | Pending |
+| 34 | [Lesson 25](./34_lesson_25.md) | drag | compound drag | sixteenth | 4 beats | Done |
+| 35 | [Single Dragadiddle](./35_single_dragadiddle.md) | drag | compound drag | sixteenth | 3 beats | Done |
+| 36 | [Drag Paradiddle #1](./36_drag_paradiddle_1.md) | drag | compound drag | sixteenth | 3.5 beats | Done |
+| 37 | [Drag Paradiddle #2](./37_drag_paradiddle_2.md) | drag | compound drag | sixteenth | 5 beats | Done |
 | 38 | Single Ratamacue | drag | ratamacue | sixteenth | 2 beats | Pending |
 | 39 | Double Ratamacue | drag | ratamacue | sixteenth | 3 beats | Pending |
 | 40 | Triple Ratamacue | drag | ratamacue | sixteenth | 4 beats | Pending |
