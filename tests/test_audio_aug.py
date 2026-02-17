@@ -116,6 +116,16 @@ class TestRoomSimulator:
         wet_diff = np.mean(np.abs(wet_output - sample_audio))
         assert dry_diff < wet_diff
 
+    def test_synthetic_ir_direct_sound_at_zero(self):
+        """Direct sound should be at ir[0], not delayed by pre_delay."""
+        sim = RoomSimulator(sample_rate=44100)
+        for room_type in [RoomType.PRACTICE_ROOM, RoomType.GYM, RoomType.GARAGE]:
+            config = RoomConfig(room_type=room_type)
+            ir = sim._generate_synthetic_ir(config)
+            # Direct sound should be the first significant energy
+            # Check that ir[0] has significant amplitude (the direct sound)
+            assert abs(ir[0, 0]) > 0.1, f"{room_type}: direct sound not at ir[0]"
+
     def test_convenience_function(self, sample_audio):
         """Test apply_room convenience function."""
         output = apply_room(sample_audio, RoomType.STUDIO, wet_dry_mix=0.3)

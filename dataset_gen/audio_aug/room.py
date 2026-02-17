@@ -271,10 +271,10 @@ class RoomSimulator:
         # Pre-delay
         pre_delay_samples = int(pre_delay / 1000 * self.sample_rate)
 
-        # Direct sound (attenuated)
-        ir[pre_delay_samples] = 0.8
+        # Direct sound at sample 0 (no pre-delay offset)
+        ir[0] = 0.8
 
-        # Early reflections
+        # Early reflections start after pre-delay (relative to direct sound)
         early_samples = int(early_delay / 1000 * self.sample_rate)
         n_early = 6  # Number of early reflections
         for i in range(n_early):
@@ -283,7 +283,7 @@ class RoomSimulator:
             if delay < ir_length_samples:
                 ir[delay] += amplitude * np.random.choice([-1, 1])
 
-        # Add diffuse reverb tail
+        # Diffuse reverb tail starts after early reflections
         tail_start = pre_delay_samples + early_samples
         if tail_start < ir_length_samples:
             ir[tail_start:] += noise[tail_start:] * 0.3
