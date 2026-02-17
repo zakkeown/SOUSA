@@ -70,10 +70,10 @@ These specs serve as the authoritative source of truth for the SOUSA project and
 | 20 | [Flam](./20_flam.md) | flam | basic flam | eighth | 1 beat | Done |
 | 21 | [Flam Accent](./21_flam_accent.md) | flam | basic flam | triplet | 2 beats | Done |
 | 22 | [Flam Tap](./22_flam_tap.md) | flam | basic flam | eighth | 1 beat | Done |
-| 23 | Flamacue | flam | compound flam | sixteenth | 2.5 beats | Pending |
-| 24 | Flam Paradiddle | flam | compound flam | sixteenth | 2 beats | Pending |
-| 25 | Single Flammed Mill | flam | compound flam | sixteenth | 2 beats | Pending |
-| 26 | Flam Paradiddle-Diddle | flam | compound flam | sixteenth | 3 beats | Pending |
+| 23 | [Flamacue](./23_flamacue.md) | flam | compound flam | sixteenth | 3 beats | Done |
+| 24 | [Flam Paradiddle](./24_flam_paradiddle.md) | flam | compound flam | sixteenth | 2.5 beats | Done |
+| 25 | [Single Flammed Mill](./25_single_flammed_mill.md) | flam | compound flam | sixteenth | 2 beats | Done |
+| 26 | [Flam Paradiddle-Diddle](./26_flam_paradiddle_diddle.md) | flam | compound flam | sextuplet | 2 beats | Done |
 | 27 | Pataflafla | flam | advanced flam | sixteenth | 2 beats | Pending |
 | 28 | Swiss Army Triplet | flam | advanced flam | triplet | 2 beats | Pending |
 | 29 | Inverted Flam Tap | flam | advanced flam | eighth | 1 beat | Pending |
