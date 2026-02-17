@@ -36,6 +36,7 @@ from dataset_gen.audio_aug.pipeline import (
     AugmentationPipeline,
     AugmentationConfig,
     AugmentationPreset,
+    PRESET_CONFIGS,
     augment_audio,
     random_augmentation,
 )
@@ -374,6 +375,21 @@ class TestAugmentationPipeline:
 
         assert output.shape == sample_audio.shape
         assert isinstance(config, AugmentationConfig)
+
+    def test_standard_presets_light_compression(self):
+        """Standard recording presets should use light compression to preserve dynamics."""
+        degraded_presets = {
+            AugmentationPreset.LO_FI,
+            AugmentationPreset.VINTAGE_TAPE,
+            AugmentationPreset.PHONE_RECORDING,
+        }
+        for preset, config in PRESET_CONFIGS.items():
+            if preset in degraded_presets:
+                continue
+            if config.compression_enabled:
+                assert (
+                    config.compression_ratio <= 3.0
+                ), f"{preset.name}: compression ratio {config.compression_ratio} > 3.0"
 
     def test_get_augmentation_params(self, sample_audio):
         """Test getting augmentation parameters."""
