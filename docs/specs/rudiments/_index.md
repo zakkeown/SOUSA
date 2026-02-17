@@ -14,9 +14,9 @@ These specs serve as the authoritative source of truth for the SOUSA project and
 
 | PAS # | Name | Category | Family | Subdivision | Cycle Length | Status |
 |-------|------|----------|--------|-------------|--------------|--------|
-| 1 | Single Stroke Roll | roll | single stroke | sixteenth | 2 beats | Pending |
-| 2 | Single Stroke Four | roll | single stroke | sixteenth | 1 beat | Pending |
-| 3 | Single Stroke Seven | roll | single stroke | sixteenth | 2 beats | Pending |
+| 1 | [Single Stroke Roll](./01_single_stroke_roll.md) | roll | single stroke | sixteenth | 2 beats | Done |
+| 2 | [Single Stroke Four](./02_single_stroke_four.md) | roll | single stroke | sixteenth | 1 beat | Done |
+| 3 | [Single Stroke Seven](./03_single_stroke_seven.md) | roll | single stroke | sixteenth | 2 beats | Done |
 
 ### B. Multiple Bounce
 
