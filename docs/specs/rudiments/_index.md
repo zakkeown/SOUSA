@@ -56,10 +56,10 @@ These specs serve as the authoritative source of truth for the SOUSA project and
 
 | PAS # | Name | Category | Family | Subdivision | Cycle Length | Status |
 |-------|------|----------|--------|-------------|--------------|--------|
-| 16 | Single Paradiddle | diddle | paradiddle | sixteenth | 2 beats | Pending |
-| 17 | Double Paradiddle | diddle | paradiddle | sixteenth | 3 beats | Pending |
-| 18 | Triple Paradiddle | diddle | paradiddle | sixteenth | 4 beats | Pending |
-| 19 | Paradiddle-Diddle | diddle | paradiddle | sixteenth | 1.5 beats | Pending |
+| 16 | [Single Paradiddle](./16_single_paradiddle.md) | diddle | paradiddle | sixteenth | 2 beats | Done |
+| 17 | [Double Paradiddle](./17_double_paradiddle.md) | diddle | paradiddle | sixteenth | 3 beats | Done |
+| 18 | [Triple Paradiddle](./18_triple_paradiddle.md) | diddle | paradiddle | sixteenth | 4 beats | Done |
+| 19 | [Paradiddle-Diddle](./19_paradiddle_diddle.md) | diddle | paradiddle | sextuplet | 2 beats | Done |
 
 ---
 
