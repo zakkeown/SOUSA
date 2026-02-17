@@ -86,6 +86,36 @@ def _combine_onsets(
     return combined
 
 
+def _filter_resonance(
+    onsets: list[DetectedOnset],
+    window_ms: float = 25.0,
+    ratio: float = 0.4,
+) -> list[DetectedOnset]:
+    """Remove likely resonance peaks — weak detections near a much stronger one.
+
+    A detection is considered resonance if there is a stronger detection within
+    *window_ms* and the weaker detection's strength is less than *ratio* of the
+    stronger one. This avoids filtering legitimate flam pairs where both notes
+    produce independently strong activations.
+    """
+    if len(onsets) < 2:
+        return onsets
+    sorted_onsets = sorted(onsets, key=lambda o: o.time_sec)
+    keep: list[DetectedOnset] = []
+    for i, onset in enumerate(sorted_onsets):
+        is_resonance = False
+        for j, other in enumerate(sorted_onsets):
+            if i == j:
+                continue
+            gap_ms = abs(onset.time_sec - other.time_sec) * 1000.0
+            if gap_ms < window_ms and onset.strength < other.strength * ratio:
+                is_resonance = True
+                break
+        if not is_resonance:
+            keep.append(onset)
+    return keep
+
+
 # ---------------------------------------------------------------------------
 # madmom backend
 # ---------------------------------------------------------------------------
@@ -249,8 +279,10 @@ def detect_onsets(
         raise ValueError(f"Unknown method: {method!r}")
 
     if use_madmom:
-        return _detect_onsets_madmom(path, y, sr, threshold, combine_ms)
-    return _detect_onsets_librosa(path, y, sr, threshold, combine_ms)
+        onsets = _detect_onsets_madmom(path, y, sr, threshold, combine_ms)
+    else:
+        onsets = _detect_onsets_librosa(path, y, sr, threshold, combine_ms)
+    return _filter_resonance(onsets)
 
 
 def get_onset_activation(

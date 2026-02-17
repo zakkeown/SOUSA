@@ -40,6 +40,10 @@ def _match_onsets(
 ) -> dict[int, float | None]:
     """Match each MIDI onset to its closest detected onset.
 
+    Uses velocity-priority matching: louder MIDI onsets match first so that
+    main strokes in flam pairs get priority over grace notes. This prevents
+    a grace note from "stealing" a detection that belongs to the main stroke.
+
     Returns:
         Dict mapping MIDI onset index to timing offset in ms (detected - MIDI),
         or None if no detected onset matched within the window.
@@ -53,7 +57,11 @@ def _match_onsets(
     det_times = [o.time_sec * 1000.0 for o in detected_onsets]
     used: set[int] = set()
 
-    for i, midi in enumerate(midi_onsets):
+    # Process by velocity (highest first) so main strokes get priority
+    priority_order = sorted(range(len(midi_onsets)), key=lambda i: -midi_onsets[i].velocity)
+
+    for i in priority_order:
+        midi = midi_onsets[i]
         t_midi = midi.time_sec * 1000.0
         best_offset: float | None = None
         best_det_idx: int | None = None
@@ -73,6 +81,54 @@ def _match_onsets(
         result[i] = best_offset
 
     return result
+
+
+def _midi_guided_detections(
+    midi_onsets: list[MidiOnset],
+    detected_onsets: list[DetectedOnset] | None,
+    activation: np.ndarray | None,
+    activation_fps: int,
+    floor: float = 0.01,
+    proximity_ms: float = 20.0,
+) -> list[DetectedOnset]:
+    """Supplement detected onsets with MIDI-guided ones.
+
+    For each MIDI onset that has no nearby detection, checks the activation
+    function. If activation is above a low floor (even if below the detection
+    threshold), adds a synthetic detection. This catches onsets where the
+    neural net sees continuous activity rather than a distinct peak.
+
+    Args:
+        midi_onsets: MIDI ground-truth onsets.
+        detected_onsets: Already-detected onsets.
+        activation: Onset activation array (from get_onset_activation).
+        activation_fps: Frames per second of the activation array.
+        floor: Minimum activation to accept as a guided detection.
+        proximity_ms: Skip if an existing detection is within this many ms.
+
+    Returns:
+        Combined and sorted list of detected onsets (original + guided).
+    """
+    if activation is None or not midi_onsets:
+        return list(detected_onsets or [])
+
+    det_times_ms = [o.time_sec * 1000.0 for o in (detected_onsets or [])]
+    supplemented = list(detected_onsets or [])
+
+    for midi in midi_onsets:
+        t_ms = midi.time_sec * 1000.0
+        # Skip if already have a detection within proximity window
+        if any(abs(t_ms - dt) < proximity_ms for dt in det_times_ms):
+            continue
+        # Check activation at this MIDI time
+        frame = int(round(midi.time_sec * activation_fps))
+        frame = max(0, min(frame, len(activation) - 1))
+        act_val = float(activation[frame])
+        if act_val >= floor:
+            supplemented.append(DetectedOnset(time_sec=midi.time_sec, strength=act_val))
+            det_times_ms.append(t_ms)
+
+    return sorted(supplemented, key=lambda o: o.time_sec)
 
 
 def _rms_envelope(
@@ -545,6 +601,12 @@ def render_cycle_zoom(
 
     # Precompute RMS envelope (3ms frames — smooth enough to read, fine enough for flams)
     env_time, env_rms = _rms_envelope(mono, sample_rate, frame_ms=3.0)
+
+    # Supplement detected onsets with MIDI-guided detections where activation
+    # is above a low floor but below the detection threshold
+    detected_onsets = _midi_guided_detections(
+        midi_onsets, detected_onsets, activation, activation_fps
+    )
 
     # Match MIDI onsets to detected onsets for timing accuracy display
     onset_matches = _match_onsets(midi_onsets, detected_onsets)
