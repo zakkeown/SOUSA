@@ -75,6 +75,13 @@ def compute_stroke_labels(events: list[StrokeEvent]) -> list[StrokeLabel]:
             parent_stroke_index=parent_index,
         )
         labels.append(label)
+
+    # Compute buzz_count for primary buzz strokes
+    for label in labels:
+        if label.stroke_type == "buzz" and not label.is_grace_note:
+            sub_count = sum(1 for l in labels if l.parent_stroke_index == label.index)
+            label.buzz_count = 1 + sub_count  # primary + subs
+
     return labels
 
 
@@ -226,7 +233,7 @@ def compute_exercise_scores(
 
     # Accent differentiation
     accent_strokes = [s for s in stroke_labels if s.is_accent]
-    tap_strokes = [s for s in stroke_labels if s.stroke_type == "tap"]
+    tap_strokes = [s for s in stroke_labels if s.stroke_type in ("tap", "buzz")]
 
     if accent_strokes and tap_strokes:
         accent_vel = np.mean([s.actual_velocity for s in accent_strokes])

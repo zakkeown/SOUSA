@@ -39,6 +39,9 @@ class StrokeLabel(BaseModel):
     flam_spacing_ms: float | None = None  # Actual spacing to primary stroke
     parent_stroke_index: int | None = None  # Index of the primary stroke
 
+    # Buzz roll specific
+    buzz_count: int | None = None  # Total strokes in buzz group (primary + subs)
+
 
 class MeasureLabel(BaseModel):
     """Aggregate labels for a single measure."""

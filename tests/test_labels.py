@@ -595,3 +595,100 @@ class TestRollSustainFormula:
         events = [make_stroke_event(i, velocity=80) for i in range(3)]
         score = _compute_roll_sustain(events)
         assert score == 80  # Default
+
+
+# ============================================================================
+# Buzz Label Tests
+# ============================================================================
+
+
+class TestBuzzLabels:
+    """Tests for buzz stroke label generation."""
+
+    def test_buzz_stroke_type_in_labels(self):
+        """Buzz strokes should have stroke_type='buzz' in labels."""
+        from dataset_gen.labels.compute import compute_stroke_labels
+        from dataset_gen.midi_gen.generator import StrokeEvent
+        from dataset_gen.rudiments.schema import StrokeType, Hand
+
+        events = [
+            StrokeEvent(
+                index=0,
+                hand=Hand.RIGHT,
+                stroke_type=StrokeType.BUZZ,
+                intended_time_ms=0,
+                actual_time_ms=1,
+                intended_velocity=100,
+                actual_velocity=98,
+            ),
+            StrokeEvent(
+                index=1,
+                hand=Hand.LEFT,
+                stroke_type=StrokeType.BUZZ,
+                intended_time_ms=250,
+                actual_time_ms=252,
+                intended_velocity=100,
+                actual_velocity=97,
+            ),
+        ]
+
+        labels = compute_stroke_labels(events)
+        assert labels[0].stroke_type == "buzz"
+        assert labels[1].stroke_type == "buzz"
+        assert not labels[0].is_accent
+
+    def test_buzz_count_on_label(self):
+        """Labels for buzz primaries should include buzz_count."""
+        from dataset_gen.labels.compute import compute_stroke_labels
+        from dataset_gen.midi_gen.generator import StrokeEvent
+        from dataset_gen.rudiments.schema import StrokeType, Hand
+
+        events = [
+            StrokeEvent(
+                index=0,
+                hand=Hand.RIGHT,
+                stroke_type=StrokeType.BUZZ,
+                intended_time_ms=0,
+                actual_time_ms=0,
+                intended_velocity=100,
+                actual_velocity=100,
+            ),
+            # 3 sub-strokes parented to primary (index 0)
+            StrokeEvent(
+                index=1,
+                hand=Hand.RIGHT,
+                stroke_type=StrokeType.BUZZ,
+                intended_time_ms=3,
+                actual_time_ms=3,
+                intended_velocity=85,
+                actual_velocity=84,
+                is_grace_note=True,
+                parent_stroke_index=0,
+            ),
+            StrokeEvent(
+                index=2,
+                hand=Hand.RIGHT,
+                stroke_type=StrokeType.BUZZ,
+                intended_time_ms=6,
+                actual_time_ms=6,
+                intended_velocity=72,
+                actual_velocity=71,
+                is_grace_note=True,
+                parent_stroke_index=0,
+            ),
+            StrokeEvent(
+                index=3,
+                hand=Hand.RIGHT,
+                stroke_type=StrokeType.BUZZ,
+                intended_time_ms=9,
+                actual_time_ms=9,
+                intended_velocity=61,
+                actual_velocity=60,
+                is_grace_note=True,
+                parent_stroke_index=0,
+            ),
+        ]
+
+        labels = compute_stroke_labels(events)
+        primary_label = labels[0]
+        assert primary_label.buzz_count == 4  # 1 primary + 3 subs
