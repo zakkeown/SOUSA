@@ -115,9 +115,6 @@ python scripts/prove_utility.py output/dataset
 #    Outputs: score_distribution, timing_accuracy, rudiment_distribution,
 #             skill_tier_distribution, tempo_distribution, timing_vs_velocity
 python scripts/generate_plots.py output/dataset --output-dir output/dataset/plots
-
-# 7. Score correlation analysis — identifies redundant scores, PCA, clustering
-python -m experiments.score_analysis --data-dir output/dataset
 ```
 
 ### Audio Inspection (for debugging individual samples)
