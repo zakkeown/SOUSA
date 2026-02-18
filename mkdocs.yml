@@ -139,6 +139,49 @@ nav:
     - Score Computation: reference/score-computation.md
     - Audio Processing: reference/audio-processing.md
     - Data Format: reference/data-format.md
+    - Rudiment Specs:
+      - specs/rudiments/_index.md
+      - Conventions: specs/rudiments/_conventions.md
+      - Single Stroke Roll: specs/rudiments/01_single_stroke_roll.md
+      - Single Stroke Four: specs/rudiments/02_single_stroke_four.md
+      - Single Stroke Seven: specs/rudiments/03_single_stroke_seven.md
+      - Multiple Bounce Roll: specs/rudiments/04_multiple_bounce_roll.md
+      - Triple Stroke Roll: specs/rudiments/05_triple_stroke_roll.md
+      - Double Stroke Open Roll: specs/rudiments/06_double_stroke_open_roll.md
+      - Five Stroke Roll: specs/rudiments/07_five_stroke_roll.md
+      - Six Stroke Roll: specs/rudiments/08_six_stroke_roll.md
+      - Seven Stroke Roll: specs/rudiments/09_seven_stroke_roll.md
+      - Nine Stroke Roll: specs/rudiments/10_nine_stroke_roll.md
+      - Ten Stroke Roll: specs/rudiments/11_ten_stroke_roll.md
+      - Eleven Stroke Roll: specs/rudiments/12_eleven_stroke_roll.md
+      - Thirteen Stroke Roll: specs/rudiments/13_thirteen_stroke_roll.md
+      - Fifteen Stroke Roll: specs/rudiments/14_fifteen_stroke_roll.md
+      - Seventeen Stroke Roll: specs/rudiments/15_seventeen_stroke_roll.md
+      - Single Paradiddle: specs/rudiments/16_single_paradiddle.md
+      - Double Paradiddle: specs/rudiments/17_double_paradiddle.md
+      - Triple Paradiddle: specs/rudiments/18_triple_paradiddle.md
+      - Paradiddle-Diddle: specs/rudiments/19_paradiddle_diddle.md
+      - Flam: specs/rudiments/20_flam.md
+      - Flam Accent: specs/rudiments/21_flam_accent.md
+      - Flam Tap: specs/rudiments/22_flam_tap.md
+      - Flamacue: specs/rudiments/23_flamacue.md
+      - Flam Paradiddle: specs/rudiments/24_flam_paradiddle.md
+      - Single Flammed Mill: specs/rudiments/25_single_flammed_mill.md
+      - Flam Paradiddle-Diddle: specs/rudiments/26_flam_paradiddle_diddle.md
+      - Pataflafla: specs/rudiments/27_pataflafla.md
+      - Swiss Army Triplet: specs/rudiments/28_swiss_army_triplet.md
+      - Inverted Flam Tap: specs/rudiments/29_inverted_flam_tap.md
+      - Flam Drag: specs/rudiments/30_flam_drag.md
+      - Drag: specs/rudiments/31_drag.md
+      - Single Drag Tap: specs/rudiments/32_single_drag_tap.md
+      - Double Drag Tap: specs/rudiments/33_double_drag_tap.md
+      - Lesson 25: specs/rudiments/34_lesson_25.md
+      - Single Dragadiddle: specs/rudiments/35_single_dragadiddle.md
+      - Drag Paradiddle 1: specs/rudiments/36_drag_paradiddle_1.md
+      - Drag Paradiddle 2: specs/rudiments/37_drag_paradiddle_2.md
+      - Single Ratamacue: specs/rudiments/38_single_ratamacue.md
+      - Double Ratamacue: specs/rudiments/39_double_ratamacue.md
+      - Triple Ratamacue: specs/rudiments/40_triple_ratamacue.md
   - API Reference:
     - api/index.md
     - Rudiments: api/rudiments.md
