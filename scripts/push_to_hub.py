@@ -12,7 +12,7 @@ Usage:
     python scripts/push_to_hub.py username/sousa --private          # Private repository
 
 Prerequisites:
-    1. Install hub dependencies: pip install 'rudimentary[hub]'
+    1. Install hub dependencies: pip install 'sousa[hub]'
     2. Login to HuggingFace: huggingface-cli login
     3. Generate dataset: python scripts/generate_dataset.py
 
@@ -46,7 +46,7 @@ Examples:
   python scripts/push_to_hub.py myuser/sousa --no-audio   # Skip audio files
 
 Prerequisites:
-  pip install 'rudimentary[hub]'
+  pip install 'sousa[hub]'
   huggingface-cli login
         """,
     )
@@ -140,7 +140,7 @@ Prerequisites:
         import huggingface_hub  # noqa: F401
     except ImportError:
         logger.error("huggingface_hub not installed")
-        logger.error("Install with: pip install 'rudimentary[hub]'")
+        logger.error("Install with: pip install 'sousa[hub]'")
         sys.exit(1)
 
     # Configure upload

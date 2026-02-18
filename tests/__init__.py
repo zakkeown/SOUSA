@@ -1,1 +1,1 @@
-"""Tests for the rudimentary dataset generator."""
+"""Tests for the SOUSA dataset generator."""
