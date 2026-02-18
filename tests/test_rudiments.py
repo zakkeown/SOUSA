@@ -136,6 +136,33 @@ class TestRudimentLoading:
             StrokeType.TAP,
         ]
 
+    def test_swiss_army_triplet_sticking_differs_from_flam_accent(self, definitions_dir):
+        """Swiss army triplet has doubled last stroke: R L L | L R R (not R L R | L R L)."""
+        swiss = load_rudiment(definitions_dir / "28_swiss_army_triplet.yaml")
+        flam_accent = load_rudiment(definitions_dir / "21_flam_accent.yaml")
+
+        # Extract non-grace sticking from each
+        def get_sticking(rudiment):
+            return [s.hand for s in rudiment.pattern.strokes if s.stroke_type != StrokeType.GRACE]
+
+        swiss_sticking = get_sticking(swiss)
+        flam_sticking = get_sticking(flam_accent)
+
+        # They must differ
+        assert (
+            swiss_sticking != flam_sticking
+        ), "Swiss army triplet sticking should differ from flam accent"
+
+        # Swiss army: R L L | L R R
+        assert swiss_sticking == [
+            Hand.RIGHT,
+            Hand.LEFT,
+            Hand.LEFT,
+            Hand.LEFT,
+            Hand.RIGHT,
+            Hand.RIGHT,
+        ]
+
     def test_rudiment_duration_calculation(self, definitions_dir):
         """Test duration calculation for rudiments."""
         yaml_path = definitions_dir / "16_single_paradiddle.yaml"
