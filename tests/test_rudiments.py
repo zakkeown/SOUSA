@@ -42,6 +42,22 @@ class TestStickingPattern:
         pattern = parse_sticking_string("RL RR LR LL")
         assert len(pattern.strokes) == 8
 
+    def test_parse_buzz_notation(self):
+        """Test that B in simple pattern produces BUZZ stroke type."""
+        from dataset_gen.rudiments.loader import _parse_pattern_from_yaml
+
+        pattern = _parse_pattern_from_yaml(
+            {
+                "simple": "B B B B",
+                "beats_per_cycle": 1,
+            }
+        )
+        assert len(pattern.strokes) == 4
+        # B alternates hands like R/L
+        assert all(s.stroke_type == StrokeType.BUZZ for s in pattern.strokes)
+        assert pattern.strokes[0].hand == Hand.RIGHT
+        assert pattern.strokes[1].hand == Hand.LEFT
+
     def test_accent_positions(self):
         """Test accent position detection."""
         pattern = parse_sticking_string("RLRR LRLL", ">... >...")

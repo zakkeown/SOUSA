@@ -74,10 +74,17 @@ def _parse_pattern_from_yaml(pattern_data: dict) -> StickingPattern:
         if accent_chars and len(accent_chars) != len(sticking_chars):
             raise ValueError("Accent pattern must match sticking pattern length")
 
+        hand_toggle = True  # Start with RIGHT for buzz strokes
         for i, char in enumerate(sticking_chars):
-            hand = Hand.RIGHT if char.upper() == "R" else Hand.LEFT
-            is_accent = accent_chars and accent_chars[i] == ">"
-            stroke_type = StrokeType.ACCENT if is_accent else StrokeType.TAP
+            upper = char.upper()
+            if upper == "B":
+                hand = Hand.RIGHT if hand_toggle else Hand.LEFT
+                hand_toggle = not hand_toggle
+                stroke_type = StrokeType.BUZZ
+            else:
+                hand = Hand.RIGHT if upper == "R" else Hand.LEFT
+                is_accent = accent_chars and accent_chars[i] == ">"
+                stroke_type = StrokeType.ACCENT if is_accent else StrokeType.TAP
             strokes.append(Stroke(hand=hand, stroke_type=stroke_type))
 
         beats = pattern_data.get("beats_per_cycle", len(strokes) / 4)
@@ -131,6 +138,7 @@ def _parse_rudiment_params(params_data: dict | None) -> RudimentParams:
             if "buzz_strokes_range" in params_data
             else None
         ),
+        buzz_detail=params_data.get("buzz_detail"),
         drag_spacing_range=(
             tuple(params_data["drag_spacing_range"])
             if "drag_spacing_range" in params_data

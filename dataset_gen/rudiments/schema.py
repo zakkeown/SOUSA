@@ -122,6 +122,10 @@ class RudimentParams(BaseModel):
     buzz_strokes_range: tuple[int, int] | None = Field(
         default=None, description="Min/max bounce strokes per primary stroke"
     )
+    buzz_detail: Literal["sub_strokes", "marking"] | None = Field(
+        default=None,
+        description="Buzz generation mode: sub_strokes expands in MIDI, marking only tags stroke type",
+    )
 
     # Drag parameters (drags have 2 grace notes)
     drag_spacing_range: tuple[float, float] | None = Field(
