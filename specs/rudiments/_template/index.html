@@ -12,7 +12,7 @@
         <meta name="author" content="Zak Keown">
       
       
-        <link rel="canonical" href="https://zakkeown.github.io/SOUSA/plans/2025-01-27-hf-upload-tar-sharding-design/">
+        <link rel="canonical" href="https://zakkeown.github.io/SOUSA/specs/rudiments/_template/">
       
       
       
@@ -20,19 +20,19 @@
         
       
       
-      <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.2">
     
     
       
-        <title>HuggingFace Upload: TAR Sharding Design - SOUSA Documentation</title>
+        <title>PAS #{NUMBER}: - SOUSA Documentation</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -51,11 +51,11 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
     
-      <link rel="stylesheet" href="../../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#huggingface-upload-tar-sharding-design" class="md-skip">
+        <a href="#pas-number" class="md-skip">
           Skip to content
         </a>
       
@@ -94,7 +94,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="SOUSA Documentation" class="md-header__button md-logo" aria-label="SOUSA Documentation" data-md-component="logo">
+    <a href="../../.." title="SOUSA Documentation" class="md-header__button md-logo" aria-label="SOUSA Documentation" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -114,7 +114,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              HuggingFace Upload: TAR Sharding Design
+              PAS #{NUMBER}:
             
           </span>
         </div>
@@ -227,7 +227,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../.." class="md-tabs__link">
+      <a href="../../.." class="md-tabs__link">
         
   
   
@@ -248,7 +248,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../getting-started/" class="md-tabs__link">
+        <a href="../../../getting-started/" class="md-tabs__link">
           
   
   
@@ -270,7 +270,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../user-guide/" class="md-tabs__link">
+        <a href="../../../user-guide/" class="md-tabs__link">
           
   
   
@@ -292,7 +292,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../reference/" class="md-tabs__link">
+        <a href="../../../reference/" class="md-tabs__link">
           
   
   
@@ -314,7 +314,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../api/" class="md-tabs__link">
+        <a href="../../../api/" class="md-tabs__link">
           
   
   
@@ -336,7 +336,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../examples/" class="md-tabs__link">
+        <a href="../../../examples/" class="md-tabs__link">
           
   
   
@@ -356,7 +356,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../contributing/" class="md-tabs__link">
+      <a href="../../../contributing/" class="md-tabs__link">
         
   
   
@@ -375,7 +375,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../limitations.md" class="md-tabs__link">
+      <a href="../../../limitations.md" class="md-tabs__link">
         
   
   
@@ -410,7 +410,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="SOUSA Documentation" class="md-nav__button md-logo" aria-label="SOUSA Documentation" data-md-component="logo">
+    <a href="../../.." title="SOUSA Documentation" class="md-nav__button md-logo" aria-label="SOUSA Documentation" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -440,7 +440,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         
   
   
@@ -498,7 +498,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../getting-started/" class="md-nav__link ">
+            <a href="../../../getting-started/" class="md-nav__link ">
               
   
   
@@ -542,7 +542,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../getting-started/installation/" class="md-nav__link">
+      <a href="../../../getting-started/installation/" class="md-nav__link">
         
   
   
@@ -570,7 +570,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../getting-started/quickstart/" class="md-nav__link">
+      <a href="../../../getting-started/quickstart/" class="md-nav__link">
         
   
   
@@ -598,7 +598,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../getting-started/loading/" class="md-nav__link">
+      <a href="../../../getting-started/loading/" class="md-nav__link">
         
   
   
@@ -668,7 +668,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../user-guide/" class="md-nav__link ">
+            <a href="../../../user-guide/" class="md-nav__link ">
               
   
   
@@ -712,7 +712,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../user-guide/generation/" class="md-nav__link">
+      <a href="../../../user-guide/generation/" class="md-nav__link">
         
   
   
@@ -740,7 +740,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../user-guide/augmentation/" class="md-nav__link">
+      <a href="../../../user-guide/augmentation/" class="md-nav__link">
         
   
   
@@ -768,7 +768,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../user-guide/filtering/" class="md-nav__link">
+      <a href="../../../user-guide/filtering/" class="md-nav__link">
         
   
   
@@ -796,7 +796,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../user-guide/ml-training/" class="md-nav__link">
+      <a href="../../../user-guide/ml-training/" class="md-nav__link">
         
   
   
@@ -824,7 +824,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../user-guide/validation/" class="md-nav__link">
+      <a href="../../../user-guide/validation/" class="md-nav__link">
         
   
   
@@ -875,6 +875,8 @@
       
         
       
+        
+      
     
     
     
@@ -894,7 +896,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../reference/" class="md-nav__link ">
+            <a href="../../../reference/" class="md-nav__link ">
               
   
   
@@ -938,7 +940,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/architecture/" class="md-nav__link">
+      <a href="../../../reference/architecture/" class="md-nav__link">
         
   
   
@@ -966,7 +968,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/rudiment-schema/" class="md-nav__link">
+      <a href="../../../reference/rudiment-schema/" class="md-nav__link">
         
   
   
@@ -994,7 +996,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/score-computation/" class="md-nav__link">
+      <a href="../../../reference/score-computation/" class="md-nav__link">
         
   
   
@@ -1022,7 +1024,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/audio-processing/" class="md-nav__link">
+      <a href="../../../reference/audio-processing/" class="md-nav__link">
         
   
   
@@ -1050,7 +1052,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/data-format/" class="md-nav__link">
+      <a href="../../../reference/data-format/" class="md-nav__link">
         
   
   
@@ -1066,6 +1068,1330 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rudiment Specs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Rudiment Specs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../_index/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PAS 40 International Drum Rudiment Engineering Specs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../_conventions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Conventions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01_single_stroke_roll/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Single Stroke Roll
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02_single_stroke_four/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Single Stroke Four
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03_single_stroke_seven/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Single Stroke Seven
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04_multiple_bounce_roll/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multiple Bounce Roll
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05_triple_stroke_roll/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Triple Stroke Roll
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06_double_stroke_open_roll/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Double Stroke Open Roll
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07_five_stroke_roll/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Five Stroke Roll
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08_six_stroke_roll/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Six Stroke Roll
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09_seven_stroke_roll/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seven Stroke Roll
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10_nine_stroke_roll/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nine Stroke Roll
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../11_ten_stroke_roll/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ten Stroke Roll
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../12_eleven_stroke_roll/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Eleven Stroke Roll
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../13_thirteen_stroke_roll/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Thirteen Stroke Roll
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../14_fifteen_stroke_roll/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fifteen Stroke Roll
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../15_seventeen_stroke_roll/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seventeen Stroke Roll
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../16_single_paradiddle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Single Paradiddle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../17_double_paradiddle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Double Paradiddle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../18_triple_paradiddle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Triple Paradiddle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../19_paradiddle_diddle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Paradiddle-Diddle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../20_flam/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flam
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../21_flam_accent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flam Accent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../22_flam_tap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flam Tap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../23_flamacue/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flamacue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../24_flam_paradiddle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flam Paradiddle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../25_single_flammed_mill/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Single Flammed Mill
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../26_flam_paradiddle_diddle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flam Paradiddle-Diddle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../27_pataflafla/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pataflafla
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../28_swiss_army_triplet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Swiss Army Triplet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../29_inverted_flam_tap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inverted Flam Tap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../30_flam_drag/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flam Drag
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../31_drag/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Drag
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../32_single_drag_tap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Single Drag Tap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../33_double_drag_tap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Double Drag Tap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../34_lesson_25/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lesson 25
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../35_single_dragadiddle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Single Dragadiddle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../36_drag_paradiddle_1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Drag Paradiddle 1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../37_drag_paradiddle_2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Drag Paradiddle 2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../38_single_ratamacue/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Single Ratamacue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../39_double_ratamacue/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Double Ratamacue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../40_triple_ratamacue/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Triple Ratamacue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -1126,7 +2452,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../api/" class="md-nav__link ">
+            <a href="../../../api/" class="md-nav__link ">
               
   
   
@@ -1170,7 +2496,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/rudiments/" class="md-nav__link">
+      <a href="../../../api/rudiments/" class="md-nav__link">
         
   
   
@@ -1198,7 +2524,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/profiles/" class="md-nav__link">
+      <a href="../../../api/profiles/" class="md-nav__link">
         
   
   
@@ -1226,7 +2552,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/midi-gen/" class="md-nav__link">
+      <a href="../../../api/midi-gen/" class="md-nav__link">
         
   
   
@@ -1254,7 +2580,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/audio-synth/" class="md-nav__link">
+      <a href="../../../api/audio-synth/" class="md-nav__link">
         
   
   
@@ -1282,7 +2608,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/audio-aug/" class="md-nav__link">
+      <a href="../../../api/audio-aug/" class="md-nav__link">
         
   
   
@@ -1310,7 +2636,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/labels/" class="md-nav__link">
+      <a href="../../../api/labels/" class="md-nav__link">
         
   
   
@@ -1338,7 +2664,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/pipeline/" class="md-nav__link">
+      <a href="../../../api/pipeline/" class="md-nav__link">
         
   
   
@@ -1366,7 +2692,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/validation/" class="md-nav__link">
+      <a href="../../../api/validation/" class="md-nav__link">
         
   
   
@@ -1434,7 +2760,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../examples/" class="md-nav__link ">
+            <a href="../../../examples/" class="md-nav__link ">
               
   
   
@@ -1478,7 +2804,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/pytorch-dataloader/" class="md-nav__link">
+      <a href="../../../examples/pytorch-dataloader/" class="md-nav__link">
         
   
   
@@ -1506,7 +2832,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/feature-extraction/" class="md-nav__link">
+      <a href="../../../examples/feature-extraction/" class="md-nav__link">
         
   
   
@@ -1534,7 +2860,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/filtering/" class="md-nav__link">
+      <a href="../../../examples/filtering/" class="md-nav__link">
         
   
   
@@ -1562,7 +2888,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/hierarchical-labels/" class="md-nav__link">
+      <a href="../../../examples/hierarchical-labels/" class="md-nav__link">
         
   
   
@@ -1597,7 +2923,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../contributing/" class="md-nav__link">
+      <a href="../../../contributing/" class="md-nav__link">
         
   
   
@@ -1624,7 +2950,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../limitations.md" class="md-nav__link">
+      <a href="../../../limitations.md" class="md-nav__link">
         
   
   
@@ -1671,10 +2997,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#solution" class="md-nav__link">
+  <a href="#1-identity" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Solution
+        1. Identity
       
     </span>
   </a>
@@ -1682,66 +3008,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#archive-structure" class="md-nav__link">
+  <a href="#2-rhythmic-structure" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Archive Structure
+        2. Rhythmic Structure
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#parquet-schema-changes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parquet Schema Changes
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#implementation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Implementation
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Implementation">
+    <nav class="md-nav" aria-label="2. Rhythmic Structure">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#new-file-dataset_genhubarchiverpy" class="md-nav__link">
+  <a href="#stroke-grid" class="md-nav__link">
     <span class="md-ellipsis">
       
-        New File: dataset_gen/hub/archiver.py
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#changes-to-dataset_genhubuploaderpy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Changes to dataset_gen/hub/uploader.py
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#changes-to-scriptspush_to_hubpy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Changes to scripts/push_to_hub.py
+        Stroke Grid
       
     </span>
   </a>
@@ -1754,22 +3036,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#consumer-usage" class="md-nav__link">
+  <a href="#3-sticking-articulation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Consumer Usage
+        3. Sticking &amp; Articulation
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Consumer Usage">
+    <nav class="md-nav" aria-label="3. Sticking &amp; Articulation">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#basic-with-helper" class="md-nav__link">
+  <a href="#sticking-sequence" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Basic (with helper)
+        Sticking Sequence
       
     </span>
   </a>
@@ -1777,10 +3059,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#batch-processing-extract-shards" class="md-nav__link">
+  <a href="#stroke-detail-table" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Batch Processing (extract shards)
+        Stroke Detail Table
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ornament-timing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ornament Timing
       
     </span>
   </a>
@@ -1793,35 +3086,202 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#file-count-estimate" class="md-nav__link">
+  <a href="#4-dynamics-model" class="md-nav__link">
     <span class="md-ellipsis">
       
-        File Count Estimate
+        4. Dynamics Model
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Dynamics Model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#velocity-ratios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Velocity Ratios
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#testing" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#accent-pattern" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Testing
+        Accent Pattern
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#migration" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#dynamic-contour" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Migration
+        Dynamic Contour
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-physical-kinesthetic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Physical / Kinesthetic
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Physical / Kinesthetic">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#stroke-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stroke Map
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tempo-dependent-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tempo-Dependent Behavior
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-variations-pedagogy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Variations &amp; Pedagogy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Variations &amp; Pedagogy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-variations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Variations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#builds-toward" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Builds Toward
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#teaching-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Teaching Notes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#historical-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Historical Context
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-notation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Notation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Notation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#stick-notation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stick Notation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grid-visualization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Grid Visualization
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1845,196 +3305,313 @@
   
 
 
-<h1 id="huggingface-upload-tar-sharding-design">HuggingFace Upload: TAR Sharding Design<a class="headerlink" href="#huggingface-upload-tar-sharding-design" title="Permanent link">&para;</a></h1>
-<p><strong>Date:</strong> 2025-01-27
-<strong>Status:</strong> Approved
-<strong>Problem:</strong> Current upload script tries to push 240k individual files, exceeding HuggingFace's 100k file limit and causing rate limiting (128 commits/hour)</p>
-<h2 id="solution">Solution<a class="headerlink" href="#solution" title="Permanent link">&para;</a></h2>
-<p>Bundle audio/MIDI files into sharded TAR archives, reducing total file count to ~100.</p>
-<h2 id="archive-structure">Archive Structure<a class="headerlink" href="#archive-structure" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>output/dataset/hf_staging/
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── README.md
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>├── data/
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│   ├── train.parquet
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│   ├── validation.parquet
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│   └── test.parquet
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>├── audio/
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│   ├── train-00000.tar
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│   ├── train-00001.tar
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│   ├── ... (~96 shards at 1GB each)
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│   ├── validation-00000.tar
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│   └── test-00000.tar
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>└── midi/
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    ├── train.tar
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    ├── validation.tar
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    └── test.tar
-</span></code></pre></div>
-<h2 id="parquet-schema-changes">Parquet Schema Changes<a class="headerlink" href="#parquet-schema-changes" title="Permanent link">&para;</a></h2>
-<p>Current columns:
-- <code>audio_path</code>: <code>"audio/adv000_double_drag_tap_112bpm_douglasn_practiceroom.flac"</code>
-- <code>midi_path</code>: <code>"midi/adv000_double_drag_tap_112bpm.mid"</code></p>
-<p>New columns:
-- <code>audio_shard</code>: <code>"train-00042.tar"</code>
-- <code>audio_filename</code>: <code>"adv000_double_drag_tap_112bpm_douglasn_practiceroom.flac"</code>
-- <code>midi_shard</code>: <code>"train.tar"</code>
-- <code>midi_filename</code>: <code>"adv000_double_drag_tap_112bpm.mid"</code></p>
-<h2 id="implementation">Implementation<a class="headerlink" href="#implementation" title="Permanent link">&para;</a></h2>
-<h3 id="new-file-dataset_genhubarchiverpy">New File: <code>dataset_gen/hub/archiver.py</code><a class="headerlink" href="#new-file-dataset_genhubarchiverpy" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nd">@dataclass</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">ShardInfo</span><span class="p">:</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">shard_name</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="k">def</span><span class="w"> </span><span class="nf">create_sharded_archives</span><span class="p">(</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">source_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">output_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="n">filenames_by_split</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>  <span class="c1"># split -&gt; list of filenames</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    <span class="n">target_shard_size_bytes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1_000_000_000</span><span class="p">,</span>  <span class="c1"># 1GB</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    <span class="n">extension</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;flac&quot;</span><span class="p">,</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ShardInfo</span><span class="p">]:</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="sd">    Create TAR archives from source files, sharded by size.</span>
-</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>
-</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="sd">    Args:</span>
-</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="sd">        source_dir: Directory containing source files</span>
-</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="sd">        output_dir: Directory to write TAR archives</span>
-</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="sd">        filenames_by_split: Mapping of split name to list of filenames</span>
-</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="sd">        target_shard_size_bytes: Target size per shard</span>
-</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="sd">        extension: File extension to process</span>
-</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>
-</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="sd">    Returns:</span>
-</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="sd">        Mapping of original filename to ShardInfo(shard_name, filename)</span>
-</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="sd">    &quot;&quot;&quot;</span>
-</span></code></pre></div>
-<p>Key behaviors:
-- Groups files by split first
-- Creates shards when accumulated size exceeds target
-- Returns mapping for parquet updates
-- Uses deterministic ordering for reproducibility</p>
-<h3 id="changes-to-dataset_genhubuploaderpy">Changes to <code>dataset_gen/hub/uploader.py</code><a class="headerlink" href="#changes-to-dataset_genhubuploaderpy" title="Permanent link">&para;</a></h3>
-<ol>
-<li>
-<p>Add <code>use_tar_shards: bool = True</code> to <code>HubConfig</code></p>
-</li>
-<li>
-<p>Replace <code>_copy_media_files()</code> logic:
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">_create_media_archives</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">media_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">extension</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ShardInfo</span><span class="p">]:</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Create sharded TAR archives for audio or MIDI files.&quot;&quot;&quot;</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="c1"># Get filenames grouped by split from the merged dataframe</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="c1"># Call create_sharded_archives()</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="c1"># Return shard mapping</span>
-</span></code></pre></div></p>
-</li>
-<li>
-<p>Update <code>_merge_dataframes()</code> to add shard columns:
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># After creating archives:</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">merged_df</span><span class="p">[</span><span class="s2">&quot;audio_shard&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">merged_df</span><span class="p">[</span><span class="s2">&quot;sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="k">lambda</span> <span class="n">sid</span><span class="p">:</span> <span class="n">audio_shard_map</span><span class="p">[</span><span class="n">sid</span><span class="p">]</span><span class="o">.</span><span class="n">shard_name</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">)</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">merged_df</span><span class="p">[</span><span class="s2">&quot;audio_filename&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">merged_df</span><span class="p">[</span><span class="s2">&quot;sample_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="k">lambda</span> <span class="n">sid</span><span class="p">:</span> <span class="n">audio_shard_map</span><span class="p">[</span><span class="n">sid</span><span class="p">]</span><span class="o">.</span><span class="n">filename</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">)</span>
-</span></code></pre></div></p>
-</li>
-<li>
-<p>Keep <code>upload_large_folder()</code> - works fine with ~100 files</p>
-</li>
-</ol>
-<h3 id="changes-to-scriptspush_to_hubpy">Changes to <code>scripts/push_to_hub.py</code><a class="headerlink" href="#changes-to-scriptspush_to_hubpy" title="Permanent link">&para;</a></h3>
-<p>Add flag to disable sharding (for testing):
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="s2">&quot;--no-sharding&quot;</span><span class="p">,</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Disable TAR sharding (not recommended for large datasets)&quot;</span><span class="p">,</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">)</span>
-</span></code></pre></div></p>
-<h2 id="consumer-usage">Consumer Usage<a class="headerlink" href="#consumer-usage" title="Permanent link">&para;</a></h2>
-<h3 id="basic-with-helper">Basic (with helper)<a class="headerlink" href="#basic-with-helper" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dataset</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">huggingface_hub</span><span class="w"> </span><span class="kn">import</span> <span class="n">hf_hub_download</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">tarfile</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">soundfile</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sf</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="k">def</span><span class="w"> </span><span class="nf">load_audio</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">repo_id</span><span class="o">=</span><span class="s2">&quot;zkeown/sousa&quot;</span><span class="p">):</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Load audio from a dataset sample.&quot;&quot;&quot;</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    <span class="n">shard_path</span> <span class="o">=</span> <span class="n">hf_hub_download</span><span class="p">(</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>        <span class="n">repo_id</span><span class="p">,</span>
-</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>        <span class="sa">f</span><span class="s2">&quot;audio/</span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;audio_shard&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>        <span class="n">repo_type</span><span class="o">=</span><span class="s2">&quot;dataset&quot;</span>
-</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>    <span class="p">)</span>
-</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>    <span class="k">with</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">shard_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">tar</span><span class="p">:</span>
-</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>        <span class="n">audio_bytes</span> <span class="o">=</span> <span class="n">tar</span><span class="o">.</span><span class="n">extractfile</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="s2">&quot;audio_filename&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>        <span class="k">return</span> <span class="n">sf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">audio_bytes</span><span class="p">))</span>
-</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>
-</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;zkeown/sousa&quot;</span><span class="p">)</span>
-</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="n">audio</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="n">load_audio</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
-</span></code></pre></div>
-<h3 id="batch-processing-extract-shards">Batch Processing (extract shards)<a class="headerlink" href="#batch-processing-extract-shards" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Download and extract all training audio</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">for</span> <span class="n">shard</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">][</span><span class="s2">&quot;audio_shard&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="n">shard_path</span> <span class="o">=</span> <span class="n">hf_hub_download</span><span class="p">(</span><span class="s2">&quot;zkeown/sousa&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;audio/</span><span class="si">{</span><span class="n">shard</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">repo_type</span><span class="o">=</span><span class="s2">&quot;dataset&quot;</span><span class="p">)</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="k">with</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">shard_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">tar</span><span class="p">:</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>        <span class="n">tar</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="s2">&quot;./audio/&quot;</span><span class="p">)</span>
-</span></code></pre></div>
-<h2 id="file-count-estimate">File Count Estimate<a class="headerlink" href="#file-count-estimate" title="Permanent link">&para;</a></h2>
+<h1 NAME="NAME" RUDIMENT="RUDIMENT" id="pas-number">PAS #{NUMBER}:<a class="headerlink" href="#pas-number" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>See <a href="../_conventions/">Conventions &amp; Shared Definitions</a> for stroke types, velocity ratios, height classes, motion types, and notation rules.</p>
+</blockquote>
+<hr />
+<h2 id="1-identity">1. Identity<a class="headerlink" href="#1-identity" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Content</th>
-<th>Files</th>
+<th>Field</th>
+<th>Value</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Parquet (3 splits)</td>
-<td>3</td>
+<td><strong>PAS Number</strong></td>
+<td>{1-40}</td>
 </tr>
 <tr>
-<td>Audio shards (~96GB / 1GB)</td>
-<td>~96</td>
+<td><strong>Name</strong></td>
+<td>{Official PAS name}</td>
 </tr>
 <tr>
-<td>Validation audio</td>
-<td>~1-2</td>
+<td><strong>Category</strong></td>
+<td>{roll / diddle / flam / drag}</td>
 </tr>
 <tr>
-<td>Test audio</td>
-<td>~1-2</td>
+<td><strong>Family</strong></td>
+<td>{e.g., single stroke, paradiddle, basic flam, ratamacue}</td>
 </tr>
 <tr>
-<td>MIDI (3 splits, small)</td>
-<td>3</td>
+<td><strong>Composed Of</strong></td>
+<td>{Primitive components, e.g., "singles + diddle", "flam + paradiddle"}</td>
 </tr>
 <tr>
-<td>README</td>
-<td>1</td>
+<td><strong>Related</strong></td>
+<td>{Links to related rudiments by PAS number and name}</td>
 </tr>
 <tr>
-<td><strong>Total</strong></td>
-<td><strong>~106</strong></td>
+<td><strong>NARD Original</strong></td>
+<td>{Yes / No}</td>
 </tr>
 </tbody>
 </table>
-<p>Well under 100k limit.</p>
-<h2 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Unit tests for <code>archiver.py</code>:</li>
-<li>Shard size targeting</li>
-<li>Split separation</li>
-<li>
-<p>Deterministic output</p>
-</li>
-<li>
-<p>Integration test:</p>
-</li>
-<li>Generate small dataset</li>
-<li>Run upload with <code>--dry-run</code></li>
-<li>Verify archive structure</li>
-<li>Verify parquet shard columns</li>
-</ol>
-<h2 id="migration">Migration<a class="headerlink" href="#migration" title="Permanent link">&para;</a></h2>
-<p>No migration needed - this changes the upload format, not the generation format. Existing generated datasets work with the new uploader.</p>
+<hr />
+<h2 id="2-rhythmic-structure">2. Rhythmic Structure<a class="headerlink" href="#2-rhythmic-structure" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Time Signature</strong></td>
+<td>{e.g., 4/4}</td>
+</tr>
+<tr>
+<td><strong>Base Subdivision</strong></td>
+<td>{quarter / eighth / triplet / sixteenth / sextuplet / 32<sup>nd</sup>}</td>
+</tr>
+<tr>
+<td><strong>Cycle Length</strong></td>
+<td>{N beats}</td>
+</tr>
+<tr>
+<td><strong>Strokes Per Cycle</strong></td>
+<td>{Total count including grace notes}</td>
+</tr>
+<tr>
+<td><strong>Primary Strokes Per Cycle</strong></td>
+<td>{Count excluding grace notes}</td>
+</tr>
+</tbody>
+</table>
+<h3 id="stroke-grid">Stroke Grid<a class="headerlink" href="#stroke-grid" title="Permanent link">&para;</a></h3>
+<!-- Each stroke's position as a beat fraction. Position 0 = downbeat of the cycle. -->
+
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Position (beats)</th>
+<th>Grid Slot</th>
+<th>Hand</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>{R/L}</td>
+<td>{A/t/g/d1/d2/b}</td>
+</tr>
+<tr>
+<td>2</td>
+<td>{fraction}</td>
+<td>{slot name}</td>
+<td>{R/L}</td>
+<td>{type}</td>
+</tr>
+<tr>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-sticking-articulation">3. Sticking &amp; Articulation<a class="headerlink" href="#3-sticking-articulation" title="Permanent link">&para;</a></h2>
+<h3 id="sticking-sequence">Sticking Sequence<a class="headerlink" href="#sticking-sequence" title="Permanent link">&para;</a></h3>
+<!-- Write the full sticking using R/L with accent markers (>) and ornament prefixes. Use | to separate beats or groups. -->
+
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>{e.g., R L R R | L R L L}
+</span></code></pre></div>
+<h3 id="stroke-detail-table">Stroke Detail Table<a class="headerlink" href="#stroke-detail-table" title="Permanent link">&para;</a></h3>
+<!-- One row per stroke in the cycle. For ornaments, specify the parent stroke. -->
+
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Hand</th>
+<th>Stroke Type</th>
+<th>Ornament Role</th>
+<th>Parent Stroke</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>{R/L}</td>
+<td>{accent/tap/grace/d1/d2/buzz}</td>
+<td>{primary / grace / none}</td>
+<td>{# or n/a}</td>
+<td>{Any special notes}</td>
+</tr>
+<tr>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ornament-timing">Ornament Timing<a class="headerlink" href="#ornament-timing" title="Permanent link">&para;</a></h3>
+<!-- Only include sections relevant to this rudiment. Omit sections that do not apply. -->
+
+<p><strong>Flam Grace Notes</strong> (if applicable):
+- Grace offset from primary: {negative beat fraction, e.g., -1/32}
+- Grace hand: {opposite of primary}</p>
+<p><strong>Drag Grace Notes</strong> (if applicable):
+- First grace offset: {e.g., -1/16}
+- Second grace offset: {e.g., -1/32}
+- Grace hand: {same hand for both, opposite of primary}</p>
+<p><strong>Diddle Timing</strong> (if applicable):
+- Each diddle stroke: {fraction of parent grid slot, e.g., &frac12; of &frac14; beat = &#8539; beat each}</p>
+<hr />
+<h2 id="4-dynamics-model">4. Dynamics Model<a class="headerlink" href="#4-dynamics-model" title="Permanent link">&para;</a></h2>
+<h3 id="velocity-ratios">Velocity Ratios<a class="headerlink" href="#velocity-ratios" title="Permanent link">&para;</a></h3>
+<!-- List the velocity ratio for each stroke type present in this rudiment. Reference _conventions.md for the full scale. -->
+
+<table>
+<thead>
+<tr>
+<th>Stroke Type</th>
+<th>Velocity Ratio</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>accent</td>
+<td>1.0</td>
+<td>{Reference level}</td>
+</tr>
+<tr>
+<td>tap</td>
+<td>{0.65 - 0.77}</td>
+<td>{Context-specific value or range}</td>
+</tr>
+<tr>
+<td>{other types}</td>
+<td>{ratio}</td>
+<td>{notes}</td>
+</tr>
+</tbody>
+</table>
+<h3 id="accent-pattern">Accent Pattern<a class="headerlink" href="#accent-pattern" title="Permanent link">&para;</a></h3>
+<!-- Text visualization showing accent placement across the cycle. Use > for accents, - for unaccented. -->
+
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>{e.g., &gt;  -  -  &gt;  |  &gt;  -  -  &gt;}
+</span></code></pre></div>
+<h3 id="dynamic-contour">Dynamic Contour<a class="headerlink" href="#dynamic-contour" title="Permanent link">&para;</a></h3>
+<!-- Describe the overall dynamic shape of the rudiment. Is there a crescendo, decrescendo, or repeating accent pattern? How does the dynamic contour support the musical character? -->
+
+<p>{Description of the dynamic shape and character}</p>
+<hr />
+<h2 id="5-physical-kinesthetic">5. Physical / Kinesthetic<a class="headerlink" href="#5-physical-kinesthetic" title="Permanent link">&para;</a></h2>
+<h3 id="stroke-map">Stroke Map<a class="headerlink" href="#stroke-map" title="Permanent link">&para;</a></h3>
+<!-- Height class and motion type for each stroke position. See _conventions.md for definitions. -->
+
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Hand</th>
+<th>Stroke Type</th>
+<th>Height Class</th>
+<th>Motion Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>{R/L}</td>
+<td>{type}</td>
+<td>{full/half/low/tap}</td>
+<td>{wrist + arm / wrist / fingers / rebound}</td>
+</tr>
+<tr>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+</tbody>
+</table>
+<h3 id="tempo-dependent-behavior">Tempo-Dependent Behavior<a class="headerlink" href="#tempo-dependent-behavior" title="Permanent link">&para;</a></h3>
+<!-- Describe how technique changes across the tempo range. Include specific thresholds where applicable. -->
+
+<table>
+<thead>
+<tr>
+<th>Tempo Range</th>
+<th>Technique Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Slow ({BPM range})</td>
+<td>{Description of technique at slow tempos}</td>
+</tr>
+<tr>
+<td>Moderate ({BPM range})</td>
+<td>{Description of technique at moderate tempos}</td>
+</tr>
+<tr>
+<td>Fast ({BPM range})</td>
+<td>{Description of technique at fast tempos}</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="6-variations-pedagogy">6. Variations &amp; Pedagogy<a class="headerlink" href="#6-variations-pedagogy" title="Permanent link">&para;</a></h2>
+<h3 id="common-variations">Common Variations<a class="headerlink" href="#common-variations" title="Permanent link">&para;</a></h3>
+<!-- List known variations: NARD version differences, regional interpretations, hybrid forms. -->
+
+<ul>
+<li>{Variation 1}</li>
+<li>{Variation 2}</li>
+</ul>
+<h3 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h3>
+<!-- Rudiments that should be learned before this one. Reference by PAS number and name. -->
+
+<ul>
+<li>{PAS #N: Rudiment Name}</li>
+</ul>
+<h3 id="builds-toward">Builds Toward<a class="headerlink" href="#builds-toward" title="Permanent link">&para;</a></h3>
+<!-- Rudiments that build on this one. Reference by PAS number and name. -->
+
+<ul>
+<li>{PAS #N: Rudiment Name}</li>
+</ul>
+<h3 id="teaching-notes">Teaching Notes<a class="headerlink" href="#teaching-notes" title="Permanent link">&para;</a></h3>
+<!-- Pedagogical advice: common mistakes, practice strategies, what to listen for. -->
+
+<p>{Teaching guidance}</p>
+<h3 id="historical-context">Historical Context<a class="headerlink" href="#historical-context" title="Permanent link">&para;</a></h3>
+<!-- NARD origins, historical significance, notable performers or literature. -->
+
+<p>{Historical notes}</p>
+<hr />
+<h2 id="7-notation">7. Notation<a class="headerlink" href="#7-notation" title="Permanent link">&para;</a></h2>
+<h3 id="stick-notation">Stick Notation<a class="headerlink" href="#stick-notation" title="Permanent link">&para;</a></h3>
+<!-- Text-based notation using R/L, accent markers, grace note prefixes, and bar separators. -->
+
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>{e.g., &gt;       &gt;
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>       lR  L  rL  R
+</span></code></pre></div>
+<h3 id="grid-visualization">Grid Visualization<a class="headerlink" href="#grid-visualization" title="Permanent link">&para;</a></h3>
+<!-- Aligned grid showing beat position, hand, stroke type, and accents. -->
+
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Beat:    | 1     e     &amp;     a   | 2     e     &amp;     a   |
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>Hand:    | R     L     R     R   | L     R     L     L   |
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>Type:    | A     t     A     d1  | A     t     A     d1  |
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>Accent:  | &gt;           &gt;         | &gt;           &gt;         |
+</span></code></pre></div>
 
 
 
@@ -2119,12 +3696,12 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="../../javascripts/mathjax.js"></script>
+        <script src="../../../javascripts/mathjax.js"></script>
       
         <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
       
