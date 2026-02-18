@@ -48,7 +48,6 @@ dependencies = [
 [project.optional-dependencies]
 analysis = [
     "madmom @ git+https://github.com/CPJKU/madmom.git",
-    "matplotlib>=3.7.0",
 ]
 dev = [
     "pytest>=7.0.0",
@@ -74,8 +73,6 @@ ml = [
     # Analysis
     "scikit-learn>=1.3",
     "seaborn>=0.12",
-    # Optional but recommended
-    # "wandb>=0.16",  # Uncomment for weights & biases logging
 ]
 docs = [
     "mkdocs-material>=9.5.0",
