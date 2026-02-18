@@ -12,6 +12,7 @@ from dataset_gen.rudiments.schema import (
     StrokeType,
     Hand,
     RudimentCategory,
+    RudimentParams,
     parse_sticking_string,
 )
 from dataset_gen.rudiments.loader import load_rudiment
@@ -22,6 +23,7 @@ from dataset_gen.midi_gen.generator import (
     GeneratedPerformance,
     generate_performance,
 )
+from dataset_gen.midi_gen.articulations import ArticulationEngine
 
 
 @pytest.fixture
@@ -293,3 +295,91 @@ class TestStrokeEvent:
         )
 
         assert event.velocity_error == -5
+
+
+class TestBuzzSubStrokes:
+    """Tests for buzz roll sub-stroke generation."""
+
+    def _make_buzz_rudiment(self, buzz_detail="sub_strokes"):
+        return Rudiment(
+            name="Test Buzz",
+            slug="test_buzz",
+            category=RudimentCategory.ROLL,
+            pattern=StickingPattern(
+                strokes=[
+                    Stroke(hand=Hand.RIGHT, stroke_type=StrokeType.BUZZ),
+                    Stroke(hand=Hand.LEFT, stroke_type=StrokeType.BUZZ),
+                ],
+                beats_per_cycle=1,
+            ),
+            params=RudimentParams(
+                roll_type="buzz",
+                buzz_detail=buzz_detail,
+                buzz_strokes_range=(3, 5),
+            ),
+        )
+
+    def _make_events(self):
+        return [
+            StrokeEvent(
+                index=0,
+                hand=Hand.RIGHT,
+                stroke_type=StrokeType.BUZZ,
+                intended_time_ms=0,
+                actual_time_ms=0,
+                intended_velocity=100,
+                actual_velocity=100,
+            ),
+            StrokeEvent(
+                index=1,
+                hand=Hand.LEFT,
+                stroke_type=StrokeType.BUZZ,
+                intended_time_ms=250,
+                actual_time_ms=250,
+                intended_velocity=100,
+                actual_velocity=100,
+            ),
+        ]
+
+    def test_sub_strokes_expands_events(self):
+        """sub_strokes mode should generate additional events per BUZZ stroke."""
+        rudiment = self._make_buzz_rudiment("sub_strokes")
+        profile = generate_profile(skill_tier=SkillTier.INTERMEDIATE, rng=np.random.default_rng(42))
+        engine = ArticulationEngine(seed=42)
+
+        events = self._make_events()
+        result = engine.process(events, rudiment, profile)
+
+        # Should have more events than the 2 primaries (3-5 sub-strokes each)
+        assert len(result) > 2
+
+    def test_sub_strokes_have_decaying_velocity(self):
+        """Buzz sub-strokes should decay in velocity from the primary."""
+        rudiment = self._make_buzz_rudiment("sub_strokes")
+        profile = generate_profile(skill_tier=SkillTier.PROFESSIONAL, rng=np.random.default_rng(42))
+        engine = ArticulationEngine(seed=42)
+
+        events = self._make_events()
+        result = engine.process(events, rudiment, profile)
+
+        # Find sub-strokes for the first primary (parent_stroke_index == 0)
+        subs = [e for e in result if e.parent_stroke_index == 0]
+        assert len(subs) >= 2  # At least some sub-strokes
+
+        # Sub-stroke velocities should be <= primary velocity
+        for sub in subs:
+            assert sub.actual_velocity <= 100
+
+    def test_marking_mode_no_expansion(self):
+        """marking mode should NOT add sub-strokes, just tag types."""
+        rudiment = self._make_buzz_rudiment("marking")
+        profile = generate_profile(skill_tier=SkillTier.INTERMEDIATE, rng=np.random.default_rng(42))
+        engine = ArticulationEngine(seed=42)
+
+        events = self._make_events()
+        result = engine.process(events, rudiment, profile)
+
+        # Same number of events -- no expansion
+        assert len(result) == 2
+        # Still BUZZ type
+        assert all(e.stroke_type == StrokeType.BUZZ for e in result)

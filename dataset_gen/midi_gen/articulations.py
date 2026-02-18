@@ -267,19 +267,67 @@ class ArticulationEngine:
         """
         Process buzz roll events.
 
-        For buzz rolls, we'd typically generate multiple bounce strokes
-        per primary stroke. This is a simplified version.
+        In sub_strokes mode: expand each BUZZ primary into rapid sub-strokes.
+        In marking mode: add velocity jitter but don't expand.
         """
-        # Buzz density affects consistency of roll sound
+        if getattr(params, "buzz_detail", None) != "sub_strokes":
+            # Marking mode or legacy: just add velocity jitter
+            density_consistency = dims.buzz_density_consistency
+            for event in events:
+                jitter = (1 - density_consistency) * 20
+                velocity_jitter = self.rng.normal(0, jitter)
+                event.actual_velocity = int(
+                    np.clip(event.actual_velocity + velocity_jitter, 1, 127)
+                )
+            return events
+
+        # Sub-strokes mode: expand each BUZZ stroke into rapid bounces
+        buzz_min, buzz_max = params.buzz_strokes_range or (3, 8)
         density_consistency = dims.buzz_density_consistency
+        velocity_decay = 0.85
+
+        expanded = []
+        next_index = max(e.index for e in events) + 1
 
         for event in events:
-            # Add slight randomness to velocity based on buzz consistency
-            jitter = (1 - density_consistency) * 20
-            velocity_jitter = self.rng.normal(0, jitter)
-            event.actual_velocity = int(np.clip(event.actual_velocity + velocity_jitter, 1, 127))
+            # Keep the primary stroke
+            expanded.append(event)
 
-        return events
+            if event.stroke_type != StrokeType.BUZZ:
+                continue
+
+            # Number of sub-strokes: higher consistency = closer to max
+            mean_count = buzz_min + (buzz_max - buzz_min) * density_consistency
+            count = int(
+                np.clip(
+                    self.rng.normal(mean_count, (1 - density_consistency) * 2),
+                    buzz_min,
+                    buzz_max,
+                )
+            )
+
+            # Generate sub-strokes with tight timing and decaying velocity
+            spacing_ms = 2 + self.rng.uniform(0, 3)  # 2-5ms per sub-stroke
+            for j in range(1, count):
+                sub_time = event.actual_time_ms + j * spacing_ms
+                decay = velocity_decay**j
+                sub_velocity = int(np.clip(event.actual_velocity * decay, 1, 127))
+
+                sub = StrokeEvent(
+                    index=next_index,
+                    hand=event.hand,
+                    stroke_type=StrokeType.BUZZ,
+                    intended_time_ms=event.intended_time_ms + j * spacing_ms,
+                    actual_time_ms=sub_time,
+                    intended_velocity=int(event.intended_velocity * decay),
+                    actual_velocity=sub_velocity,
+                    is_grace_note=True,
+                    parent_stroke_index=event.index,
+                )
+                expanded.append(sub)
+                next_index += 1
+
+        return expanded
 
 
 def apply_flam_spacing(

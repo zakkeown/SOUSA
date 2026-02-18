@@ -202,6 +202,8 @@ class MIDIGenerator:
                     ideal_velocity = 40
                 elif stroke.stroke_type == StrokeType.DIDDLE:
                     ideal_velocity = 75
+                elif stroke.stroke_type == StrokeType.BUZZ:
+                    ideal_velocity = 70
                 else:  # TAP
                     ideal_velocity = 65
 
