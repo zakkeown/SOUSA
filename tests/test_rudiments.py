@@ -179,6 +179,19 @@ class TestRudimentLoading:
             Hand.RIGHT,
         ]
 
+    def test_multiple_bounce_roll_has_buzz_strokes(self, definitions_dir):
+        """Multiple bounce roll strokes should be BUZZ type, not TAP."""
+        rudiment = load_rudiment(definitions_dir / "04_multiple_bounce_roll.yaml")
+        assert rudiment.slug == "multiple_bounce_roll"
+        assert rudiment.params.roll_type == "buzz"
+        assert rudiment.params.buzz_detail == "sub_strokes"
+
+        # All strokes should be BUZZ type
+        for stroke in rudiment.pattern.strokes:
+            assert (
+                stroke.stroke_type == StrokeType.BUZZ
+            ), f"Expected BUZZ but got {stroke.stroke_type}"
+
     def test_rudiment_duration_calculation(self, definitions_dir):
         """Test duration calculation for rudiments."""
         yaml_path = definitions_dir / "16_single_paradiddle.yaml"
