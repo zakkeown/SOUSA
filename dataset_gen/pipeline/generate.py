@@ -348,13 +348,11 @@ class DatasetGenerator:
         """Generate all samples for a single profile."""
         self.progress.current_profile = profile.id
 
-        # Determine tempos for this profile
+        # Determine tempos for this profile (unique to prevent sample ID collisions)
         tempo_min, tempo_max = self.config.tempo_range
-        tempos = self.rng.integers(
-            tempo_min,
-            tempo_max + 1,
-            size=self.config.tempos_per_rudiment,
-        )
+        tempo_range = np.arange(tempo_min, tempo_max + 1)
+        n_tempos = min(self.config.tempos_per_rudiment, len(tempo_range))
+        tempos = self.rng.choice(tempo_range, size=n_tempos, replace=False)
 
         for rudiment in rudiments:
             self.progress.current_rudiment = rudiment.slug
