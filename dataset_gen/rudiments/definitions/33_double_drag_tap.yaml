@@ -2,22 +2,27 @@ name: Double Drag Tap
 slug: double_drag_tap
 category: drag
 pas_number: 33
-description: Two drags followed by taps
+description: Two drags before each accented tap
 
 pattern:
   strokes:
-    # Drag R, tap L, drag R, tap L
+    # Double drag R: drag1(LL), drag2(LL), accent(R), tap(L)
+    - {hand: L, type: grace, grace_offset: -0.12}
     - {hand: L, type: grace, grace_offset: -0.08}
+    - {hand: L, type: grace, grace_offset: -0.06}
     - {hand: L, type: grace, grace_offset: -0.04}
     - {hand: R, type: accent}
     - {hand: L, type: tap}
+    # Double drag L: drag1(RR), drag2(RR), accent(L), tap(R)
+    - {hand: R, type: grace, grace_offset: -0.12}
     - {hand: R, type: grace, grace_offset: -0.08}
+    - {hand: R, type: grace, grace_offset: -0.06}
     - {hand: R, type: grace, grace_offset: -0.04}
     - {hand: L, type: accent}
     - {hand: R, type: tap}
   beats_per_cycle: 2
 
-subdivision: sixteenth
+subdivision: triplet
 tempo_range: [60, 160]
 
 params:

@@ -109,6 +109,33 @@ class TestRudimentLoading:
         assert RudimentCategory.FLAM in categories
         assert RudimentCategory.DRAG in categories
 
+    def test_double_drag_tap_has_12_strokes(self, definitions_dir):
+        """Double drag tap needs 2 drags (4 grace notes) + accent + tap per half-cycle = 12 total."""
+        rudiment = load_rudiment(definitions_dir / "33_double_drag_tap.yaml")
+        assert rudiment.slug == "double_drag_tap"
+        assert len(rudiment.pattern.strokes) == 12
+
+        # First half: drag1(LL) drag2(LL) accent(R) tap(L)
+        types = [s.stroke_type for s in rudiment.pattern.strokes[:6]]
+        assert types == [
+            StrokeType.GRACE,
+            StrokeType.GRACE,  # drag 1
+            StrokeType.GRACE,
+            StrokeType.GRACE,  # drag 2
+            StrokeType.ACCENT,
+            StrokeType.TAP,
+        ]
+        # Second half mirrors
+        types2 = [s.stroke_type for s in rudiment.pattern.strokes[6:]]
+        assert types2 == [
+            StrokeType.GRACE,
+            StrokeType.GRACE,
+            StrokeType.GRACE,
+            StrokeType.GRACE,
+            StrokeType.ACCENT,
+            StrokeType.TAP,
+        ]
+
     def test_rudiment_duration_calculation(self, definitions_dir):
         """Test duration calculation for rudiments."""
         yaml_path = definitions_dir / "16_single_paradiddle.yaml"
