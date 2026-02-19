@@ -51,16 +51,16 @@ class TestDatasetUploaderHelpers:
                     "paradiddle",
                 ],
                 "audio_path": [
-                    "audio/a1.flac",
-                    "audio/a2.flac",
-                    "audio/a3.flac",
-                    "audio/a4.flac",
+                    "audio/single_stroke_roll/a1.flac",
+                    "audio/double_stroke_roll/a2.flac",
+                    "audio/single_stroke_roll/a3.flac",
+                    "audio/paradiddle/a4.flac",
                 ],
                 "midi_path": [
-                    "midi/m1.mid",
-                    "midi/m2.mid",
-                    "midi/m3.mid",
-                    "midi/m4.mid",
+                    "midi/single_stroke_roll/m1.mid",
+                    "midi/double_stroke_roll/m2.mid",
+                    "midi/single_stroke_roll/m3.mid",
+                    "midi/paradiddle/m4.mid",
                 ],
             }
         )
@@ -88,16 +88,28 @@ class TestDatasetUploaderHelpers:
 
     def test_prepare_organizes_audio_by_rudiment(self, sample_dataset):
         """prepare() creates audio/{rudiment_slug}/ subdirectories."""
-        # Create actual audio files
+        # Create actual audio files in rudiment subdirectories
         audio_dir = sample_dataset / "audio"
         audio_dir.mkdir()
-        for name in ["a1.flac", "a2.flac", "a3.flac", "a4.flac"]:
-            (audio_dir / name).write_bytes(b"fake audio content")
+        for slug, name in [
+            ("single_stroke_roll", "a1.flac"),
+            ("double_stroke_roll", "a2.flac"),
+            ("single_stroke_roll", "a3.flac"),
+            ("paradiddle", "a4.flac"),
+        ]:
+            (audio_dir / slug).mkdir(exist_ok=True)
+            (audio_dir / slug / name).write_bytes(b"fake audio content")
 
         midi_dir = sample_dataset / "midi"
         midi_dir.mkdir()
-        for name in ["m1.mid", "m2.mid", "m3.mid", "m4.mid"]:
-            (midi_dir / name).write_bytes(b"fake midi content")
+        for slug, name in [
+            ("single_stroke_roll", "m1.mid"),
+            ("double_stroke_roll", "m2.mid"),
+            ("single_stroke_roll", "m3.mid"),
+            ("paradiddle", "m4.mid"),
+        ]:
+            (midi_dir / slug).mkdir(exist_ok=True)
+            (midi_dir / slug / name).write_bytes(b"fake midi content")
 
         config = HubConfig(dataset_dir=sample_dataset, repo_id="test/repo")
         uploader = DatasetUploader(config)
@@ -123,13 +135,25 @@ class TestDatasetUploaderHelpers:
         """prepare() writes parquets with audio/{rudiment_slug}/{filename} paths."""
         audio_dir = sample_dataset / "audio"
         audio_dir.mkdir()
-        for name in ["a1.flac", "a2.flac", "a3.flac", "a4.flac"]:
-            (audio_dir / name).write_bytes(b"fake audio content")
+        for slug, name in [
+            ("single_stroke_roll", "a1.flac"),
+            ("double_stroke_roll", "a2.flac"),
+            ("single_stroke_roll", "a3.flac"),
+            ("paradiddle", "a4.flac"),
+        ]:
+            (audio_dir / slug).mkdir(exist_ok=True)
+            (audio_dir / slug / name).write_bytes(b"fake audio content")
 
         midi_dir = sample_dataset / "midi"
         midi_dir.mkdir()
-        for name in ["m1.mid", "m2.mid", "m3.mid", "m4.mid"]:
-            (midi_dir / name).write_bytes(b"fake midi content")
+        for slug, name in [
+            ("single_stroke_roll", "m1.mid"),
+            ("double_stroke_roll", "m2.mid"),
+            ("single_stroke_roll", "m3.mid"),
+            ("paradiddle", "m4.mid"),
+        ]:
+            (midi_dir / slug).mkdir(exist_ok=True)
+            (midi_dir / slug / name).write_bytes(b"fake midi content")
 
         config = HubConfig(dataset_dir=sample_dataset, repo_id="test/repo")
         uploader = DatasetUploader(config)
@@ -156,8 +180,14 @@ class TestDatasetUploaderHelpers:
         """prepare(skip_media_copy=True) counts files but doesn't copy."""
         audio_dir = sample_dataset / "audio"
         audio_dir.mkdir()
-        for name in ["a1.flac", "a2.flac", "a3.flac", "a4.flac"]:
-            (audio_dir / name).write_bytes(b"fake audio content")
+        for slug, name in [
+            ("single_stroke_roll", "a1.flac"),
+            ("double_stroke_roll", "a2.flac"),
+            ("single_stroke_roll", "a3.flac"),
+            ("paradiddle", "a4.flac"),
+        ]:
+            (audio_dir / slug).mkdir(exist_ok=True)
+            (audio_dir / slug / name).write_bytes(b"fake audio content")
 
         config = HubConfig(dataset_dir=sample_dataset, repo_id="test/repo")
         uploader = DatasetUploader(config)
@@ -177,13 +207,25 @@ class TestDatasetUploaderHelpers:
         """prepare() creates symlinks rather than copies by default."""
         audio_dir = sample_dataset / "audio"
         audio_dir.mkdir()
-        for name in ["a1.flac", "a2.flac", "a3.flac", "a4.flac"]:
-            (audio_dir / name).write_bytes(b"fake audio content")
+        for slug, name in [
+            ("single_stroke_roll", "a1.flac"),
+            ("double_stroke_roll", "a2.flac"),
+            ("single_stroke_roll", "a3.flac"),
+            ("paradiddle", "a4.flac"),
+        ]:
+            (audio_dir / slug).mkdir(exist_ok=True)
+            (audio_dir / slug / name).write_bytes(b"fake audio content")
 
         midi_dir = sample_dataset / "midi"
         midi_dir.mkdir()
-        for name in ["m1.mid", "m2.mid", "m3.mid", "m4.mid"]:
-            (midi_dir / name).write_bytes(b"fake midi content")
+        for slug, name in [
+            ("single_stroke_roll", "m1.mid"),
+            ("double_stroke_roll", "m2.mid"),
+            ("single_stroke_roll", "m3.mid"),
+            ("paradiddle", "m4.mid"),
+        ]:
+            (midi_dir / slug).mkdir(exist_ok=True)
+            (midi_dir / slug / name).write_bytes(b"fake midi content")
 
         config = HubConfig(dataset_dir=sample_dataset, repo_id="test/repo")
         uploader = DatasetUploader(config)
@@ -198,13 +240,25 @@ class TestDatasetUploaderHelpers:
         """prepare() updates upload stats correctly."""
         audio_dir = sample_dataset / "audio"
         audio_dir.mkdir()
-        for name in ["a1.flac", "a2.flac", "a3.flac", "a4.flac"]:
-            (audio_dir / name).write_bytes(b"fake audio content")
+        for slug, name in [
+            ("single_stroke_roll", "a1.flac"),
+            ("double_stroke_roll", "a2.flac"),
+            ("single_stroke_roll", "a3.flac"),
+            ("paradiddle", "a4.flac"),
+        ]:
+            (audio_dir / slug).mkdir(exist_ok=True)
+            (audio_dir / slug / name).write_bytes(b"fake audio content")
 
         midi_dir = sample_dataset / "midi"
         midi_dir.mkdir()
-        for name in ["m1.mid", "m2.mid", "m3.mid", "m4.mid"]:
-            (midi_dir / name).write_bytes(b"fake midi content")
+        for slug, name in [
+            ("single_stroke_roll", "m1.mid"),
+            ("double_stroke_roll", "m2.mid"),
+            ("single_stroke_roll", "m3.mid"),
+            ("paradiddle", "m4.mid"),
+        ]:
+            (midi_dir / slug).mkdir(exist_ok=True)
+            (midi_dir / slug / name).write_bytes(b"fake midi content")
 
         config = HubConfig(dataset_dir=sample_dataset, repo_id="test/repo")
         uploader = DatasetUploader(config)

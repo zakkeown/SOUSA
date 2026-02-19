@@ -260,7 +260,7 @@ class DatasetUploader:
             logger.warning(f"Source directory {src_dir} does not exist")
             return
 
-        count = sum(1 for _ in src_dir.glob(f"*.{extension}"))
+        count = sum(1 for _ in src_dir.rglob(f"*.{extension}"))
 
         if subdir == "audio":
             self.stats.audio_files = count
@@ -268,7 +268,7 @@ class DatasetUploader:
             self.stats.midi_files = count
 
         # Estimate size without copying
-        total_size = sum(f.stat().st_size for f in src_dir.glob(f"*.{extension}"))
+        total_size = sum(f.stat().st_size for f in src_dir.rglob(f"*.{extension}"))
         logger.info(f"Found {count} {extension} files ({total_size / (1024**3):.2f} GB)")
 
     def _copy_media_by_rudiment(
@@ -303,7 +303,7 @@ class DatasetUploader:
 
             slug = row["rudiment_slug"]
             filename = Path(path_val).name
-            src_file = src_dir / filename
+            src_file = src_dir / slug / filename
 
             if not src_file.exists():
                 logger.warning(f"Source file not found: {src_file}")
