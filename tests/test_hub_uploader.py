@@ -10,30 +10,23 @@ from dataset_gen.hub.uploader import HubConfig, DatasetUploader
 class TestHubConfig:
     """Tests for HubConfig dataclass."""
 
-    def test_use_tar_shards_default_true(self, tmp_path):
-        """use_tar_shards defaults to True."""
+    def test_staging_dir_defaults_to_hf_staging(self, tmp_path):
+        """staging_dir defaults to dataset_dir/hf_staging."""
         config = HubConfig(
             dataset_dir=tmp_path,
             repo_id="test/repo",
         )
-        assert config.use_tar_shards is True
+        assert config.staging_dir == tmp_path / "hf_staging"
 
-    def test_use_tar_shards_can_be_disabled(self, tmp_path):
-        """use_tar_shards can be set to False."""
+    def test_custom_staging_dir(self, tmp_path):
+        """staging_dir can be set to a custom path."""
+        custom = tmp_path / "custom_staging"
         config = HubConfig(
             dataset_dir=tmp_path,
             repo_id="test/repo",
-            use_tar_shards=False,
+            staging_dir=custom,
         )
-        assert config.use_tar_shards is False
-
-    def test_tar_shard_size_default(self, tmp_path):
-        """tar_shard_size_bytes has sensible default."""
-        config = HubConfig(
-            dataset_dir=tmp_path,
-            repo_id="test/repo",
-        )
-        assert config.tar_shard_size_bytes == 1_000_000_000  # 1GB
+        assert config.staging_dir == custom
 
 
 class TestDatasetUploaderHelpers:
@@ -46,13 +39,29 @@ class TestDatasetUploaderHelpers:
         labels_dir = tmp_path / "labels"
         labels_dir.mkdir()
 
-        # Create samples parquet
+        # Create samples parquet with rudiment_slug
         samples_df = pd.DataFrame(
             {
                 "sample_id": ["s1", "s2", "s3", "s4"],
                 "profile_id": ["p1", "p1", "p2", "p3"],
-                "audio_path": ["audio/a1.flac", "audio/a2.flac", "audio/a3.flac", "audio/a4.flac"],
-                "midi_path": ["midi/m1.mid", "midi/m2.mid", "midi/m3.mid", "midi/m4.mid"],
+                "rudiment_slug": [
+                    "single_stroke_roll",
+                    "double_stroke_roll",
+                    "single_stroke_roll",
+                    "paradiddle",
+                ],
+                "audio_path": [
+                    "audio/a1.flac",
+                    "audio/a2.flac",
+                    "audio/a3.flac",
+                    "audio/a4.flac",
+                ],
+                "midi_path": [
+                    "midi/m1.mid",
+                    "midi/m2.mid",
+                    "midi/m3.mid",
+                    "midi/m4.mid",
+                ],
             }
         )
         samples_df.to_parquet(labels_dir / "samples.parquet")
@@ -77,56 +86,9 @@ class TestDatasetUploaderHelpers:
 
         return tmp_path
 
-    def test_get_filenames_by_split_audio(self, sample_dataset):
-        """_get_filenames_by_split returns audio files grouped by split."""
-        config = HubConfig(dataset_dir=sample_dataset, repo_id="test/repo")
-        uploader = DatasetUploader(config)
-
-        result = uploader._get_filenames_by_split("audio")
-
-        assert "train" in result
-        assert "validation" in result
-        assert "test" in result
-
-        # p1 has 2 samples -> train
-        assert set(result["train"]) == {"a1.flac", "a2.flac"}
-        # p2 has 1 sample -> validation
-        assert set(result["validation"]) == {"a3.flac"}
-        # p3 has 1 sample -> test
-        assert set(result["test"]) == {"a4.flac"}
-
-    def test_create_media_archives_creates_tar_files(self, sample_dataset):
-        """_create_media_archives creates TAR files in staging directory."""
+    def test_prepare_organizes_audio_by_rudiment(self, sample_dataset):
+        """prepare() creates audio/{rudiment_slug}/ subdirectories."""
         # Create actual audio files
-        audio_dir = sample_dataset / "audio"
-        audio_dir.mkdir()
-        for name in ["a1.flac", "a2.flac", "a3.flac", "a4.flac"]:
-            (audio_dir / name).write_bytes(b"fake audio content")
-
-        config = HubConfig(dataset_dir=sample_dataset, repo_id="test/repo")
-        uploader = DatasetUploader(config)
-
-        # Create staging dir
-        staging = config.staging_dir
-        staging.mkdir(parents=True)
-
-        shard_map = uploader._create_media_archives("audio", "flac")
-
-        # Should have created TAR files
-        audio_staging = staging / "audio"
-        assert audio_staging.exists()
-        assert (audio_staging / "train-00000.tar").exists()
-        assert (audio_staging / "validation-00000.tar").exists()
-        assert (audio_staging / "test-00000.tar").exists()
-
-        # Shard map should have all files
-        assert len(shard_map) == 4
-        assert "a1.flac" in shard_map
-        assert shard_map["a1.flac"].shard_name == "train-00000.tar"
-
-    def test_prepare_with_tar_shards_adds_shard_columns(self, sample_dataset):
-        """prepare() adds audio_shard and audio_filename columns when using TAR shards."""
-        # Create actual audio and midi files
         audio_dir = sample_dataset / "audio"
         audio_dir.mkdir()
         for name in ["a1.flac", "a2.flac", "a3.flac", "a4.flac"]:
@@ -137,19 +99,121 @@ class TestDatasetUploaderHelpers:
         for name in ["m1.mid", "m2.mid", "m3.mid", "m4.mid"]:
             (midi_dir / name).write_bytes(b"fake midi content")
 
-        config = HubConfig(dataset_dir=sample_dataset, repo_id="test/repo", use_tar_shards=True)
+        config = HubConfig(dataset_dir=sample_dataset, repo_id="test/repo")
         uploader = DatasetUploader(config)
 
         staging_dir = uploader.prepare()
 
-        # Check parquet has shard columns
+        # Check rudiment subdirectories exist
+        assert (staging_dir / "audio" / "single_stroke_roll").is_dir()
+        assert (staging_dir / "audio" / "double_stroke_roll").is_dir()
+        assert (staging_dir / "audio" / "paradiddle").is_dir()
+
+        # Check files are in correct subdirectories
+        assert (staging_dir / "audio" / "single_stroke_roll" / "a1.flac").exists()
+        assert (staging_dir / "audio" / "double_stroke_roll" / "a2.flac").exists()
+        assert (staging_dir / "audio" / "single_stroke_roll" / "a3.flac").exists()
+        assert (staging_dir / "audio" / "paradiddle" / "a4.flac").exists()
+
+        # MIDI should also be organized
+        assert (staging_dir / "midi" / "single_stroke_roll" / "m1.mid").exists()
+        assert (staging_dir / "midi" / "double_stroke_roll" / "m2.mid").exists()
+
+    def test_prepare_parquet_has_rudiment_paths(self, sample_dataset):
+        """prepare() writes parquets with audio/{rudiment_slug}/{filename} paths."""
+        audio_dir = sample_dataset / "audio"
+        audio_dir.mkdir()
+        for name in ["a1.flac", "a2.flac", "a3.flac", "a4.flac"]:
+            (audio_dir / name).write_bytes(b"fake audio content")
+
+        midi_dir = sample_dataset / "midi"
+        midi_dir.mkdir()
+        for name in ["m1.mid", "m2.mid", "m3.mid", "m4.mid"]:
+            (midi_dir / name).write_bytes(b"fake midi content")
+
+        config = HubConfig(dataset_dir=sample_dataset, repo_id="test/repo")
+        uploader = DatasetUploader(config)
+
+        staging_dir = uploader.prepare()
+
         train_df = pd.read_parquet(staging_dir / "data" / "train-00000-of-00001.parquet")
 
-        assert "audio_shard" in train_df.columns
-        assert "audio_filename" in train_df.columns
-        assert "midi_shard" in train_df.columns
-        assert "midi_filename" in train_df.columns
+        # Should have 'audio' and 'midi' columns with rudiment paths
+        assert "audio" in train_df.columns
+        assert "midi" in train_df.columns
 
-        # Values should be set
-        assert train_df["audio_shard"].iloc[0] == "train-00000.tar"
-        assert train_df["audio_filename"].iloc[0] in ["a1.flac", "a2.flac"]
+        # Should NOT have shard columns
+        assert "audio_shard" not in train_df.columns
+        assert "audio_filename" not in train_df.columns
+        assert "midi_shard" not in train_df.columns
+        assert "midi_filename" not in train_df.columns
+
+        # Paths should include rudiment slug
+        audio_paths = train_df["audio"].tolist()
+        assert any("single_stroke_roll" in p for p in audio_paths)
+
+    def test_prepare_dry_run_skips_media_copy(self, sample_dataset):
+        """prepare(skip_media_copy=True) counts files but doesn't copy."""
+        audio_dir = sample_dataset / "audio"
+        audio_dir.mkdir()
+        for name in ["a1.flac", "a2.flac", "a3.flac", "a4.flac"]:
+            (audio_dir / name).write_bytes(b"fake audio content")
+
+        config = HubConfig(dataset_dir=sample_dataset, repo_id="test/repo")
+        uploader = DatasetUploader(config)
+
+        staging_dir = uploader.prepare(skip_media_copy=True)
+
+        # Parquet files should exist
+        assert (staging_dir / "data" / "train-00000-of-00001.parquet").exists()
+
+        # Audio directory should NOT exist in staging
+        assert not (staging_dir / "audio").exists()
+
+        # Stats should reflect counted files
+        assert uploader.stats.audio_files == 4
+
+    def test_prepare_uses_symlinks_by_default(self, sample_dataset):
+        """prepare() creates symlinks rather than copies by default."""
+        audio_dir = sample_dataset / "audio"
+        audio_dir.mkdir()
+        for name in ["a1.flac", "a2.flac", "a3.flac", "a4.flac"]:
+            (audio_dir / name).write_bytes(b"fake audio content")
+
+        midi_dir = sample_dataset / "midi"
+        midi_dir.mkdir()
+        for name in ["m1.mid", "m2.mid", "m3.mid", "m4.mid"]:
+            (midi_dir / name).write_bytes(b"fake midi content")
+
+        config = HubConfig(dataset_dir=sample_dataset, repo_id="test/repo")
+        uploader = DatasetUploader(config)
+
+        staging_dir = uploader.prepare(use_symlinks=True)
+
+        # Files should be symlinks
+        audio_file = staging_dir / "audio" / "single_stroke_roll" / "a1.flac"
+        assert audio_file.is_symlink()
+
+    def test_prepare_stats(self, sample_dataset):
+        """prepare() updates upload stats correctly."""
+        audio_dir = sample_dataset / "audio"
+        audio_dir.mkdir()
+        for name in ["a1.flac", "a2.flac", "a3.flac", "a4.flac"]:
+            (audio_dir / name).write_bytes(b"fake audio content")
+
+        midi_dir = sample_dataset / "midi"
+        midi_dir.mkdir()
+        for name in ["m1.mid", "m2.mid", "m3.mid", "m4.mid"]:
+            (midi_dir / name).write_bytes(b"fake midi content")
+
+        config = HubConfig(dataset_dir=sample_dataset, repo_id="test/repo")
+        uploader = DatasetUploader(config)
+
+        uploader.prepare()
+
+        assert uploader.stats.total_samples == 4
+        assert uploader.stats.train_samples == 2
+        assert uploader.stats.val_samples == 1
+        assert uploader.stats.test_samples == 1
+        assert uploader.stats.audio_files == 4
+        assert uploader.stats.midi_files == 4

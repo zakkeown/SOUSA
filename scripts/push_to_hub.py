@@ -19,7 +19,7 @@ Prerequisites:
 The script will:
     1. Prepare the dataset in HuggingFace-compatible format
     2. Create consolidated parquet files for each split
-    3. Copy audio/MIDI files
+    3. Organize audio/MIDI files into rudiment subdirectories
     4. Upload everything to HuggingFace Hub
 """
 
@@ -90,11 +90,6 @@ Prerequisites:
         help="Prepare files but don't upload (for testing)",
     )
     parser.add_argument(
-        "--no-sharding",
-        action="store_true",
-        help="Disable TAR sharding (not recommended for large datasets)",
-    )
-    parser.add_argument(
         "--staging-dir",
         type=Path,
         default=None,
@@ -152,7 +147,6 @@ Prerequisites:
         include_audio=not args.no_audio,
         include_midi=not args.no_midi,
         staging_dir=args.staging_dir,
-        use_tar_shards=not args.no_sharding,
     )
 
     # Print plan
@@ -188,6 +182,7 @@ Prerequisites:
         if args.dry_run:
             print(f"\nDRY RUN complete. Parquet files prepared in: {staging_dir}")
             print("Audio/MIDI files were counted but not copied.")
+            print("Media will be organized into rudiment subdirectories on real upload.")
             print("To upload for real, remove --dry-run flag")
             return
 
