@@ -109,8 +109,9 @@ class TestDatasetWriter:
             )
             writer.flush()
 
-            # Check audio file was created
-            audio_dir = Path(tmpdir) / "audio"
+            # Check audio file was created in rudiment subdirectory
+            slug = sample_sample.rudiment_slug
+            audio_dir = Path(tmpdir) / "audio" / slug
             audio_files = list(audio_dir.glob("*.flac"))
             assert len(audio_files) == 1
 
@@ -137,8 +138,9 @@ class TestDatasetWriter:
             )
             writer.flush()
 
-            # Check MIDI file was created
-            midi_dir = Path(tmpdir) / "midi"
+            # Check MIDI file was created in rudiment subdirectory
+            slug = sample.rudiment_slug
+            midi_dir = Path(tmpdir) / "midi" / slug
             midi_files = list(midi_dir.glob("*.mid"))
             assert len(midi_files) == 1
 
@@ -202,6 +204,74 @@ class TestDatasetWriter:
             reader = ParquetReader(tmpdir)
             samples = reader.load_samples()
             assert len(samples) == 1
+
+    def test_write_to_rudiment_subdirectories(self, sample_rudiment, sample_profile):
+        """Test that MIDI and audio files are written into rudiment subdirectories."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Generate with MIDI
+            generator = MIDIGenerator(seed=42)
+            performance = generator.generate(
+                rudiment=sample_rudiment,
+                profile=sample_profile,
+                tempo_bpm=120,
+                num_cycles=2,
+                include_midi=True,
+            )
+            sample = compute_sample_labels(performance, sample_rudiment, sample_profile)
+            slug = sample.rudiment_slug  # e.g. "test_rudiment"
+
+            # Create fake audio data
+            audio_data = np.random.randn(44100, 2).astype(np.float32) * 0.5
+
+            config = StorageConfig(output_dir=Path(tmpdir))
+            writer = DatasetWriter(config)
+
+            paths = writer.write_sample(
+                sample,
+                midi_data=performance.midi_data,
+                audio_data=audio_data,
+            )
+            writer.flush()
+
+            # MIDI should be in midi/{slug}/ subdirectory
+            midi_subdir = Path(tmpdir) / "midi" / slug
+            assert midi_subdir.exists(), f"Expected midi subdirectory {midi_subdir} to exist"
+            midi_files = list(midi_subdir.glob("*.mid"))
+            assert len(midi_files) == 1
+
+            # Audio should be in audio/{slug}/ subdirectory
+            audio_subdir = Path(tmpdir) / "audio" / slug
+            assert audio_subdir.exists(), f"Expected audio subdirectory {audio_subdir} to exist"
+            audio_files = list(audio_subdir.glob("*.flac"))
+            assert len(audio_files) == 1
+
+            # sample.midi_path should reflect the new path structure
+            assert sample.midi_path is not None
+            assert (
+                slug in sample.midi_path
+            ), f"Expected rudiment slug '{slug}' in midi_path '{sample.midi_path}'"
+
+            # sample.audio_path should reflect the new path structure
+            assert sample.audio_path is not None
+            assert (
+                slug in sample.audio_path
+            ), f"Expected rudiment slug '{slug}' in audio_path '{sample.audio_path}'"
+
+    def test_setup_directories_no_flat_media_dirs(self):
+        """Test that _setup_directories does NOT pre-create flat audio/midi dirs."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            config = StorageConfig(output_dir=Path(tmpdir))
+            DatasetWriter(config)
+
+            # labels/ should be created
+            assert (Path(tmpdir) / "labels").exists()
+
+            # Flat midi/ and audio/ should NOT be pre-created
+            # (they are created on demand inside rudiment subdirs)
+            assert not (Path(tmpdir) / "midi").exists(), "Flat midi/ dir should not be pre-created"
+            assert not (
+                Path(tmpdir) / "audio"
+            ).exists(), "Flat audio/ dir should not be pre-created"
 
 
 class TestSplitGenerator:

@@ -55,9 +55,11 @@ class DatasetWriter:
     Directory structure:
     output_dir/
     ├── midi/
-    │   └── {sample_id}.mid
+    │   └── {rudiment_slug}/
+    │       └── {sample_id}.mid
     ├── audio/
-    │   └── {sample_id}.flac
+    │   └── {rudiment_slug}/
+    │       └── {sample_id}.flac
     ├── labels/
     │   ├── strokes.parquet
     │   ├── measures.parquet
@@ -88,8 +90,6 @@ class DatasetWriter:
     def _setup_directories(self) -> None:
         """Create output directory structure."""
         self.config.output_dir.mkdir(parents=True, exist_ok=True)
-        (self.config.output_dir / self.config.midi_subdir).mkdir(exist_ok=True)
-        (self.config.output_dir / self.config.audio_subdir).mkdir(exist_ok=True)
         (self.config.output_dir / self.config.labels_subdir).mkdir(exist_ok=True)
 
     def write_sample(
@@ -113,13 +113,13 @@ class DatasetWriter:
 
         # Write MIDI
         if midi_data is not None:
-            midi_path = self._write_midi(sample.sample_id, midi_data)
+            midi_path = self._write_midi(sample.sample_id, sample.rudiment_slug, midi_data)
             paths["midi"] = midi_path
             sample.midi_path = str(midi_path.relative_to(self.config.output_dir))
 
         # Write audio
         if audio_data is not None:
-            audio_path = self._write_audio(sample.sample_id, audio_data)
+            audio_path = self._write_audio(sample.sample_id, sample.rudiment_slug, audio_data)
             paths["audio"] = audio_path
             sample.audio_path = str(audio_path.relative_to(self.config.output_dir))
 
@@ -129,16 +129,20 @@ class DatasetWriter:
 
         return paths
 
-    def _write_midi(self, sample_id: str, midi_data: bytes) -> Path:
-        """Write MIDI data to file."""
-        midi_path = self.config.output_dir / self.config.midi_subdir / f"{sample_id}.mid"
+    def _write_midi(self, sample_id: str, rudiment_slug: str, midi_data: bytes) -> Path:
+        """Write MIDI data to file in rudiment subdirectory."""
+        rudiment_dir = self.config.output_dir / self.config.midi_subdir / rudiment_slug
+        rudiment_dir.mkdir(parents=True, exist_ok=True)
+        midi_path = rudiment_dir / f"{sample_id}.mid"
         midi_path.write_bytes(midi_data)
         return midi_path
 
-    def _write_audio(self, sample_id: str, audio_data: np.ndarray) -> Path:
-        """Write audio data to file."""
+    def _write_audio(self, sample_id: str, rudiment_slug: str, audio_data: np.ndarray) -> Path:
+        """Write audio data to file in rudiment subdirectory."""
         ext = self.config.audio_format
-        audio_path = self.config.output_dir / self.config.audio_subdir / f"{sample_id}.{ext}"
+        rudiment_dir = self.config.output_dir / self.config.audio_subdir / rudiment_slug
+        rudiment_dir.mkdir(parents=True, exist_ok=True)
+        audio_path = rudiment_dir / f"{sample_id}.{ext}"
 
         sf.write(
             str(audio_path),
