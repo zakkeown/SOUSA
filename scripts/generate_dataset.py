@@ -167,12 +167,8 @@ def merge_worker_outputs(output_dir: Path, num_workers: int, logger) -> None:
     import shutil
 
     main_labels_dir = output_dir / "labels"
-    main_midi_dir = output_dir / "midi"
-    main_audio_dir = output_dir / "audio"
 
     main_labels_dir.mkdir(parents=True, exist_ok=True)
-    main_midi_dir.mkdir(parents=True, exist_ok=True)
-    main_audio_dir.mkdir(parents=True, exist_ok=True)
 
     parquet_files = ["strokes.parquet", "measures.parquet", "exercises.parquet", "samples.parquet"]
 
@@ -196,22 +192,23 @@ def merge_worker_outputs(output_dir: Path, num_workers: int, logger) -> None:
         else:
             logger.warning(f"No valid data found for {pq_file}")
 
-    # Move MIDI and audio files
+    # Move MIDI and audio files preserving rudiment subdirectories
     for w in range(num_workers):
         worker_dir = output_dir / f"worker_{w}"
 
-        # Move MIDI files
-        worker_midi = worker_dir / "midi"
-        if worker_midi.exists():
-            for midi_file in worker_midi.glob("*.mid"):
-                shutil.move(str(midi_file), str(main_midi_dir / midi_file.name))
-
-        # Move audio files
-        worker_audio = worker_dir / "audio"
-        if worker_audio.exists():
-            for audio_file in worker_audio.glob("*"):
-                if audio_file.is_file():
-                    shutil.move(str(audio_file), str(main_audio_dir / audio_file.name))
+        for media_type in ["midi", "audio"]:
+            worker_media = worker_dir / media_type
+            if not worker_media.exists():
+                continue
+            main_media = output_dir / media_type
+            for rudiment_dir in worker_media.iterdir():
+                if not rudiment_dir.is_dir():
+                    continue
+                dest_dir = main_media / rudiment_dir.name
+                dest_dir.mkdir(parents=True, exist_ok=True)
+                for media_file in rudiment_dir.iterdir():
+                    if media_file.is_file():
+                        shutil.move(str(media_file), str(dest_dir / media_file.name))
 
         # Clean up worker directory
         shutil.rmtree(worker_dir, ignore_errors=True)
