@@ -703,8 +703,13 @@ class LabelVerifier:
         for _, sample_row in samples.head(max_samples_to_check).iterrows():
             sample_id = sample_row["sample_id"]
 
-            # Find MIDI file
-            midi_path = self.midi_dir / f"{sample_id}.mid"
+            # Resolve MIDI path from metadata (supports subdirectory layout)
+            midi_path_str = sample_row.get("midi_path")
+            if pd.isna(midi_path_str) or not midi_path_str:
+                # Fallback to flat layout for backward compatibility
+                midi_path = self.midi_dir / f"{sample_id}.mid"
+            else:
+                midi_path = self.dataset_dir / midi_path_str
             if not midi_path.exists():
                 continue
 

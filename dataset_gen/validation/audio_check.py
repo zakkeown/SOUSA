@@ -241,7 +241,13 @@ class AudioQualityChecker:
         files = []
         for _, row in samples_df.iterrows():
             sample_id = row["sample_id"]
-            audio_path = self.audio_dir / f"{sample_id}.flac"
+            # Resolve audio path from metadata (supports subdirectory layout)
+            audio_path_str = row.get("audio_path")
+            if pd.isna(audio_path_str) or not audio_path_str:
+                # Fallback to flat layout for backward compatibility
+                audio_path = self.audio_dir / f"{sample_id}.flac"
+            else:
+                audio_path = self.dataset_dir / audio_path_str
             if audio_path.exists():
                 files.append((sample_id, audio_path))
         return files
