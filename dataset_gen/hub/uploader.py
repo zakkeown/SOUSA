@@ -4,6 +4,7 @@ HuggingFace Hub upload utilities for SOUSA dataset.
 This module handles:
 - Restructuring the local dataset for HuggingFace Hub format
 - Creating consolidated parquet files with audio/midi paths
+- Organizing media files into rudiment subdirectories
 - Uploading to HuggingFace Hub
 """
 
@@ -16,8 +17,6 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import pandas as pd
-
-from dataset_gen.hub.archiver import ShardInfo, create_sharded_archives
 
 logger = logging.getLogger(__name__)
 
@@ -43,10 +42,6 @@ class HubConfig:
 
     # Shard settings for large datasets
     max_shard_size: str = "500MB"
-
-    # TAR sharding options (for staying under HuggingFace 100k file limit)
-    use_tar_shards: bool = True
-    tar_shard_size_bytes: int = 1_000_000_000  # 1GB per shard
 
     def __post_init__(self):
         self.dataset_dir = Path(self.dataset_dir)
@@ -97,8 +92,8 @@ class DatasetUploader:
 
         Creates staging directory with:
         - data/ containing split parquet files
-        - audio/ with audio files (if include_audio)
-        - midi/ with MIDI files (if include_midi)
+        - audio/{rudiment_slug}/ with audio files organized by rudiment
+        - midi/{rudiment_slug}/ with MIDI files organized by rudiment
         - README.md dataset card
 
         Args:
@@ -128,50 +123,25 @@ class DatasetUploader:
         # Merge samples with exercise scores
         merged_df = self._merge_dataframes(samples_df, exercises_df)
 
-        # Handle media files (TAR shards or individual files)
-        audio_shard_map: dict[str, ShardInfo] = {}
-        midi_shard_map: dict[str, ShardInfo] = {}
-
-        if self.config.use_tar_shards:
-            # Create TAR archives
-            if self.config.include_audio and not skip_media_copy:
-                audio_shard_map = self._create_media_archives("audio", "flac")
-            if self.config.include_midi and not skip_media_copy:
-                midi_shard_map = self._create_media_archives("midi", "mid")
-
-            # Add shard columns to dataframe
-            if self.config.include_audio:
-                merged_df["audio_shard"] = merged_df["audio_path"].apply(
-                    lambda p: (
-                        audio_shard_map.get(Path(p).name, ShardInfo("", "")).shard_name
-                        if pd.notna(p) and p
-                        else None
-                    )
-                )
-                merged_df["audio_filename"] = merged_df["audio_path"].apply(
-                    lambda p: Path(p).name if pd.notna(p) and p else None
-                )
-            if self.config.include_midi:
-                merged_df["midi_shard"] = merged_df["midi_path"].apply(
-                    lambda p: (
-                        midi_shard_map.get(Path(p).name, ShardInfo("", "")).shard_name
-                        if pd.notna(p) and p
-                        else None
-                    )
-                )
-                merged_df["midi_filename"] = merged_df["midi_path"].apply(
-                    lambda p: Path(p).name if pd.notna(p) and p else None
-                )
-        else:
-            # Original behavior: add simple path columns
-            if self.config.include_audio:
-                merged_df["audio"] = merged_df["audio_path"].apply(
-                    lambda p: f"audio/{Path(p).name}" if pd.notna(p) and p else None
-                )
-            if self.config.include_midi:
-                merged_df["midi"] = merged_df["midi_path"].apply(
-                    lambda p: f"midi/{Path(p).name}" if pd.notna(p) and p else None
-                )
+        # Add rudiment-organized path columns
+        if self.config.include_audio:
+            merged_df["audio"] = merged_df.apply(
+                lambda row: (
+                    f"audio/{row['rudiment_slug']}/{Path(row['audio_path']).name}"
+                    if pd.notna(row.get("audio_path")) and row["audio_path"]
+                    else None
+                ),
+                axis=1,
+            )
+        if self.config.include_midi:
+            merged_df["midi"] = merged_df.apply(
+                lambda row: (
+                    f"midi/{row['rudiment_slug']}/{Path(row['midi_path']).name}"
+                    if pd.notna(row.get("midi_path")) and row["midi_path"]
+                    else None
+                ),
+                axis=1,
+            )
 
         # Create split assignment column
         merged_df["split"] = merged_df["profile_id"].apply(lambda pid: self._get_split(pid, splits))
@@ -197,20 +167,18 @@ class DatasetUploader:
             self.stats.train_samples + self.stats.val_samples + self.stats.test_samples
         )
 
-        if not self.config.use_tar_shards:
-            # Copy/link audio files (original behavior)
-            if self.config.include_audio:
-                if skip_media_copy:
-                    self._count_media_files("audio", "flac")
-                else:
-                    self._copy_media_files("audio", "flac", use_symlinks=use_symlinks)
+        # Copy/link media files organized by rudiment
+        if self.config.include_audio:
+            if skip_media_copy:
+                self._count_media_files("audio", "flac")
+            else:
+                self._copy_media_by_rudiment(merged_df, "audio", "flac", use_symlinks=use_symlinks)
 
-            # Copy/link MIDI files (original behavior)
-            if self.config.include_midi:
-                if skip_media_copy:
-                    self._count_media_files("midi", "mid")
-                else:
-                    self._copy_media_files("midi", "mid", use_symlinks=use_symlinks)
+        if self.config.include_midi:
+            if skip_media_copy:
+                self._count_media_files("midi", "mid")
+            else:
+                self._copy_media_by_rudiment(merged_df, "midi", "mid", use_symlinks=use_symlinks)
 
         # Copy README.md (dataset card)
         readme_src = self.config.dataset_dir / "README.md"
@@ -303,22 +271,49 @@ class DatasetUploader:
         total_size = sum(f.stat().st_size for f in src_dir.glob(f"*.{extension}"))
         logger.info(f"Found {count} {extension} files ({total_size / (1024**3):.2f} GB)")
 
-    def _copy_media_files(self, subdir: str, extension: str, use_symlinks: bool = True) -> None:
-        """Copy or symlink media files to staging directory."""
+    def _copy_media_by_rudiment(
+        self,
+        merged_df: pd.DataFrame,
+        subdir: str,
+        extension: str,
+        use_symlinks: bool = True,
+    ) -> None:
+        """Copy or symlink media files into rudiment subdirectories.
+
+        Args:
+            merged_df: DataFrame with rudiment_slug and path columns
+            subdir: Media subdirectory ("audio" or "midi")
+            extension: File extension (e.g., "flac", "mid")
+            use_symlinks: If True, use symlinks instead of copies
+        """
         src_dir = self.config.dataset_dir / subdir
-        dst_dir = self.config.staging_dir / subdir
+        dst_base = self.config.staging_dir / subdir
 
         if not src_dir.exists():
             logger.warning(f"Source directory {src_dir} does not exist")
             return
 
-        dst_dir.mkdir(exist_ok=True)
+        path_col = f"{subdir}_path"
         count = 0
 
-        for src_file in src_dir.glob(f"*.{extension}"):
-            dst_file = dst_dir / src_file.name
+        for _, row in merged_df.iterrows():
+            path_val = row.get(path_col)
+            if pd.isna(path_val) or not path_val:
+                continue
+
+            slug = row["rudiment_slug"]
+            filename = Path(path_val).name
+            src_file = src_dir / filename
+
+            if not src_file.exists():
+                logger.warning(f"Source file not found: {src_file}")
+                continue
+
+            rudiment_dir = dst_base / slug
+            rudiment_dir.mkdir(parents=True, exist_ok=True)
+
+            dst_file = rudiment_dir / filename
             if use_symlinks:
-                # Use symlink to avoid duplicating large files
                 if dst_file.exists() or dst_file.is_symlink():
                     dst_file.unlink()
                 dst_file.symlink_to(src_file.resolve())
@@ -332,87 +327,7 @@ class DatasetUploader:
             self.stats.midi_files = count
 
         action = "Linked" if use_symlinks else "Copied"
-        logger.info(f"{action} {count} {extension} files to {dst_dir}")
-
-    def _get_filenames_by_split(self, media_type: str) -> dict[str, list[str]]:
-        """
-        Get filenames grouped by split for a media type.
-
-        Args:
-            media_type: Either "audio" or "midi"
-
-        Returns:
-            Dict mapping split name to list of filenames
-        """
-        # Load source data
-        samples_df = pd.read_parquet(self.config.dataset_dir / "labels" / "samples.parquet")
-
-        # Load splits
-        with open(self.config.dataset_dir / "splits.json") as f:
-            splits = json.load(f)
-
-        # Determine path column
-        path_col = f"{media_type}_path"
-        if path_col not in samples_df.columns:
-            return {"train": [], "validation": [], "test": []}
-
-        result: dict[str, list[str]] = {"train": [], "validation": [], "test": []}
-
-        for _, row in samples_df.iterrows():
-            path = row[path_col]
-            if pd.isna(path) or not path:
-                continue
-
-            filename = Path(path).name
-            profile_id = row["profile_id"]
-
-            if profile_id in splits.get("train_profile_ids", []):
-                result["train"].append(filename)
-            elif profile_id in splits.get("val_profile_ids", []):
-                result["validation"].append(filename)
-            elif profile_id in splits.get("test_profile_ids", []):
-                result["test"].append(filename)
-            else:
-                result["train"].append(filename)  # Default to train
-
-        return result
-
-    def _create_media_archives(self, media_type: str, extension: str) -> dict[str, ShardInfo]:
-        """
-        Create sharded TAR archives for media files.
-
-        Args:
-            media_type: Either "audio" or "midi"
-            extension: File extension (e.g., "flac", "mid")
-
-        Returns:
-            Dict mapping filename to ShardInfo
-        """
-        src_dir = self.config.dataset_dir / media_type
-        dst_dir = self.config.staging_dir / media_type
-
-        if not src_dir.exists():
-            logger.warning(f"Source directory {src_dir} does not exist")
-            return {}
-
-        filenames_by_split = self._get_filenames_by_split(media_type)
-
-        shard_map = create_sharded_archives(
-            source_dir=src_dir,
-            output_dir=dst_dir,
-            filenames_by_split=filenames_by_split,
-            target_shard_size_bytes=self.config.tar_shard_size_bytes,
-            extension=extension,
-        )
-
-        # Update stats
-        total_files = sum(len(files) for files in filenames_by_split.values())
-        if media_type == "audio":
-            self.stats.audio_files = total_files
-        elif media_type == "midi":
-            self.stats.midi_files = total_files
-
-        return shard_map
+        logger.info(f"{action} {count} {extension} files into {dst_base} by rudiment")
 
     def upload(self, dry_run: bool = False) -> str | None:
         """
