@@ -2,22 +2,19 @@
 HuggingFace Hub integration for SOUSA dataset.
 
 This module provides utilities to:
-- Prepare the dataset for HuggingFace Hub format
-- Upload the dataset to HuggingFace Hub
-- Generate consolidated parquet files for efficient loading
-- Organize media files into rudiment subdirectories
+- Build HuggingFace DatasetDict objects with embedded media
+- Upload Parquet-native datasets to HuggingFace Hub
+- Manage multi-config datasets (audio, midi_only, labels_only)
 """
 
 from dataset_gen.hub.uploader import (
     HubConfig,
     DatasetUploader,
-    prepare_hf_structure,
     push_to_hub,
 )
 
 __all__ = [
     "HubConfig",
     "DatasetUploader",
-    "prepare_hf_structure",
     "push_to_hub",
 ]

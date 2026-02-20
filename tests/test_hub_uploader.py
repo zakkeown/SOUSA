@@ -638,3 +638,27 @@ class TestUploadParquet:
 
             uploader.upload(purge=True)
             mock_purge.assert_called_once()
+
+
+class TestConvenienceFunctions:
+    """Tests for module-level convenience functions and exports."""
+
+    def test_push_to_hub_accepts_new_params(self):
+        """push_to_hub accepts configs, purge, max_shard_size."""
+        import inspect
+
+        from dataset_gen.hub.uploader import push_to_hub
+
+        sig = inspect.signature(push_to_hub)
+        params = list(sig.parameters.keys())
+        assert "configs" in params
+        assert "purge" in params
+        assert "max_shard_size" in params
+        assert "include_audio" not in params
+        assert "include_midi" not in params
+
+    def test_prepare_hf_structure_removed(self):
+        """prepare_hf_structure is no longer exported."""
+        from dataset_gen.hub import __all__
+
+        assert "prepare_hf_structure" not in __all__
