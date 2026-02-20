@@ -29,6 +29,44 @@ class TestHubConfig:
         assert config.staging_dir == custom
 
 
+class TestHubConfigParquet:
+    """Tests for the rewritten HubConfig dataclass (Parquet-native upload)."""
+
+    def test_configs_defaults_to_all_three(self, tmp_path):
+        """configs defaults to ["audio", "midi_only", "labels_only"]."""
+        config = HubConfig(dataset_dir=tmp_path, repo_id="test/repo")
+        assert config.configs == ["audio", "midi_only", "labels_only"]
+
+    def test_configs_custom_subset(self, tmp_path):
+        """configs can be set to a custom subset."""
+        config = HubConfig(
+            dataset_dir=tmp_path,
+            repo_id="test/repo",
+            configs=["audio"],
+        )
+        assert config.configs == ["audio"]
+
+    def test_max_shard_size_defaults_to_1gb(self, tmp_path):
+        """max_shard_size defaults to '1GB'."""
+        config = HubConfig(dataset_dir=tmp_path, repo_id="test/repo")
+        assert config.max_shard_size == "1GB"
+
+    def test_no_staging_dir_attribute(self, tmp_path):
+        """staging_dir attribute does not exist on HubConfig."""
+        config = HubConfig(dataset_dir=tmp_path, repo_id="test/repo")
+        assert not hasattr(config, "staging_dir")
+
+    def test_no_include_audio_attribute(self, tmp_path):
+        """include_audio attribute does not exist on HubConfig."""
+        config = HubConfig(dataset_dir=tmp_path, repo_id="test/repo")
+        assert not hasattr(config, "include_audio")
+
+    def test_no_include_midi_attribute(self, tmp_path):
+        """include_midi attribute does not exist on HubConfig."""
+        config = HubConfig(dataset_dir=tmp_path, repo_id="test/repo")
+        assert not hasattr(config, "include_midi")
+
+
 class TestDatasetUploaderHelpers:
     """Tests for DatasetUploader helper methods."""
 

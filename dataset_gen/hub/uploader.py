@@ -33,22 +33,16 @@ class HubConfig:
     private: bool = False
     token: str | None = None
 
-    # Content options
-    include_audio: bool = True
-    include_midi: bool = True
-
-    # Output staging directory (where HF-format files are prepared)
-    staging_dir: Path | None = None
+    # Which configs to upload: "audio", "midi_only", "labels_only"
+    configs: list[str] | None = None
 
     # Shard settings for large datasets
-    max_shard_size: str = "500MB"
+    max_shard_size: str = "1GB"
 
     def __post_init__(self):
         self.dataset_dir = Path(self.dataset_dir)
-        if self.staging_dir is None:
-            self.staging_dir = self.dataset_dir / "hf_staging"
-        else:
-            self.staging_dir = Path(self.staging_dir)
+        if self.configs is None:
+            self.configs = ["audio", "midi_only", "labels_only"]
 
 
 @dataclass
