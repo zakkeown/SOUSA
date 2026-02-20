@@ -1,8 +1,7 @@
-"""Integration test: generation output layout matches uploader staging."""
+"""Integration test: generation output is compatible with Parquet hub uploader."""
 
 import json
 import numpy as np
-import pandas as pd
 import pytest
 
 from dataset_gen.pipeline.storage import StorageConfig, DatasetWriter
@@ -54,7 +53,6 @@ def generated_dataset(tmp_path):
 
     writer.flush()
 
-    # Create splits.json
     splits = {
         "train_profile_ids": ["p1"],
         "val_profile_ids": ["p2"],
@@ -66,56 +64,45 @@ def generated_dataset(tmp_path):
     return tmp_path
 
 
-def test_generation_layout_matches_uploader(generated_dataset):
-    """Verify uploader can stage a dataset generated with rudiment subdirs."""
+def test_generated_dataset_builds_labels_only(generated_dataset):
+    """Labels-only config builds successfully from generated data."""
     config = HubConfig(dataset_dir=generated_dataset, repo_id="test/repo")
     uploader = DatasetUploader(config)
+    dd = uploader.build_dataset_dict("labels_only")
 
-    staging_dir = uploader.prepare()
-
-    # Check parquet files exist for all splits
-    assert (staging_dir / "data" / "train-00000-of-00001.parquet").exists()
-    assert (staging_dir / "data" / "validation-00000-of-00001.parquet").exists()
-    assert (staging_dir / "data" / "test-00000-of-00001.parquet").exists()
-
-    # Every audio and midi path in every split parquet should point to a real file
-    for split in ["train", "validation", "test"]:
-        df = pd.read_parquet(staging_dir / "data" / f"{split}-00000-of-00001.parquet")
-
-        assert len(df) > 0, f"No samples in {split} split"
-
-        for _, row in df.iterrows():
-            audio_path = row.get("audio")
-            if audio_path and pd.notna(audio_path):
-                full_path = staging_dir / audio_path
-                assert full_path.exists(), f"Missing staged audio: {audio_path}"
-
-            midi_path = row.get("midi")
-            if midi_path and pd.notna(midi_path):
-                full_path = staging_dir / midi_path
-                assert full_path.exists(), f"Missing staged midi: {midi_path}"
+    assert dd["train"].num_rows == 3
+    assert dd["validation"].num_rows == 3
+    assert dd["test"].num_rows == 3
+    assert "overall_score" in dd["train"].column_names
 
 
-def test_staged_paths_include_rudiment_slug(generated_dataset):
-    """Verify staged parquet paths use rudiment subdirectory format."""
+def test_generated_dataset_builds_midi_only(generated_dataset):
+    """MIDI-only config includes MIDI bytes from generated data."""
     config = HubConfig(dataset_dir=generated_dataset, repo_id="test/repo")
     uploader = DatasetUploader(config)
+    dd = uploader.build_dataset_dict("midi_only")
 
-    staging_dir = uploader.prepare()
-    train_df = pd.read_parquet(staging_dir / "data" / "train-00000-of-00001.parquet")
+    assert "midi" in dd["train"].column_names
+    midi_val = dd["train"][0]["midi"]
+    assert isinstance(midi_val, bytes)
+    assert len(midi_val) > 0
 
-    # Audio paths should be like "audio/{rudiment_slug}/{filename}"
-    for _, row in train_df.iterrows():
-        audio = row.get("audio")
-        if audio and pd.notna(audio):
-            parts = audio.split("/")
-            assert len(parts) == 3, f"Expected audio/slug/file, got: {audio}"
-            assert parts[0] == "audio"
-            assert parts[1] in ["flam", "paradiddle", "single_stroke_roll"]
 
-        midi = row.get("midi")
-        if midi and pd.notna(midi):
-            parts = midi.split("/")
-            assert len(parts) == 3, f"Expected midi/slug/file, got: {midi}"
-            assert parts[0] == "midi"
-            assert parts[1] in ["flam", "paradiddle", "single_stroke_roll"]
+def test_generated_dataset_builds_audio(generated_dataset):
+    """Audio config includes audio from generated data."""
+    config = HubConfig(dataset_dir=generated_dataset, repo_id="test/repo")
+    uploader = DatasetUploader(config)
+    dd = uploader.build_dataset_dict("audio")
+
+    assert "audio" in dd["train"].column_names
+    assert "midi" in dd["train"].column_names
+
+
+def test_all_splits_have_correct_sample_count(generated_dataset):
+    """Each split has the correct number of samples based on profile assignment."""
+    config = HubConfig(dataset_dir=generated_dataset, repo_id="test/repo")
+    uploader = DatasetUploader(config)
+    dd = uploader.build_dataset_dict("labels_only")
+
+    total = sum(ds.num_rows for ds in dd.values())
+    assert total == 9
