@@ -1,6 +1,8 @@
 """Tests for HuggingFace Hub uploader."""
 
 import json
+from unittest.mock import MagicMock
+
 import pytest
 import pandas as pd
 
@@ -498,3 +500,54 @@ class TestBuildDatasetDict:
                     "audio_path" not in columns
                 ), f"audio_path found in {config_name}/{split_name}"
                 assert "midi_path" not in columns, f"midi_path found in {config_name}/{split_name}"
+
+
+class TestPurgeRepo:
+    """Tests for DatasetUploader.purge_repo method."""
+
+    def test_purge_deletes_all_files_except_gitattributes(self):
+        """purge_repo deletes all files except .gitattributes."""
+        from pathlib import Path
+
+        config = HubConfig(dataset_dir=Path("/fake"), repo_id="test/repo")
+        uploader = DatasetUploader(config)
+
+        mock_api = MagicMock()
+        # Simulate list_repo_tree returning file-like objects
+        file1 = MagicMock()
+        file1.rfilename = "data/train-00000.parquet"
+        file2 = MagicMock()
+        file2.rfilename = "audio/single_stroke_roll/s1.flac"
+        file3 = MagicMock()
+        file3.rfilename = ".gitattributes"
+        file4 = MagicMock()
+        file4.rfilename = "README.md"
+        mock_api.list_repo_tree.return_value = [file1, file2, file3, file4]
+
+        uploader.purge_repo(api=mock_api)
+
+        # Should call create_commit with delete operations
+        mock_api.create_commit.assert_called_once()
+        call_kwargs = mock_api.create_commit.call_args[1]
+        assert call_kwargs["repo_type"] == "dataset"
+        operations = call_kwargs["operations"]
+        deleted_paths = [op.path_in_repo for op in operations]
+        assert ".gitattributes" not in deleted_paths
+        assert "data/train-00000.parquet" in deleted_paths
+        assert "audio/single_stroke_roll/s1.flac" in deleted_paths
+        assert "README.md" in deleted_paths
+
+    def test_purge_skips_empty_repo(self):
+        """purge_repo does nothing if only .gitattributes exists."""
+        from pathlib import Path
+
+        config = HubConfig(dataset_dir=Path("/fake"), repo_id="test/repo")
+        uploader = DatasetUploader(config)
+
+        mock_api = MagicMock()
+        gitattr = MagicMock()
+        gitattr.rfilename = ".gitattributes"
+        mock_api.list_repo_tree.return_value = [gitattr]
+
+        uploader.purge_repo(api=mock_api)
+        mock_api.create_commit.assert_not_called()

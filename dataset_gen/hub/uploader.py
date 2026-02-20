@@ -323,6 +323,54 @@ class DatasetUploader:
         action = "Linked" if use_symlinks else "Copied"
         logger.info(f"{action} {count} {extension} files into {dst_base} by rudiment")
 
+    def purge_repo(self, api=None) -> None:
+        """Delete all files from the hub repo except .gitattributes.
+
+        This is used before uploading a new dataset structure (e.g., Parquet
+        migration) to remove stale files without deleting the entire repo.
+
+        Args:
+            api: Optional HfApi instance.  One is created if not provided.
+        """
+        if api is None:
+            try:
+                from huggingface_hub import HfApi
+            except ImportError:
+                raise ImportError(
+                    "huggingface_hub is required for purge. "
+                    "Install with: pip install 'sousa[hub]'"
+                )
+            api = HfApi(token=self.config.token)
+
+        from huggingface_hub import CommitOperationDelete
+
+        logger.info(f"Listing files in {self.config.repo_id} for purge...")
+        items = api.list_repo_tree(
+            repo_id=self.config.repo_id,
+            repo_type="dataset",
+            recursive=True,
+        )
+
+        paths_to_delete = [
+            item.rfilename
+            for item in items
+            if hasattr(item, "rfilename") and item.rfilename != ".gitattributes"
+        ]
+
+        if not paths_to_delete:
+            logger.info("No files to purge (repo is empty or only .gitattributes)")
+            return
+
+        logger.info(f"Purging {len(paths_to_delete)} files from {self.config.repo_id}")
+        operations = [CommitOperationDelete(path_in_repo=p) for p in paths_to_delete]
+        api.create_commit(
+            repo_id=self.config.repo_id,
+            repo_type="dataset",
+            operations=operations,
+            commit_message="chore: purge for Parquet migration",
+        )
+        logger.info("Purge complete")
+
     def build_dataset_dict(self, config_name: str):
         """Build a HuggingFace DatasetDict with embedded binary media data.
 
