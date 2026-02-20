@@ -1,7 +1,7 @@
 """Tests for HuggingFace Hub uploader."""
 
 import json
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 import pandas as pd
@@ -551,3 +551,90 @@ class TestPurgeRepo:
 
         uploader.purge_repo(api=mock_api)
         mock_api.create_commit.assert_not_called()
+
+
+class TestUploadParquet:
+    """Tests for the rewritten DatasetUploader.upload method (Parquet-native)."""
+
+    def test_upload_pushes_each_config(self, tmp_path):
+        """upload() pushes each configured config to hub."""
+        config = HubConfig(dataset_dir=tmp_path, repo_id="test/repo", configs=["labels_only"])
+        uploader = DatasetUploader(config)
+
+        with (
+            patch.object(uploader, "build_dataset_dict") as mock_build,
+            patch("dataset_gen.hub.uploader.HfApi") as mock_hf,
+        ):
+            mock_dd = MagicMock()
+            mock_dd.items.return_value = [("train", MagicMock(num_rows=10))]
+            mock_build.return_value = mock_dd
+
+            uploader.upload()
+
+            mock_build.assert_called_once_with("labels_only")
+            mock_dd.push_to_hub.assert_called_once()
+            call_kwargs = mock_dd.push_to_hub.call_args
+            assert call_kwargs[0][0] == "test/repo"
+            assert call_kwargs[1]["config_name"] == "labels_only"
+
+    def test_upload_dry_run_builds_but_does_not_push(self, tmp_path):
+        """upload(dry_run=True) builds DatasetDict but doesn't push."""
+        config = HubConfig(dataset_dir=tmp_path, repo_id="test/repo", configs=["labels_only"])
+        uploader = DatasetUploader(config)
+
+        with (
+            patch.object(uploader, "build_dataset_dict") as mock_build,
+            patch("dataset_gen.hub.uploader.HfApi"),
+        ):
+            mock_dd = MagicMock()
+            mock_dd.items.return_value = [("train", MagicMock(num_rows=10))]
+            mock_build.return_value = mock_dd
+
+            result = uploader.upload(dry_run=True)
+
+            mock_build.assert_called_once()
+            mock_dd.push_to_hub.assert_not_called()
+            assert result is None
+
+    def test_upload_pushes_auxiliary_tables(self, tmp_path):
+        """upload() uploads strokes.parquet and measures.parquet to auxiliary/."""
+        labels_dir = tmp_path / "labels"
+        labels_dir.mkdir()
+        (labels_dir / "strokes.parquet").write_bytes(b"fake strokes")
+        (labels_dir / "measures.parquet").write_bytes(b"fake measures")
+
+        config = HubConfig(dataset_dir=tmp_path, repo_id="test/repo", configs=["labels_only"])
+        uploader = DatasetUploader(config)
+
+        with (
+            patch.object(uploader, "build_dataset_dict") as mock_build,
+            patch("dataset_gen.hub.uploader.HfApi") as mock_hf_cls,
+        ):
+            mock_dd = MagicMock()
+            mock_dd.items.return_value = []
+            mock_build.return_value = mock_dd
+            mock_api = mock_hf_cls.return_value
+
+            uploader.upload()
+
+            upload_calls = mock_api.upload_file.call_args_list
+            uploaded_paths = [c[1]["path_in_repo"] for c in upload_calls]
+            assert "auxiliary/strokes.parquet" in uploaded_paths
+            assert "auxiliary/measures.parquet" in uploaded_paths
+
+    def test_upload_with_purge_calls_purge_repo(self, tmp_path):
+        """upload(purge=True) calls purge_repo before pushing."""
+        config = HubConfig(dataset_dir=tmp_path, repo_id="test/repo", configs=["labels_only"])
+        uploader = DatasetUploader(config)
+
+        with (
+            patch.object(uploader, "build_dataset_dict") as mock_build,
+            patch.object(uploader, "purge_repo") as mock_purge,
+            patch("dataset_gen.hub.uploader.HfApi"),
+        ):
+            mock_dd = MagicMock()
+            mock_dd.items.return_value = []
+            mock_build.return_value = mock_dd
+
+            uploader.upload(purge=True)
+            mock_purge.assert_called_once()

@@ -18,6 +18,11 @@ from pathlib import Path
 
 import pandas as pd
 
+try:
+    from huggingface_hub import HfApi
+except ImportError:  # pragma: no cover
+    HfApi = None  # type: ignore[assignment,misc]
+
 logger = logging.getLogger(__name__)
 
 
@@ -455,56 +460,91 @@ class DatasetUploader:
 
         return DatasetDict(split_datasets)
 
-    def upload(self, dry_run: bool = False) -> str | None:
+    def upload(self, dry_run: bool = False, purge: bool = False) -> str | None:
         """
-        Upload prepared dataset to HuggingFace Hub.
+        Upload dataset to HuggingFace Hub using Parquet-native approach.
+
+        For each configured config, builds a DatasetDict via build_dataset_dict()
+        and pushes it with push_to_hub(). Also uploads auxiliary label tables
+        (strokes.parquet, measures.parquet) and the README.
 
         Args:
-            dry_run: If True, prepare but don't actually upload
+            dry_run: If True, build DatasetDicts but don't push to Hub
+            purge: If True, purge existing repo files before uploading
 
         Returns:
             URL to the uploaded dataset, or None if dry_run
         """
-        # Ensure staging is prepared
-        staging_dir = self.config.staging_dir
-        if not staging_dir.exists() or not (staging_dir / "data").exists():
-            staging_dir = self.prepare()
-
-        if dry_run:
-            logger.info(f"DRY RUN: Would upload {staging_dir} to {self.config.repo_id}")
-            return None
-
-        try:
-            from huggingface_hub import HfApi
-        except ImportError:
+        if HfApi is None:
             raise ImportError(
-                "huggingface_hub is required for upload. Install with: pip install 'sousa[hub]'"
+                "huggingface_hub is required for upload. " "Install with: pip install 'sousa[hub]'"
             )
 
         api = HfApi(token=self.config.token)
 
-        # Create repository if it doesn't exist
-        logger.info(f"Creating/verifying repository: {self.config.repo_id}")
-        api.create_repo(
-            repo_id=self.config.repo_id,
-            repo_type="dataset",
-            exist_ok=True,
-            private=self.config.private,
-        )
+        if not dry_run:
+            api.create_repo(
+                repo_id=self.config.repo_id,
+                repo_type="dataset",
+                exist_ok=True,
+                private=self.config.private,
+            )
+            if purge:
+                self.purge_repo(api=api)
 
-        # Upload the entire staging directory using upload_large_folder
-        # which is optimized for repos with many files (120k+ in our case)
-        logger.info(f"Uploading dataset to {self.config.repo_id}...")
-        logger.info("Using upload_large_folder for better performance with many files")
-        api.upload_large_folder(
-            folder_path=str(staging_dir),
-            repo_id=self.config.repo_id,
-            repo_type="dataset",
-        )
+        for config_name in self.config.configs:
+            logger.info(f"Building DatasetDict for config '{config_name}'...")
+            dd = self.build_dataset_dict(config_name)
+
+            for split_name, ds in dd.items():
+                logger.info(f"  {config_name}/{split_name}: {ds.num_rows} rows")
+
+            if dry_run:
+                logger.info(f"DRY RUN: would push config '{config_name}'")
+                continue
+
+            dd.push_to_hub(
+                self.config.repo_id,
+                config_name=config_name,
+                max_shard_size=self.config.max_shard_size,
+                token=self.config.token,
+                private=self.config.private,
+            )
+
+        if not dry_run:
+            self._upload_auxiliary(api)
+            # Upload README
+            readme = self.config.dataset_dir / "README.md"
+            if readme.exists():
+                api.upload_file(
+                    path_or_fileobj=str(readme),
+                    path_in_repo="README.md",
+                    repo_id=self.config.repo_id,
+                    repo_type="dataset",
+                )
 
         url = f"https://huggingface.co/datasets/{self.config.repo_id}"
-        logger.info(f"Upload complete: {url}")
-        return url
+        return None if dry_run else url
+
+    def _upload_auxiliary(self, api) -> None:
+        """Upload auxiliary label tables to the hub.
+
+        Uploads strokes.parquet and measures.parquet from the labels directory
+        to the ``auxiliary/`` directory on the hub.
+
+        Args:
+            api: HfApi instance to use for uploading.
+        """
+        labels_dir = self.config.dataset_dir / "labels"
+        for filename in ["strokes.parquet", "measures.parquet"]:
+            src = labels_dir / filename
+            if src.exists():
+                api.upload_file(
+                    path_or_fileobj=str(src),
+                    path_in_repo=f"auxiliary/{filename}",
+                    repo_id=self.config.repo_id,
+                    repo_type="dataset",
+                )
 
 
 def prepare_hf_structure(
