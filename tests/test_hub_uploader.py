@@ -309,3 +309,192 @@ class TestDatasetUploaderHelpers:
         assert uploader.stats.test_samples == 1
         assert uploader.stats.audio_files == 4
         assert uploader.stats.midi_files == 4
+
+
+class TestBuildDatasetDict:
+    """Tests for DatasetUploader.build_dataset_dict method."""
+
+    @pytest.fixture
+    def sample_dataset(self, tmp_path):
+        """Create a minimal dataset structure for testing build_dataset_dict.
+
+        Creates 4 samples across 3 profiles:
+        - p1 has 2 samples (train split)
+        - p2 has 1 sample (val split)
+        - p3 has 1 sample (test split)
+        """
+        # Create labels directory
+        labels_dir = tmp_path / "labels"
+        labels_dir.mkdir()
+
+        # Create samples parquet with rudiment_slug and media paths
+        samples_df = pd.DataFrame(
+            {
+                "sample_id": ["s1", "s2", "s3", "s4"],
+                "profile_id": ["p1", "p1", "p2", "p3"],
+                "rudiment_slug": [
+                    "single_stroke_roll",
+                    "double_stroke_roll",
+                    "single_stroke_roll",
+                    "paradiddle",
+                ],
+                "tempo_bpm": [120, 140, 100, 160],
+                "skill_tier": ["beginner", "intermediate", "advanced", "professional"],
+                "audio_path": [
+                    "audio/single_stroke_roll/s1.flac",
+                    "audio/double_stroke_roll/s2.flac",
+                    "audio/single_stroke_roll/s3.flac",
+                    "audio/paradiddle/s4.flac",
+                ],
+                "midi_path": [
+                    "midi/single_stroke_roll/s1.mid",
+                    "midi/double_stroke_roll/s2.mid",
+                    "midi/single_stroke_roll/s3.mid",
+                    "midi/paradiddle/s4.mid",
+                ],
+            }
+        )
+        samples_df.to_parquet(labels_dir / "samples.parquet")
+
+        # Create exercises parquet with scores
+        exercises_df = pd.DataFrame(
+            {
+                "sample_id": ["s1", "s2", "s3", "s4"],
+                "timing_accuracy": [70.0, 80.0, 85.0, 95.0],
+                "overall_score": [72.0, 82.0, 84.0, 93.0],
+            }
+        )
+        exercises_df.to_parquet(labels_dir / "exercises.parquet")
+
+        # Create splits.json
+        splits = {
+            "train_profile_ids": ["p1"],
+            "val_profile_ids": ["p2"],
+            "test_profile_ids": ["p3"],
+        }
+        with open(tmp_path / "splits.json", "w") as f:
+            json.dump(splits, f)
+
+        # Create actual audio files (fake bytes) in rudiment subdirectories
+        for slug, filename in [
+            ("single_stroke_roll", "s1.flac"),
+            ("double_stroke_roll", "s2.flac"),
+            ("single_stroke_roll", "s3.flac"),
+            ("paradiddle", "s4.flac"),
+        ]:
+            audio_dir = tmp_path / "audio" / slug
+            audio_dir.mkdir(parents=True, exist_ok=True)
+            (audio_dir / filename).write_bytes(b"fake audio data for " + filename.encode())
+
+        # Create actual MIDI files (fake bytes) in rudiment subdirectories
+        for slug, filename in [
+            ("single_stroke_roll", "s1.mid"),
+            ("double_stroke_roll", "s2.mid"),
+            ("single_stroke_roll", "s3.mid"),
+            ("paradiddle", "s4.mid"),
+        ]:
+            midi_dir = tmp_path / "midi" / slug
+            midi_dir.mkdir(parents=True, exist_ok=True)
+            (midi_dir / filename).write_bytes(b"fake midi data for " + filename.encode())
+
+        return tmp_path
+
+    def test_build_labels_only_dataset_dict(self, sample_dataset):
+        """labels_only config returns DatasetDict with correct splits and no media columns."""
+        from datasets import DatasetDict
+
+        config = HubConfig(dataset_dir=sample_dataset, repo_id="test/repo")
+        uploader = DatasetUploader(config)
+
+        dd = uploader.build_dataset_dict("labels_only")
+
+        # Returns a DatasetDict
+        assert isinstance(dd, DatasetDict)
+
+        # Has correct split names
+        assert set(dd.keys()) == {"train", "validation", "test"}
+
+        # Correct row counts: p1 has 2 samples (train), p2 has 1 (val), p3 has 1 (test)
+        assert len(dd["train"]) == 2
+        assert len(dd["validation"]) == 1
+        assert len(dd["test"]) == 1
+
+        # Has expected metadata columns
+        assert "sample_id" in dd["train"].column_names
+        assert "overall_score" in dd["train"].column_names
+
+        # No media columns
+        assert "audio" not in dd["train"].column_names
+        assert "midi" not in dd["train"].column_names
+
+    def test_build_midi_only_dataset_dict(self, sample_dataset):
+        """midi_only config has midi column (bytes) but no audio column."""
+        config = HubConfig(dataset_dir=sample_dataset, repo_id="test/repo")
+        uploader = DatasetUploader(config)
+
+        dd = uploader.build_dataset_dict("midi_only")
+
+        # Has midi column
+        assert "midi" in dd["train"].column_names
+
+        # No audio column
+        assert "audio" not in dd["train"].column_names
+
+        # MIDI data is bytes
+        midi_val = dd["train"][0]["midi"]
+        assert isinstance(midi_val, bytes)
+        assert len(midi_val) > 0
+
+    def test_build_audio_dataset_dict(self, sample_dataset):
+        """audio config has both audio and midi columns."""
+        from datasets import Audio as AudioFeature
+
+        config = HubConfig(dataset_dir=sample_dataset, repo_id="test/repo")
+        uploader = DatasetUploader(config)
+
+        dd = uploader.build_dataset_dict("audio")
+
+        # Has both audio and midi columns
+        assert "audio" in dd["train"].column_names
+        assert "midi" in dd["train"].column_names
+
+        # Audio column is typed as Audio feature
+        assert isinstance(dd["train"].features["audio"], AudioFeature)
+
+        # MIDI data is bytes (access column directly to avoid triggering audio decode)
+        midi_val = dd["train"]["midi"][0]
+        assert isinstance(midi_val, bytes)
+
+    def test_metadata_columns_present(self, sample_dataset):
+        """All expected metadata and score columns are present in the output."""
+        config = HubConfig(dataset_dir=sample_dataset, repo_id="test/repo")
+        uploader = DatasetUploader(config)
+
+        dd = uploader.build_dataset_dict("labels_only")
+
+        columns = dd["train"].column_names
+        # Metadata columns from samples
+        assert "sample_id" in columns
+        assert "profile_id" in columns
+        assert "rudiment_slug" in columns
+        assert "tempo_bpm" in columns
+        assert "skill_tier" in columns
+
+        # Score columns from exercises
+        assert "timing_accuracy" in columns
+        assert "overall_score" in columns
+
+    def test_internal_path_columns_excluded(self, sample_dataset):
+        """audio_path and midi_path columns are NOT in the output."""
+        config = HubConfig(dataset_dir=sample_dataset, repo_id="test/repo")
+        uploader = DatasetUploader(config)
+
+        # Check all three config types
+        for config_name in ["labels_only", "midi_only", "audio"]:
+            dd = uploader.build_dataset_dict(config_name)
+            for split_name in ["train", "validation", "test"]:
+                columns = dd[split_name].column_names
+                assert (
+                    "audio_path" not in columns
+                ), f"audio_path found in {config_name}/{split_name}"
+                assert "midi_path" not in columns, f"midi_path found in {config_name}/{split_name}"

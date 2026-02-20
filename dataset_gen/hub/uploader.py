@@ -323,6 +323,90 @@ class DatasetUploader:
         action = "Linked" if use_symlinks else "Copied"
         logger.info(f"{action} {count} {extension} files into {dst_base} by rudiment")
 
+    def build_dataset_dict(self, config_name: str):
+        """Build a HuggingFace DatasetDict with embedded binary media data.
+
+        Loads samples and exercises parquet files, merges them, assigns splits,
+        and constructs a DatasetDict with the appropriate columns for the given
+        config type.
+
+        Args:
+            config_name: One of "labels_only", "midi_only", or "audio".
+                - "labels_only": metadata + scores only, no media columns.
+                - "midi_only": metadata + scores + midi column (raw bytes).
+                - "audio": metadata + scores + audio (Audio feature) + midi (raw bytes).
+
+        Returns:
+            DatasetDict with "train", "validation", and "test" splits.
+        """
+        from datasets import Audio, Dataset, DatasetDict
+
+        # Load source data
+        samples_df = pd.read_parquet(self.config.dataset_dir / "labels" / "samples.parquet")
+        exercises_df = pd.read_parquet(self.config.dataset_dir / "labels" / "exercises.parquet")
+
+        with open(self.config.dataset_dir / "splits.json") as f:
+            splits = json.load(f)
+
+        # Merge samples with exercise scores
+        merged_df = self._merge_dataframes(samples_df, exercises_df)
+
+        # Assign splits
+        merged_df["split"] = merged_df["profile_id"].apply(lambda pid: self._get_split(pid, splits))
+
+        # Drop internal filesystem path columns
+        internal_cols = [c for c in ["audio_path", "midi_path"] if c in merged_df.columns]
+
+        # For media configs, we need the paths before dropping them
+        if config_name in ("midi_only", "audio"):
+            midi_paths = merged_df["midi_path"].copy() if "midi_path" in merged_df.columns else None
+        else:
+            midi_paths = None
+
+        if config_name == "audio":
+            audio_paths = (
+                merged_df["audio_path"].copy() if "audio_path" in merged_df.columns else None
+            )
+        else:
+            audio_paths = None
+
+        merged_df = merged_df.drop(columns=internal_cols, errors="ignore")
+
+        # Build per-split datasets
+        split_datasets = {}
+        split_mapping = {"train": "train", "val": "validation", "test": "test"}
+
+        for split_key, split_name in split_mapping.items():
+            mask = merged_df["split"] == split_key
+            split_df = merged_df[mask].drop(columns=["split"]).reset_index(drop=True)
+
+            # Add media columns based on config_name
+            if config_name in ("midi_only", "audio") and midi_paths is not None:
+                split_midi_paths = midi_paths[mask].reset_index(drop=True)
+                split_df["midi"] = split_midi_paths.apply(
+                    lambda p: (
+                        (self.config.dataset_dir / p).read_bytes() if pd.notna(p) and p else None
+                    )
+                )
+
+            if config_name == "audio" and audio_paths is not None:
+                split_audio_paths = audio_paths[mask].reset_index(drop=True)
+                split_df["audio"] = split_audio_paths.apply(
+                    lambda p: str(self.config.dataset_dir / p) if pd.notna(p) and p else None
+                )
+
+            # Convert to HF Dataset using from_dict to avoid large_string
+            # arrow type that pandas produces (Audio cast requires string, not large_string)
+            ds = Dataset.from_dict(split_df.to_dict(orient="list"))
+
+            # Cast audio column to Audio feature type
+            if config_name == "audio" and "audio" in ds.column_names:
+                ds = ds.cast_column("audio", Audio())
+
+            split_datasets[split_name] = ds
+
+        return DatasetDict(split_datasets)
+
     def upload(self, dry_run: bool = False) -> str | None:
         """
         Upload prepared dataset to HuggingFace Hub.
