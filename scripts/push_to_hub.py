@@ -1,26 +1,20 @@
 #!/usr/bin/env python3
 """
-Push SOUSA dataset to HuggingFace Hub.
-======================================
+Push SOUSA dataset to HuggingFace Hub as Parquet shards.
+========================================================
 
-Upload the generated SOUSA dataset to HuggingFace Hub for public distribution.
+Upload the generated SOUSA dataset with embedded audio/MIDI in Parquet format.
 
 Usage:
-    python scripts/push_to_hub.py username/sousa                    # Upload to Hub
-    python scripts/push_to_hub.py username/sousa --dry-run          # Test without upload
-    python scripts/push_to_hub.py username/sousa --no-audio         # Labels + MIDI only
-    python scripts/push_to_hub.py username/sousa --private          # Private repository
+    python scripts/push_to_hub.py zkeown/sousa                       # Upload all configs
+    python scripts/push_to_hub.py zkeown/sousa --dry-run              # Test without upload
+    python scripts/push_to_hub.py zkeown/sousa --configs labels_only  # Labels only (~50MB)
+    python scripts/push_to_hub.py zkeown/sousa --purge                # Clear repo first
 
 Prerequisites:
     1. Install hub dependencies: pip install 'sousa[hub]'
     2. Login to HuggingFace: huggingface-cli login
     3. Generate dataset: python scripts/generate_dataset.py
-
-The script will:
-    1. Prepare the dataset in HuggingFace-compatible format
-    2. Create consolidated parquet files for each split
-    3. Organize audio/MIDI files into rudiment subdirectories
-    4. Upload everything to HuggingFace Hub
 """
 
 import argparse
@@ -28,22 +22,29 @@ import logging
 import sys
 from pathlib import Path
 
-# Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from dataset_gen.hub import HubConfig, DatasetUploader
 
+VALID_CONFIGS = ["audio", "midi_only", "labels_only"]
+
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Push SOUSA dataset to HuggingFace Hub",
+        description="Push SOUSA dataset to HuggingFace Hub as Parquet shards",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python scripts/push_to_hub.py myuser/sousa              # Public upload
-  python scripts/push_to_hub.py myuser/sousa --private    # Private repo
-  python scripts/push_to_hub.py myuser/sousa --dry-run    # Test run
-  python scripts/push_to_hub.py myuser/sousa --no-audio   # Skip audio files
+  python scripts/push_to_hub.py zkeown/sousa                        # All configs
+  python scripts/push_to_hub.py zkeown/sousa --configs labels_only   # Labels only
+  python scripts/push_to_hub.py zkeown/sousa --configs midi_only audio  # MIDI + audio
+  python scripts/push_to_hub.py zkeown/sousa --purge --yes           # Purge without prompt
+  python scripts/push_to_hub.py zkeown/sousa --dry-run               # Test run
+
+Configs:
+  audio        Full dataset with FLAC audio + MIDI bytes + labels (~96GB)
+  midi_only    MIDI bytes + labels, no audio (~2.5GB)
+  labels_only  Pure tabular metadata + scores (~50MB)
 
 Prerequisites:
   pip install 'sousa[hub]'
@@ -53,7 +54,7 @@ Prerequisites:
     parser.add_argument(
         "repo_id",
         type=str,
-        help="HuggingFace repository ID (e.g., username/sousa)",
+        help="HuggingFace repository ID (e.g., zkeown/sousa)",
     )
     parser.add_argument(
         "--dataset-dir",
@@ -61,6 +62,30 @@ Prerequisites:
         type=Path,
         default=Path("output/dataset"),
         help="Path to generated dataset (default: output/dataset)",
+    )
+    parser.add_argument(
+        "--configs",
+        nargs="+",
+        choices=VALID_CONFIGS,
+        default=None,
+        help="Which configs to upload (default: all three)",
+    )
+    parser.add_argument(
+        "--max-shard-size",
+        type=str,
+        default="1GB",
+        help="Max Parquet shard size (default: 1GB)",
+    )
+    parser.add_argument(
+        "--purge",
+        action="store_true",
+        help="Delete all existing files from the repo before upload",
+    )
+    parser.add_argument(
+        "--yes",
+        "-y",
+        action="store_true",
+        help="Skip confirmation prompts",
     )
     parser.add_argument(
         "--token",
@@ -75,25 +100,9 @@ Prerequisites:
         help="Make the repository private",
     )
     parser.add_argument(
-        "--no-audio",
-        action="store_true",
-        help="Skip audio files (upload labels and MIDI only)",
-    )
-    parser.add_argument(
-        "--no-midi",
-        action="store_true",
-        help="Skip MIDI files (upload labels and audio only)",
-    )
-    parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Prepare files but don't upload (for testing)",
-    )
-    parser.add_argument(
-        "--staging-dir",
-        type=Path,
-        default=None,
-        help="Custom staging directory for HF format",
+        help="Build DatasetDicts but don't upload (for testing)",
     )
     parser.add_argument(
         "--quiet",
@@ -121,83 +130,69 @@ Prerequisites:
     labels_dir = args.dataset_dir / "labels"
     if not labels_dir.exists():
         logger.error(f"Labels directory not found: {labels_dir}")
-        logger.error("Dataset appears incomplete")
         sys.exit(1)
 
-    # Check for dataset card
-    readme = args.dataset_dir / "README.md"
-    if not readme.exists():
-        logger.warning("No README.md (dataset card) found in dataset directory")
-        logger.warning("Consider creating one for better discoverability on HuggingFace")
-
-    # Check for HuggingFace dependencies
+    # Check dependencies
     try:
         import huggingface_hub  # noqa: F401
+        import datasets  # noqa: F401
     except ImportError:
-        logger.error("huggingface_hub not installed")
+        logger.error("Required packages not installed")
         logger.error("Install with: pip install 'sousa[hub]'")
         sys.exit(1)
 
-    # Configure upload
+    configs = args.configs or VALID_CONFIGS
+
+    # Print plan
+    print("\n" + "=" * 60)
+    print("HUGGINGFACE HUB UPLOAD (Parquet)")
+    print("=" * 60)
+    print(f"\nRepository: {args.repo_id}")
+    print(f"Visibility: {'Private' if args.private else 'Public'}")
+    print(f"Source:     {args.dataset_dir}")
+    print(f"Configs:    {', '.join(configs)}")
+    print(f"Shard size: {args.max_shard_size}")
+    if args.purge:
+        print("Purge:      YES - will delete all existing files first")
+    if args.dry_run:
+        print("Mode:       DRY RUN (no actual upload)")
+    print("=" * 60 + "\n")
+
+    # Confirm purge
+    if args.purge and not args.dry_run and not args.yes:
+        response = input(f"This will DELETE all files from {args.repo_id}. Continue? [y/N] ")
+        if response.lower() != "y":
+            print("Aborted.")
+            sys.exit(0)
+
+    # Configure and upload
     config = HubConfig(
         dataset_dir=args.dataset_dir,
         repo_id=args.repo_id,
         token=args.token,
         private=args.private,
-        include_audio=not args.no_audio,
-        include_midi=not args.no_midi,
-        staging_dir=args.staging_dir,
+        configs=configs,
+        max_shard_size=args.max_shard_size,
     )
 
-    # Print plan
-    print("\n" + "=" * 60)
-    print("HUGGINGFACE HUB UPLOAD")
-    print("=" * 60)
-    print(f"\nRepository: {config.repo_id}")
-    print(f"Visibility: {'Private' if config.private else 'Public'}")
-    print(f"\nSource: {config.dataset_dir}")
-    print("\nContent:")
-    print("  Labels (parquet): Yes")
-    print(f"  Audio files:      {'Yes' if config.include_audio else 'No'}")
-    print(f"  MIDI files:       {'Yes' if config.include_midi else 'No'}")
-    if args.dry_run:
-        print("\nMode: DRY RUN (no actual upload)")
-    print("=" * 60 + "\n")
-
-    # Execute upload
     uploader = DatasetUploader(config)
 
     try:
-        # Prepare staging directory
-        logger.info("Preparing HuggingFace format...")
+        url = uploader.upload(dry_run=args.dry_run, purge=args.purge)
+
         if args.dry_run:
-            # Skip media copy for dry-run to avoid duplicating 96GB of files
-            staging_dir = uploader.prepare(skip_media_copy=True)
+            print("\nDRY RUN complete. No files were uploaded.")
+            print("Remove --dry-run to upload for real.")
         else:
-            # Use symlinks to avoid duplicating large files
-            staging_dir = uploader.prepare(skip_media_copy=False, use_symlinks=True)
-        print(f"\nStaging directory: {staging_dir}")
-        print(uploader.stats.summary())
-
-        if args.dry_run:
-            print(f"\nDRY RUN complete. Parquet files prepared in: {staging_dir}")
-            print("Audio/MIDI files were counted but not copied.")
-            print("Media will be organized into rudiment subdirectories on real upload.")
-            print("To upload for real, remove --dry-run flag")
-            return
-
-        # Upload
-        logger.info("Uploading to HuggingFace Hub...")
-        url = uploader.upload(dry_run=False)
-
-        print("\n" + "=" * 60)
-        print("UPLOAD COMPLETE")
-        print("=" * 60)
-        print(f"\nDataset URL: {url}")
-        print("\nYou can now load the dataset with:")
-        print("  from datasets import load_dataset")
-        print(f'  dataset = load_dataset("{args.repo_id}")')
-        print("=" * 60)
+            print("\n" + "=" * 60)
+            print("UPLOAD COMPLETE")
+            print("=" * 60)
+            print(f"\nDataset URL: {url}")
+            print("\nLoad the dataset:")
+            print(f'  ds = load_dataset("{args.repo_id}")               # audio (default)')
+            print(f'  ds = load_dataset("{args.repo_id}", "midi_only")  # MIDI + labels')
+            print(f'  ds = load_dataset("{args.repo_id}", "labels_only") # labels only')
+            print("=" * 60)
 
     except Exception as e:
         logger.error(f"Upload failed: {e}")
