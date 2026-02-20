@@ -2,314 +2,322 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://zakkeown.github.io/SOUSA/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/LIMITATIONS/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/api/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/api/audio-aug/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/api/audio-synth/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/api/labels/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/api/midi-gen/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/api/pipeline/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/api/profiles/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/api/rudiments/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/api/validation/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/contributing/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/examples/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/examples/feature-extraction/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/examples/filtering/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/examples/hierarchical-labels/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/examples/pytorch-dataloader/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/getting-started/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/getting-started/installation/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/getting-started/loading/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/getting-started/quickstart/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/plans/2026-02-19-huggingface-publish-design/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/plans/2026-02-19-huggingface-publish-plan/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
+    </url>
+    <url>
+         <loc>https://zakkeown.github.io/SOUSA/plans/2026-02-20-parquet-hub-migration-design/</loc>
+         <lastmod>2026-02-20</lastmod>
+    </url>
+    <url>
+         <loc>https://zakkeown.github.io/SOUSA/plans/2026-02-20-parquet-hub-migration-plan/</loc>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/reference/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/reference/architecture/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/reference/audio-processing/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/reference/data-format/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/reference/rudiment-schema/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/reference/score-computation/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/01_single_stroke_roll/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/02_single_stroke_four/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/03_single_stroke_seven/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/04_multiple_bounce_roll/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/05_triple_stroke_roll/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/06_double_stroke_open_roll/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/07_five_stroke_roll/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/08_six_stroke_roll/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/09_seven_stroke_roll/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/10_nine_stroke_roll/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/11_ten_stroke_roll/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/12_eleven_stroke_roll/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/13_thirteen_stroke_roll/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/14_fifteen_stroke_roll/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/15_seventeen_stroke_roll/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/16_single_paradiddle/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/17_double_paradiddle/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/18_triple_paradiddle/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/19_paradiddle_diddle/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/20_flam/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/21_flam_accent/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/22_flam_tap/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/23_flamacue/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/24_flam_paradiddle/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/25_single_flammed_mill/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/26_flam_paradiddle_diddle/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/27_pataflafla/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/28_swiss_army_triplet/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/29_inverted_flam_tap/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/30_flam_drag/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/31_drag/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/32_single_drag_tap/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/33_double_drag_tap/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/34_lesson_25/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/35_single_dragadiddle/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/36_drag_paradiddle_1/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/37_drag_paradiddle_2/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/38_single_ratamacue/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/39_double_ratamacue/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/40_triple_ratamacue/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/_conventions/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/_index/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/specs/rudiments/_template/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/user-guide/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/user-guide/augmentation/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/user-guide/filtering/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/user-guide/generation/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/user-guide/ml-training/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
     <url>
          <loc>https://zakkeown.github.io/SOUSA/user-guide/validation/</loc>
-         <lastmod>2026-02-19</lastmod>
+         <lastmod>2026-02-20</lastmod>
     </url>
 </urlset>
